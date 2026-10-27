@@ -1,0 +1,2022 @@
+[
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority\nCompliance and Risk Management \nRulebook \n19 May 2025",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 1,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n2 \nContents \nINTRODUCTION .................................................................................................................................................................... 5 \nI. PART I – COMPLIANCE MANAGEMENT .................................................................................................... 6 \nA. General principles ..................................................................................................................................................................... 6",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 2,
+    "section": "A. General principles ...........................................",
+    "chunk_index": 0
+  },
+  {
+    "text": "B. Compliance management system..................................................................................................................................... 7 \nC. Duties of the Compliance Officer ..................................................................................................................................... 8 \nD. Risk management...................................................................................................................................................................... 9 \nE. Operation management ..................................................................................................................................................... 15",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 2,
+    "section": "B. Compliance management system..................................",
+    "chunk_index": 1
+  },
+  {
+    "text": "F. Books and records ................................................................................................................................................................. 16 \nG. Audit ............................................................................................................................................................................................. 17 \nH. Regulatory reporting ............................................................................................................................................................ 18 \nI. Regulatory notifications ..................................................................................................................................................... 19",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 2,
+    "section": "F. Books and records ............................................",
+    "chunk_index": 2
+  },
+  {
+    "text": "J. Staff management and training ..................................................................................................................................... 20 \nII. PART II – TAX REPORTING AND COMPLIANCE ...................................................................................22 \nIII. PART III – ANTI-MONEY LAUNDERING AND COMBATING THE FINANCING OF \nTERRORISM ...........................................................................................................................................................23 \nA. Appointment and duties of Money Laundering Reporting Officer ............................................................. 23",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 2,
+    "section": "J. Staff management and training ................................",
+    "chunk_index": 3
+  },
+  {
+    "text": "A. Appointment and duties of Money Laundering Reporting Officer ............................................................. 23 \nB. Policies and procedures ...................................................................................................................................................... 24 \nC. AML/CFT controls ................................................................................................................................................................ 26 \nD. Risk assessments ................................................................................................................................................................... 26",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 2,
+    "section": "A. Appointment and duties of Money Laundering Reporting Officer .",
+    "chunk_index": 4
+  },
+  {
+    "text": "E. Client due diligence ............................................................................................................................................................... 28 \nF. Suspicious Transaction monitoring and reporting .............................................................................................. 31 \nG. FATF Travel Rule ................................................................................................................................................................... 32 \nH. Compliance with targeted financial sanctions ........................................................................................................ 34",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 2,
+    "section": "E. Client due diligence .........................................",
+    "chunk_index": 5
+  },
+  {
+    "text": "I. Record keeping ........................................................................................................................................................................ 35",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 2,
+    "section": "I. Record keeping ...............................................",
+    "chunk_index": 6
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n3 \nJ. Enforcement ............................................................................................................................................................................. 36 \nIV. PART IV – CLIENT MONEY RULES ..............................................................................................................37 \nA. Application and Interpretation ....................................................................................................................................... 37",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 3,
+    "section": "J. Enforcement ..................................................",
+    "chunk_index": 0
+  },
+  {
+    "text": "B. Treatment of Client Money .............................................................................................................................................. 37 \nC. Third-Party Bank ................................................................................................................................................................... 40 \nD. Disclosure, reporting and audit requirements........................................................................................................ 41 \nE. Reconciliation ........................................................................................................................................................................... 42",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 3,
+    "section": "B. Treatment of Client Money ....................................",
+    "chunk_index": 1
+  },
+  {
+    "text": "F. Failure to comply .................................................................................................................................................................... 43 \nV. PART V – CLIENT VIRTUAL ASSETS RULES...........................................................................................44 \nA. Application and Interpretation ....................................................................................................................................... 44 \nB. Treatment of Client VAs .................................................................................................................................................... 44",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 3,
+    "section": "F. Failure to comply ............................................",
+    "chunk_index": 2
+  },
+  {
+    "text": "C. Proof of reserves .................................................................................................................................................................... 45 \nD. Reconciliation ........................................................................................................................................................................... 45 \nVI. PART VI – ANTI-BRIBERY AND CORRUPTION .....................................................................................46 \nA. General principles .................................................................................................................................................................. 46",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 3,
+    "section": "C. Proof of reserves ............................................",
+    "chunk_index": 3
+  },
+  {
+    "text": "B. No corrupt payments ........................................................................................................................................................... 47 \nC. Investigation and reporting .............................................................................................................................................. 47 \nD. Information and trainings.................................................................................................................................................. 48 \nE. Responsibility for the policy ............................................................................................................................................. 49",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 3,
+    "section": "B. No corrupt payments ..........................................",
+    "chunk_index": 4
+  },
+  {
+    "text": "F. Consequences of breach .................................................................................................................................................... 49 \nVII. PART VII – SPONSORED VASPS ..................................................................................................................50 \nA. Interpretation........................................................................................................................................................................... 50 \nB. Requirement to obtain prior approval ........................................................................................................................ 50",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 3,
+    "section": "F. Consequences of breach .......................................",
+    "chunk_index": 5
+  },
+  {
+    "text": "C. Application process ............................................................................................................................................................... 50 \nD. Establishing a Sponsored VASP relationship ......................................................................................................... 51 \nE. Regulatory status, marketing and disclosures ....................................................................................................... 52",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 3,
+    "section": "C. Application process ..........................................",
+    "chunk_index": 6
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n4 \nF. Compliance responsibility .................................................................................................................................................. 52 \nG. Responsible Officer ............................................................................................................................................................... 53 \nH. Capital and prudential requirements ........................................................................................................................... 54",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 4,
+    "section": "F. Compliance responsibility ....................................",
+    "chunk_index": 0
+  },
+  {
+    "text": "I. Accounts ..................................................................................................................................................................................... 54 \nJ. Complaints handling requirements .............................................................................................................................. 55 \nK. Governance and reporting responsibilities .............................................................................................................. 55 \nSCHEDULE 1 – DEFINITIONS ........................................................................................................................................57",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 4,
+    "section": "I. Accounts .....................................................",
+    "chunk_index": 1
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n5 \nIntroduction \nThe Dubai Virtual Assets Regulatory Authority (\"VARA\") was established and authorised by Law No. \n(4) of 2022 Regulating Virtual Assets in the Emirate of Dubai  (\"Dubai VA Law \") to regulate Virtual \nAsset Service Providers (\"VASPs\").  \nThis Compliance and Risk Management Rulebook is issued pursuant to, and forms part of, the Virtual \nAssets and Related Activities Regulations 2023, as may be amended from time to time (\"Regulations\"), \nissued by VARA, and applies to all VASPs Licensed by VARA to carry out any VA Activity in the Emirate.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 5,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "issued by VARA, and applies to all VASPs Licensed by VARA to carry out any VA Activity in the Emirate.  \nThis Compliance and Risk Management Rulebook applies in addition to all other requirements in the \nRegulations as may be in force from time to time. As such, VASPs Licensed by VARA to carry out any \nVA Activity must also comply with the following Rulebooks applicable to all VASPs— \n• Company Rulebook; \n• Technology and Information Rulebook;  \n• Market Conduct Rulebook; and \n• All Rulebooks specific to the VA Activities that a VASP is Licensed by VARA to carry out. \nCapitalised terms in this Compliance and Risk Management Rulebook have the meanings ascribed to \nthem in the Regulations or as otherwise defined herein or provided in Schedule 1.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 5,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "them in the Regulations or as otherwise defined herein or provided in Schedule 1. \nUnless otherwise stated, all requirements in this Compliance and Risk Management Rulebook are Rules \nand have binding effect.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 5,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n6 \nI. Part I – Compliance Management \nIntroduction \nPart I of this Compliance and Risk Management Rulebook sets out— \n• general principles for regulatory compliance; \n• the implementation of a compliance management system including appointing a Compliance \nOfficer (\"CO\");  \n• management, operations and information risk; \n• record keeping and audit; and \n• employee management and training. \nA. General principles \nVASPs shall comply with the spirit of the following principles when conducting all their business \nfrom or through, or servicing the Emirate, including all VA Activities.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 6,
+    "section": "I. Part I – Compliance Management",
+    "chunk_index": 0
+  },
+  {
+    "text": "from or through, or servicing the Emirate, including all VA Activities. \n1. Integrity – honesty and fairness: VASPs should act truthfully, justly and equitably, in good faith \nserving the best interests of their clients, yet at all times preserving market integrity. \n2. Diligence: VASPs should act with due skill, care and diligence reasonably expected of a VASP of \na similar nature and/or catering to a similar activity.  \n3. Capabilities: VASPs should have, and effectively employ necessary resources (financial, technical \nor otherwise) and procedures for the sound, effective and efficient operation of their business, \nincluding VA Activities.  \n4. Client assets: VASPs should ensure that client assets are promptly and properly accounted for, \nand adequately safeguarded.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 6,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "4. Client assets: VASPs should ensure that client assets are promptly and properly accounted for, \nand adequately safeguarded. \n5. Effective disclosures: VASPs should ensure that any disclosure is clear, concise and effective, and \ncontains information necessary for their clients to make an informed decision and be kept up -\nto-date. VASPs should dispatch information in a timely manner if ongoing disclosure is required \nby relevant authorities, including VARA , or under any fiduciary duty owed by VASPs to their \nclients. \n6. Compliance: VASPs should devise effective strategies to ensure ongoing compliance with— \na. all legal and regulatory requirements (including any conditions in respect of a Licence ) \napplicable to the conduct of their business, including VA Activities; and",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 6,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n7 \nb. their own constitutional documents, internal policies and controls,  \nso as to promote the best interests of their clients and for promoting the integrity of the market.  \n7. Dealings with regulators. VASPs should act in an open and transparent manner with regulators \nat all times, including VARA.  \n \nB. Compliance management system  \n1. VASPs shall establish and maintain an effective compliance management system (\"CMS\") \nwhich— \na. covers all relevant aspects of the ir operations, including the unfettered access to \nnecessary records and documentation by the Board and relevant Staff;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 7,
+    "section": "B. Compliance management system",
+    "chunk_index": 0
+  },
+  {
+    "text": "necessary records and documentation by the Board and relevant Staff; \nb. is independent of all operational and business functions; \nc. ensures that the CO is notified of any material non-compliance promptly;  \nd. comprises technical competence, resources (including financial and non -financial) and \nexperience necessary for the performance of their functions; and \ne. comprises a testing and monitoring program me that is risk -based and designed to \nregularly select and review different areas of the business and analyse key performance \nand risk indicators, \nin order to allow them to identify potential compliance violations and to ensure that they comply \nwith all applicable laws and regulatory requirements , and their own internal policies and \nprocedures at all times.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 7,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "with all applicable laws and regulatory requirements , and their own internal policies and \nprocedures at all times.  \n2. The CO shall ultimately be responsible for establishing and administering the CMS, and notifying \nVARA and other relevant authorities of the occurrence of any material non -compliance by the \nVASP, its Board or its Staff with applicable legal and regulatory requirements. \n3. VASPs shall establish, maintain and enforce clear and detailed compliance policies and \nprocedures to enable all Staff and the Board to— \na. comply with all applicable legal and regulatory requirements at all times, including all \nconditions in respect of a Licence, record keeping, business practices, AML/CFT, and \ncompliance with relevant client, proprietary and Staff dealing requirements;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 7,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n8 \nb. ensure that client complaints are handled properly with appropriate remedial action. \nComplaints should be handled and investigated by Staff who are not directly involved in \nthe subject matter of the complaint; and \nc. have access to all necessary information required to perform a business transaction. \n4. The CMS and the compliance policies and procedures shall be reviewed and updated from time \nto time to ensure that they are aligned with the changing business and regulatory landscape \napplicable to the global Virtual Asset sector.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 8,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "to time to ensure that they are aligned with the changing business and regulatory landscape \napplicable to the global Virtual Asset sector.  \n5. VASPs shall ensure that all Staff performing compliance functions are Fit and Proper Persons \nand possess the necessary skills, qualifications and experience for their roles. \n6. To the extent that VASP s carry out any VA Activities or similar business activities anywhere \nother than the Emirate, VASPs shall comply with all applicable laws and regulatory requirements \nin any jurisdiction in which they carry out such VA Activities or similar business activities. \n \nC. Duties of the Compliance Officer \n1. VASPs shall appoint a CO who—  \na. possesses at least five (5) years of relevant experience in a compliance function;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 8,
+    "section": "C. Duties of the Compliance Officer",
+    "chunk_index": 1
+  },
+  {
+    "text": "1. VASPs shall appoint a CO who—  \na. possesses at least five (5) years of relevant experience in a compliance function; \nb. is a Fit and Proper Person as approved by VARA; \nc. is a resident in the UAE or holds a UAE passport; \nd. is a full-time employee of the VASP; and \ne. reports directly to the Board. \nSuch appointment shall be reviewed annually to ensure that the CO remains a Fit and Proper \nPerson capable of discharging all relevant duties. VARA has the sole discretion to request a \nVASP to provide such evidence as VARA may require which shows that the above requirements \nare satisfied.  \n2. The CO shall be responsible for— \na. ensuring Staff, including Senior Management, are properly and adequately trained in",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 8,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "are satisfied.  \n2. The CO shall be responsible for— \na. ensuring Staff, including Senior Management, are properly and adequately trained in \nrespect of their understanding and compliance with all applicable laws and regulatory \nrequirements, including those relating to consumer protection and AML/CFT;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 8,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n9 \nb. developing and implementing compliance policies and procedures, including a Business \nContinuity and Disaster Recovery Plan (\"BCDR Plan\") as required in the Technology and \nInformation Rulebook; \nc. assessing emerging issues and risks; \nd. reporting compliance activities and compliance audits to the Board; and \ne. if necessary, ensuring appropriate corrective action s are taken in response to \ndeficiencies in the CMS and/or non -compliance with any applicable laws or regulatory \nrequirements. \n3. Compliance activities may be delegated to appropriate professionals, provided that—",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 9,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "requirements. \n3. Compliance activities may be delegated to appropriate professionals, provided that— \na. the CO shall continue to be held accountable for all responsibilities and obligations in \nrelation to the implementation of the CMS; and \nb. all applicable requirements in the Company Rulebook, including Outsourcing \nmanagement requirements, are complied with.  \n4. Subject to relevant requirements in the Company Rulebook and if deemed appropriate by the \nVASP, the CO may hold more than one (1) non-client facing role within the VASP, provided such \nroles do not create conflicting duties , including but not limited to , the Money Laundering \nReporting Officer (\"MLRO\") and the head of the risk function. VARA will take into account other",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 9,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "Reporting Officer (\"MLRO\") and the head of the risk function. VARA will take into account other \nroles held by the CO in determining whether the individual is a Fit and Proper Person. \n \nD. Risk management \n1. VASPs shall establish and maintain— \na. an effective risk management function;  \nb. policies and procedures; and  \nc. risk measurement and reporting methodologies, \neach commensurate with the nature, size, complexity, and risk profile of the VASP in order to \nidentify, measure, quantify, manage and monitor the risks, whether financial, technological or \notherwise, to which they are or may be exposed. Such policies and procedures should be followed \nstrictly to ensure that risks are maintained at acceptable and appropriate levels.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 9,
+    "section": "D. Risk management",
+    "chunk_index": 2
+  },
+  {
+    "text": "strictly to ensure that risks are maintained at acceptable and appropriate levels.  \n2. The risk management function should consist of a sufficient number of suitably qualified and \nexperienced Staff. The head of the risk function of a VASP must have the appropriate",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 9,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n10 \nqualifications and authority to oversee and monitor the overall risk exposures of the VASP. The \nCO may also be the head of the risk function. If the head of the risk function is a separate \nindividual from the CO, the head of the risk function must also report directly to the Board of \nthe VASP. \n3. The Board shall ensure that the risk management policies are subject to ongoing comprehensive \nreview, particularly when there is a material change in the VASP’s business, operations or Senior \nManagement or Staff, or to the market conditions and applicable laws and regulations that may",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 10,
+    "section": "P. The",
+    "chunk_index": 0
+  },
+  {
+    "text": "Management or Staff, or to the market conditions and applicable laws and regulations that may \naffect the risk exposure of the VASP.  \n4. The head of the risk function of a VASP shall submit risk exposure reports to the Board  which \nidentify and report all actual or potential risks. Such reports must be submitted to the Board at \nleast once every quarter, or more frequently if required for the VASP to address a specific risk \nwhich has been identified.  \n5. The effectiveness of the risk management policy of each VASP will depend on the types of risks \nassociated with the VASP and its business operations, including the VA Activities it carries out. \nThe key types of risks that must be considered by all VASPs, and reported in the risk exposure",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 10,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "The key types of risks that must be considered by all VASPs, and reported in the risk exposure \nreports under Rule I.D.4 of this Compliance and Risk Management Rulebook above, to the extent \nthey are applicable, and the mitigating measures which must be adopted for each type of risk  \ninclude, but are not limited to— \na. Financial stability risks. \ni. Financial soundness: Risk s arising when a VASP lacks the necessary capital , \nliquidity or reserves to run operations (both in the going -concern and wind -\ndown scenario) and meet all commitments to its clients, including but not limited \nto when a VASP is likely to be unable to comply with  any of its  Capital and \nPrudential Requirements in the Company Rulebook.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 10,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "to when a VASP is likely to be unable to comply with  any of its  Capital and \nPrudential Requirements in the Company Rulebook.  \nii. Market risk: Risks arising from the type and nature of market risk undertaken \nby the VASP (e.g. the nature of market risk exposure of the VASP’s services and",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 10,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n11 \nVA Activities). In relation to such risks, VASPs shall adopt mitigating measures \nincluding but not limited to— \n1. regular control techniques to monitor market risks, including \nconducting regular reviews of financial statements and the value of their \nVirtual Asset holdings; and  \n2. establish and maintain effective risk management measures to quantify \nthe impact of changing market conditions on themselves and their \nclients. Factors to be considered include— \n(a) unspecified adverse market movements  (including but \nnot limited to 'flash crashes', catastrophic risk or tail",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 11,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "(a) unspecified adverse market movements  (including but \nnot limited to 'flash crashes', catastrophic risk or tail \nevents), by using an appropriate value-at-risk model or \nother methodology to estimate potential loss;  \n(b) individual market factors, to measure the sensitivity of \nthe VASP’s risk exposure to specific market risk factors; \nand \n(c) stress testing, determining the effect of material \nchanges in market conditions (whether or not specific \nto Virtual Asset markets) on the VASP using \nquantitative and qualitative variable assumptions.  \niii. Credit risks: Risks arising from the type and nature of credit risk undertaken by \nthe VASP (e.g. the nature and level of credit risk exposure of the VASP’s services",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 11,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "the VASP (e.g. the nature and level of credit risk exposure of the VASP’s services \nand VA Activities ). In relation to such risk s, VASP s shall adopt mitigating \nmeasures, at both an individual account and consolidated account  level, \nincluding but not limited to— \n1. establish and maintain an effective credit rating system to evaluate the \ncreditworthiness of their clients and counterparties;  \n2. adopt clearly defined objective measures to evaluate potential clients \nand counterparties and to determine or review the relevant credit \nratings which are used to set appropriate credit , trading and position",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 11,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n12 \nlimits for all clients  and counterparties, which shall be enforced at all \ntimes;  \n3. use appropriate quantitative risk measurement methodologies to \neffectively calculate and monitor the credit exposure of VASP in relation \nto clients and counterparties, including pre-settlement credit exposures \nand settlement risks. Credit risks posed by all clients and counterparties \nbelonging to the same group of Entities can be aggregated for the \npurpose of measuring the credit exposure of the VASP; \n4. if applicable in respect of the VA Activities of the VASP, establish and",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 12,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "purpose of measuring the credit exposure of the VASP; \n4. if applicable in respect of the VA Activities of the VASP, establish and \nmaintain all policies in respect of margin required under any Rulebook, \nwhich notwithstanding all other requirements in those Rulebooks \nshould include— \n(a) the types of margin which may be called, the applicable \nmargin rates and the method of calculating the margin;  \n(b) the acceptable methods of margin payment and forms \nof collateral;  \n(c) the circumstances under which a client or counterparty \nmay be required to provide margin and additional \nmargin, and the consequences of a failure to meet a \nmargin call, including the actions which the VASP may \nbe entitled to take; and \n(d) applicable escalation procedures where a client or",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 12,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "margin call, including the actions which the VASP may \nbe entitled to take; and \n(d) applicable escalation procedures where a client or \ncounterparty fails to meet successive margin calls.  \niv. Liquidity risks: Risks arising from the type and nature of the VASP’s liquidity or \nasset and liability mix. In relation to such risk s, VASPs shall adopt mitigating \nmeasures including but not limited to— \n1. enforce concentration limits with respect to particular products, \nmarkets and counterparties, taking into account their liquidity profile \nand the liquidity profile of the VASP;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 12,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n13 \n2. regularly monitor any maturity mismatch between sources and funding \nrequirements and concentrations of individual V irtual Assets, markets \nand counterparties; and \n3. establish clear default procedures to alert relevant Staff and Senior \nManagement to potential liquidity problems and to provide such Staff \nand Senior Management with sufficient time to minimise the impact \nbrought by any client’s or counterparty’s liquidity issues. \nb. Market conduct risks. \ni. Business strategy: Risks arising from the overall strategy and current sources of",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 13,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "b. Market conduct risks. \ni. Business strategy: Risks arising from the overall strategy and current sources of \nbusiness of the VASP (e.g. strategic planning process  and achievability of \nstrategy). \nii. Client onboarding risks: Risks arising from onboarding clients (individuals and \ncorporates). This refers to the level of client due diligence (\"CDD\") applied, such \nas sanction screening, risk rating and watchlist screening. \niii. Organisation and regulation: Risks arising from the structure of a VASP, the \ncharacteristics and nature of responsibilities of UBOs, Board members  and \nSenior Management responsibilities.  \niv. Operational risks: Risks arising from type and nature of operational risk involved \nin the VASP’s activities (e.g. direct or indirect loss from inadequate or failed",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 13,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "in the VASP’s activities (e.g. direct or indirect loss from inadequate or failed \ninternal processes, systems or external events).  \nv. Quality of management & corporate governance: Risks arising from the quality \nof the VASP’s management, the nature of the corporate governance, \nmanagement information and compliance culture , including but not limited to \nnon-compliance with relevant requirements in the Company Rulebook.  \nvi. Relationship with regulators : Risk arising from the nature of the VASP’s \nrelationship with other regulators, including recent regulatory history.  \nvii. Cybersecurity risks: Risks of exposure or loss from a cyber-attack, data, system \nor security breach, including any breach of Personal Data security, not limited to",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 13,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "or security breach, including any breach of Personal Data security, not limited to \nnon-compliance with relevant requirements in the Technology and Information",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 13,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n14 \nRulebook. VASPs must also include all risks relating or the VASP’s reputation in \nsuch events.  \nc. Compliance and risk management risks.  \ni. AML/CFT, market abuse & fraud: Risks arising from the VASP’s susceptibility \nto financial crime risk arising from money laundering, market abuse, terrorism \nfinancing, and fraud, including but not limited to non -compliance with relevant \nrequirements in this Compliance and Risk Management Rulebook. \nii. Outsourcing & counterparty risks: Risk s arising from Outsourcing to third \nparties, developing relationships or dependencies on counterparties in any",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 14,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "parties, developing relationships or dependencies on counterparties in any \ntransactions, including with any Controlling Entity, Group Entity or UBO. \niii. Risk management systems: Risks arising from the nature and effectiveness of \nthe systems and procedures to identify, measure, monitor and control the \nVASP’s risks (e.g. credit risk, insurance underwriting risk, market risk, \noperational risk, legal risk and new product risk).  \niv. Compliance function and arrangements: Risks arising from the nature and \neffectiveness of the compliance function of a VASP. These include its mandate, \nstructure, staffing, methodology, reporting lines and effectiveness.  \nv. Business continuity: risks arising from the effectiveness of business continuity",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 14,
+    "section": "P. These include its mandate,",
+    "chunk_index": 1
+  },
+  {
+    "text": "v. Business continuity: risks arising from the effectiveness of business continuity \narrangements, including but not limited to non -compliance with relevant \nrequirements in this Compliance and Risk Management Rulebook. \nd. Consumer protection risks. \ni. Communications with clients & financial promotions: Risks arising from the \nnature of financial promotion and advertising practices employed by the VASP, \nincluding but not limited to  non-compliance with relevant requirements in the \nMarket Conduct Rulebook.  \nii. Legal risks: Risks arising from the nature of the VASP’s contractual agreements. \niii. Disclosure and reporting: Risks arising from the nature of terms of business, \nperiodic statements and other documentation provided to clients, including but",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 14,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "periodic statements and other documentation provided to clients, including but \nnot limited to non-compliance with relevant requirements in the Market \nConduct Rulebook.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 14,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n15 \niv. Client assets: Risk arising from the VASP holding or controlling of Client Money \nand Client VAs. \n \nE. Operation management \n1. VASPs shall establish and maintain effective operational policies and processes to ensure— \na. they have regular exchange of information with their clients, Group and, where \nappropriate, counterparties; \nb. the integrity of their dealing practices, including the treatment of all clients in a fair, \nhonest and professional manner; \nc. the safeguarding of both their assets and all Virtual Assets (including Client VAs ) in",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 15,
+    "section": "E. Operation management",
+    "chunk_index": 0
+  },
+  {
+    "text": "honest and professional manner; \nc. the safeguarding of both their assets and all Virtual Assets (including Client VAs ) in \naccordance with applicable requirements in this Compliance and Risk Management \nRulebook and the Technology and Information Rulebook;  \nd. the maintenance of proper records and the reliability of the information contained in \nsuch records in accordance with applicable requirements in this Compliance and Risk \nManagement Rulebook; and \ne. the compliance by VASP and all its Staff with all applicable laws and regulatory \nrequirements. \n2. Where a VASP may act on behalf of the client in relation to the operation of an account, it shall \nproperly communicate to the client the necessary procedures and terms and conditions under",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 15,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "properly communicate to the client the necessary procedures and terms and conditions under \nwhich the VASP may act on its behalf in transactions which are consistent with the stated \nobjectives of the client and strictly follow such procedures.  \n3. In addition to applicable requirements in the Market Conduct Rulebook, VASPs shall establish \nand enforce procedures to ensure that there are safeguards against any of their Staff or \nmembers of the Board taking advantage of confidential information or Inside Information.  \n4. In addition to applicable requirements in the Technology and Information Rulebook, VASPs shall \nestablish and maintain robust procedures to protect their Virtual Assets and Client VAs from",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 15,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "establish and maintain robust procedures to protect their Virtual Assets and Client VAs from \ntheft, fraud and /or misappropriation. All Staff and members of the Board should follow all \napplicable internal protocols to acquire, transfer or otherwise dispose of any of the VASP’s \nVirtual Assets and Client VAs in accordance with applicable requirements in this Compliance and \nRisk Management Rulebook and the Technology and Information Rulebook.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 15,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n16 \n5. VASPs shall regularly check all—  \na. records and reports, whether issued by third parties, such as banks,  other VASPs, or \nother virtual asset service providers outside of the Emirate; and  \nb. relevant information recorded on all systems including distributed ledgers, \nand reconcile the above with their internal records for the purpose of identifying any errors, \nomissions or misplacement of assets, including Virtual Assets. \n6. VASPs may establish committees as they deem appropriate in order to ensure compliance with",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 16,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "6. VASPs may establish committees as they deem appropriate in order to ensure compliance with \nall applicable laws and regulatory requirements. VARA may require a VASP, either as a condition \nof granting a Licence or at any stage thereafter, to establish any committee(s) determined by \nVARA as it deems appropriate, and VASPs shall comply with such requirements. \n \nF. Books and records  \n1. VASPs shall keep their books and records properly in their original form or native file format \n(including as recorded on distributed ledgers where appropriate), including— \na. keeping proper audit trails of all transactions, such as the amount, date and time of each \ntransaction, any payment instruction, the total amount of fees and charges, the names,",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 16,
+    "section": "F. Books and records",
+    "chunk_index": 1
+  },
+  {
+    "text": "transaction, any payment instruction, the total amount of fees and charges, the names, \ndetails of accounts or VA Wallet s and country of residence  of the clients and to the \nextent practicable, that of any other Entities involved in the transaction, so as to enable \nthe VASP to carry out thorough investigation of any Suspicious Transactions (subject \nto further requirements set out in Part  III of this Compliance and Risk Management \nRulebook);  \nb. maintaining and organising all information relating to clients produced by third parties; \nc. maintaining sufficient records to prove that the VASP is in compliance with all applicable \nlaws and regulatory requirements, including AML/CFT laws and requirements in Part III \nof this Compliance and Risk Management Rulebook;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 16,
+    "section": "Part  III",
+    "chunk_index": 2
+  },
+  {
+    "text": "laws and regulatory requirements, including AML/CFT laws and requirements in Part III \nof this Compliance and Risk Management Rulebook; \nd. keeping proper records to enable the VASP to carry out an audit in a convenient manner;  \ne. keeping a general ledger containing all assets (including Virtual Assets ), liabilities, \nownership equity, income and expense accounts;  \nf. keeping statements or valuations sent or provided to clients and counterparties; \ng. keeping minutes of meetings of the Board;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 16,
+    "section": "Part III",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n17 \nh. retaining communications and documentation related to investigations of client \ncomplaints and transaction error resolution or concerning facts giving rise to potential \nviolation of laws and regulatory requirements; and \ni. maintaining a conflicts of interest register in accordance with the Company Rulebook. \n2. VASPs shall retain each such record as set out in Rule  I.F.1 of this Compliance and Risk \nManagement Rulebook in accordance with the following timelines— \na. no less than eight (8) years; or \nb. for an indefinite period for all records which may relate to national security of the UAE.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 17,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "a. no less than eight (8) years; or \nb. for an indefinite period for all records which may relate to national security of the UAE.  \n3. VASPs shall furnish copies of any records to VARA in accordance with all applicable \nrequirements in the Regulations, Rules or Directives.  \n \nG. Audit \n1. External audit. \na. VASPs shall appoint an independent third -party auditor to perform an audit of the \nfinancial statements of the VASP in order to make available an annual report , and \npromptly notify VARA of the full name and contact details of the auditor upon \nappointment.  \nb. The annual report of VASPs shall promptly be made available to their clients and VARA \nupon request.  \nc. VASPs should understand the steps taken by the auditor in proving the existence and",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 17,
+    "section": "G. Audit",
+    "chunk_index": 1
+  },
+  {
+    "text": "upon request.  \nc. VASPs should understand the steps taken by the auditor in proving the existence and \nownership of Virtual Assets and ascertaining the reasonableness of the valuation of \nVirtual Assets.  \nd. The accounting information given in the annual report shall be prepared in accordance \nwith generally accepted accounting principles. \ne. If requested, VASPs shall procure relevant counterparties to cooperate with the auditor \nand to provide with the auditor all necessary information for the auditor to conduct the \naudit. \nf. VARA may in its sole and absolute discretion require a VASP to appoint alternative \nauditors if their original auditors are not deemed appropriate for the size and complexity \nof their business and in terms of reputation.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 17,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n18 \n2. Internal audit. \na. VASPs shall, where applicable, establish and maintain an objective internal audit \nfunction which shall be independent of the operational function and submit regular \nreports directly to the Senior Management. \nb. VASPs shall establish and maintain clear policies in defining the role and responsibilities \nof, and the working relationship between, the internal and external auditors. \nc. The internal audit function shall— \ni. perform audit work regularly and at least on a quarterly basis; \nii. inform the Senior Management of findings and recommendations; and",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 18,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "i. perform audit work regularly and at least on a quarterly basis; \nii. inform the Senior Management of findings and recommendations; and  \niii. follow up with and resolve matters or risks highlighted in the relevant reports.  \n \nH. Regulatory reporting \n1. On a monthly basis, VASPs shall as a minimum submit to VARA the following information— \na. their balance sheet and a list of all off-balance sheet items; \nb. their statement of profit and loss; \nc. their income statement; \nd. their cashflow statements;  \ne. addresses of their VA Wallets; \nf. a full list of Entities in their Group that actively invest their own, or the Group’s, portfolio \nin Virtual Assets, and a complete record of all transactions, including but not limited to",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 18,
+    "section": "H. Regulatory reporting",
+    "chunk_index": 1
+  },
+  {
+    "text": "in Virtual Assets, and a complete record of all transactions, including but not limited to \nloans or any transactions involving any VA Activity for which the VASP is Licensed, with \nall such Entities identified; and \ng. transactions with Related Parties as prescribed in the Company Rulebook. \n2. On a quarterly basis, VASPs shall as a minimum submit to VARA the following information— \na. the minutes of all Board meetings and Board committee meetings; \nb. a statement demonstrating compliance with any financial requirements established by \nVARA including but not limited to Reserve Assets; \nc. financial projections and strategic business plans; and \nd. a risk exposure report prepared and submitted to the Board in accordance with Rule  \nI.D.4 of this Compliance and Risk Management Rulebook.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 18,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n19 \n3. On an annual basis, VASPs shall as a minimum submit to VARA the following information— \na. audited annual financial statements, together with an opinion and an attestation by an \nindependent third -party auditor regarding the effectiveness of the VASP’s internal \ncontrol structure;  \nb. an assessment by Senior Management of the VASP’s compliance with such applicable \nlaws, Regulations, Rules and Directives  during the fiscal year covered by the financial \nstatements; \nc. certification of the financial statements by a member of the Board or a Responsible",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 19,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "statements; \nc. certification of the financial statements by a member of the Board or a Responsible \nIndividual attesting to the truth and correctness of those statements; \nd. a representative sample of all documentation relating to client onboarding (including \nactual documentation of the first one hundred (100) clients onboarded of the year); \ne. descriptions of product offerings relating to their VA Activities;  \nf. Group structure chart including shareholding of the VASP and the identity of all UBOs; \ng. the names of each of the members of the Board and the Senior Management in the \nVASP, a brief biography of each such member including their qualifications and \nexperience and any position that a member of the Board or the Senior Management \nholds in other Entities;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 19,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "experience and any position that a member of the Board or the Senior Management \nholds in other Entities; \nh. the identification of any independent director(s) if applicable; \ni. the names of all the members of any committees, the authorities and assignments \nentrusted thereto, and activities carried out by the committees during that year; and \nj. the number of meetings held by the Board and the committees , and the names of the \nattendees. \n4. VARA may require upon request to a VASP, information to be provided in addition to those \nlisted in Rule I.F.1 of this Compliance and Risk Management Rulebook. \n \nI. Regulatory notifications \n1. VASPs shall notify VARA in writing of—  \na. any changes to items set out in Rule  I.H.3 of this Compliance and Risk Management \nRulebook; and",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 19,
+    "section": "I. Regulatory notifications",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n20 \nb. any criminal or material civil action, charge or proceedings or Insolvency Proceedings, or \nany investigations, inspection or enquiries which may lead to any such action, charge or \nproceedings, made against the VASP or any of its Board members , UBOs or Senior \nManagement immediately after the commencement of any such action , charge, \nproceeding, investigation, inspection or enquiry. \n2. VASPs shall submit a report to VARA immediately upon the discovery of any violation or breach \nof any law, Regulation, Rule or Directive related to the conduct of any VA Activity.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 20,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "of any law, Regulation, Rule or Directive related to the conduct of any VA Activity. \n3. VASPs shall, upon request from VARA, disclose information regarding their activities in \njurisdictions other than the Emirate. \n4. VASPs shall comply with all requirements in the Technology and Information Rulebook with \nregards to notifying VARA of incidents relating to a cybersecurity breach, including but not \nlimited to incidents involving a loss of information or affecting Personal Data.  \n \nJ. Staff management and training  \n1. VASPs shall implement procedures to ensure that they only employ suitably qualified individuals \nwith the requisite skills, knowledge and expertise to perform the duties for which they are",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 20,
+    "section": "J. Staff management and training",
+    "chunk_index": 1
+  },
+  {
+    "text": "with the requisite skills, knowledge and expertise to perform the duties for which they are \nemployed and that such individuals are duly registered with all applicable professional bodies as \nrequired. \n2. VASPs shall employ appropriate numbers of Staff to discharge relevant duties effectively. Unless \notherwise stated in the Regulations  and Rulebooks , Staff are not required to be physically \nlocated in the Emirate, provided that the VASP is able to ensure that all supervisory, monitoring \nand enforcement functions are effectively implemented to VARA’s satisfaction. \n3. VASPs shall ensure that all Staff are provided with adequate and up -to-date information \nregarding all their policies and procedures.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 20,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "3. VASPs shall ensure that all Staff are provided with adequate and up -to-date information \nregarding all their policies and procedures. \n4. Adequate training suitable for the duties which the Staff is required to perform in their role shall \nbe provided at the beginning of their employment and on an ongoing basis.  \n5. VASPs shall implement and provide AML/CFT training for all Staff on a regular basis and \nmonitor their compliance with all established procedures.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 20,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n21 \n6. VASPs shall make necessary arrangements to ensure that all operational policies and procedures \nare communicated to new hires within their first thirty (30) calendar days of starting their \nemployment. \n7. In the event that the operational policies and procedures are updated, VASPs shall ensure that— \na. relevant information is promptly communicated to all Staff; and  \nb. any such updated operational policies and procedures are made available to all Staff at \nall times.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 21,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n22 \nII. Part II – Tax Reporting and Compliance \n1. VASPs must, at all times, comply with all tax reporting obligations under all applicable laws, \nregulations, rules or guidance  as well as national, international and industry best practices, \nincluding, but not limited to,  under the United States Foreign Account Tax Compliance Act \n(\"FATCA\") where applicable.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 22,
+    "section": "I. Part II – Tax Reporting and Compliance",
+    "chunk_index": 0
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n23 \nIII. Part III – Anti-Money Laundering and Combating the Financing of \nTerrorism \nIntroduction \nPart III of this Compliance and Risk Management Rulebook sets out requirements which aim to prevent \nthe use of Virtual Assets and services relating to them in furtherance of illicit activities. VARA considers \nsuch illicit activities to include money laundering and the financing of terrorism, as well as proliferation \nfinancing and sanctions non-compliance. \nA. Appointment and duties of Money Laundering Reporting Officer  \n1. VASPs shall appoint a Money Laundering Reporting Officer who—",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 23,
+    "section": "I. Part III – Anti-Money Laundering and Combating the Financing o",
+    "chunk_index": 0
+  },
+  {
+    "text": "A. Appointment and duties of Money Laundering Reporting Officer  \n1. VASPs shall appoint a Money Laundering Reporting Officer who— \na. possesses at least two (2) years of experience handling AML/CFT matters; and \nb. is a Fit and Proper Person (\"MLRO\"). \nSuch appointment shall be reviewed annually to ensure that the MLRO remains a Fit and Proper \nPerson capable of discharging all relevant duties. VARA has the sole discretion to request a \nVASP to provide such evidence as VARA may require which shows that the above requirements \nare satisfied. In addition, VARA shall take into consideration any failures by an individual to \ncomply with Part III of this Compliance and Risk Management Rulebook when assessing whether \nan individual is a Fit and Proper Person.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 23,
+    "section": "A. Appointment and duties of Money Laundering Reporting Officer",
+    "chunk_index": 1
+  },
+  {
+    "text": "comply with Part III of this Compliance and Risk Management Rulebook when assessing whether \nan individual is a Fit and Proper Person. \n2. The MLRO shall be responsible for— \na. ensuring the Board and Staff are properly and adequately trained in respect of their \nunderstanding and compliance with all applicable AML/CFT laws and regulatory \nrequirements, particular those relevant to VA Activities; \nb. developing and implementing AML/CFT policies and procedures as required under \nRule III.B of this Compliance and Risk Management Rulebook; \nc. conducting AML/CFT risk assessments in accordance with Rule III.D of this Compliance \nand Risk Management Rulebook and implementing all necessary changes to the VASP’s \nrelevant policies and procedures to address such issues and risks;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 23,
+    "section": "Part III",
+    "chunk_index": 2
+  },
+  {
+    "text": "relevant policies and procedures to address such issues and risks; \nd. monitoring and reporting Suspicious Transactions in accordance with Rule III.F of this \nCompliance and Risk Management Rulebook;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 23,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n24 \ne. if necessary, ensuring appropriate corrective actions are taken in response to non -\ncompliance with any Federal AML-CFT Laws; \nf. reporting to the Board on a quarterly basis on the effectiveness of the VASP’s AML/CFT \npolicies and procedures, identifying any failures in such policies and procedures and/or \nany non-compliance with any Federal AML-CFT Laws;  \ng. ensuring the quarterly reports required under Rule III.A.2.f of this Compliance and Risk \nManagement Rulebook include a summary of all Anonymity-Enhanced Transactions and \nclients involved during that quarter; and",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 24,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "Management Rulebook include a summary of all Anonymity-Enhanced Transactions and \nclients involved during that quarter; and \nh. making the reports required under Rule III.A.2.f of this Compliance and Risk \nManagement Rulebook available to VARA on request. \n3. AML/CFT activities may be delegated to appropriate Entities, provided that— \na. the MLRO shall continue to be held accountable for all responsibilities and obligations \nin relation to the implementation of the relevant policies and procedures; and \nb. all applicable requirements in the Company Rulebook , including Outsourcing \nmanagement requirements, are complied with.  \n4. Subject to relevant requirements in the Company Rulebook and if deemed appropriate by the",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 24,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "management requirements, are complied with.  \n4. Subject to relevant requirements in the Company Rulebook and if deemed appropriate by the \nVASP, the MLRO may hold more than one (1) non-client facing role within the VASP, provided \nsuch roles do not create conflicting duties, including but not limited to, the CO and the head of \nthe risk function. VARA will take into account other roles held by the MLRO in determining \nwhether the individual is a Fit and Proper Person. \n \nB. Policies and procedures \n1. VASPs will establish and implement policies and procedures to comply with all  AML/CFT \nrequirements and existing applicable laws, regulatory requirements and guidelines, including but \nnot limited to— \na. the Federal AML-CFT Laws;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 24,
+    "section": "B. Policies and procedures",
+    "chunk_index": 2
+  },
+  {
+    "text": "requirements and existing applicable laws, regulatory requirements and guidelines, including but \nnot limited to— \na. the Federal AML-CFT Laws;  \nb. the Financial Action Task Force’s (\"FATF\") 12-Month Review of the Revised FATF \nStandards on Virtual Assets and Virtual Asset Service Providers (June 2020);  \nc. FATF’s Second 12-Month Review of the Revised FATF Standards on Virtual Assets and \nVirtual Asset Service Providers (July 2021);",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 24,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n25 \nd. FATF’s Updated Guidance for a Risk-Based Approach to Virtual Assets and Virtual Asset \nService Providers (October 2021); \ne. the International Standards on Combating Money Laundering and the Financing of \nTerrorism & Proliferation, The FATF Recommendations (March 2022); \nf. the UAE E xecutive Office for Control & Non-Proliferation (\"EOCN\") Guidance on \nCounter Proliferation Financing for FI’s, DNFPBs, and VASPs (March 2022); and \ng. the EOCN’s Local Terrorist List, as may be amended from time to time.  \n2. To ensure compliance with the Federal AML -CFT Laws, such policies and procedures must",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 25,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "2. To ensure compliance with the Federal AML -CFT Laws, such policies and procedures must \nestablish courses of action allowing VASPs to—  \na. refrain from opening or conducting any financial or commercial transaction under an \nanonymous or fictitious name or by pseudonym or number, and maintaining a \nrelationship or providing any services to it; \nb. ensure prompt application of the directives when issued by the competent authorities \nin the UAE for implementing United Nations Security Council Resolutions relating to the \nsuppression and combating of terrorism, terrorist financing and proliferation of \nweapons of mass destruction and its financing , and other related directives, as well as \ncompliance with all other applicable laws, regulatory requirements and guidelines in",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 25,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "compliance with all other applicable laws, regulatory requirements and guidelines in \nrelation to economic sanctions; \nc. notwithstanding all relevant requirements in th is Compliance and Risk Management \nRulebook, maintain all records, documents, and data for all transactions, whether local \nor international, and make this information available to VARA upon request; and \nd. ensure full compliance with any other AML/CFT requirements and applicable laws, \nregulatory requirements and guidelines as may be promulgated by VARA, UAE federal \ngovernment bodies, FATF or the Middle East and North Africa Financial Action Task \nForce from time to time.  \n3. VASPs shall establish adequate risk rules to screen clients, UBOs, Virtual Asset transactions and \nVA Wallet addresses to—",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 25,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "3. VASPs shall establish adequate risk rules to screen clients, UBOs, Virtual Asset transactions and \nVA Wallet addresses to—  \na. identify potential illicit activities, potentially adverse information in higher risk situations \n(e.g. criminal history ) and applicability of targeted or other international financial \nsanctions; and",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 25,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n26 \nb. alert operation and compliance teams to impose relevant restriction and conduct further \ninvestigation. \n4. All policies and procedures established and implemented pursuant to Rule III.B.1 of this \nCompliance and Risk Management Rulebook must be attested by a competent third party and \nshall be submitted to VARA in the licensing process and no more than twenty-one (21) calendar \ndays after any changes coming into effect.  \n \nC. AML/CFT controls \n1. VASPs should have effective AML/CFT controls and systems in place  which can adequately",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 26,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "C. AML/CFT controls \n1. VASPs should have effective AML/CFT controls and systems in place  which can adequately \nmanage the AML/CFT risks relevant to their VA Activities, including the use of distributed ledger \nanalytics tools, as well as other investigative tools or capabilities to monitor and screen \ntransactions. \n2. In respect of any distributed ledger analytics tools used, VASP s should review and document \ntheir review of the capabilities and weaknesses of such tools and design controls to monitor \nclients’ interaction with their VA Activities. \n3. Information about Virtual Asset transactions and VA Wallet addresses are dynamic in nature. \nVASPs should review and document their review of the performance and function of any",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 26,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "VASPs should review and document their review of the performance and function of any \ndistributed ledger analytics tools used to for ongoing monitoring. \n4. VASPs shall, if applicable, implement internal controls to address the FATF Report Virtual Assets \nRed Flags Indicators of Money Laundering and Terrorist Financing (September 2020) (and any \nsubsequent versions of, or supplements to, this publication) when designing transaction \nmonitoring scenarios and thresholds to monitor clients’ interaction with their VA Activities. \n \nD. Risk assessments \n1. Business risk assessment.  In implementing adequate and appropriate AML/CFT policies, \nprocedures, and controls to detect and prevent illicit activities, VASPs must conduct AML/CFT \nbusiness risk assessments.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 26,
+    "section": "D. Risk assessments",
+    "chunk_index": 2
+  },
+  {
+    "text": "procedures, and controls to detect and prevent illicit activities, VASPs must conduct AML/CFT \nbusiness risk assessments. \n2. The AML/CFT business risk assessments must be designed and implemented in order for VASPs \nto understand , identify and assess money laundering risks specific to their business and \noperations, taking into consideration their nature, size, and complexity. This includes, but is not",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 26,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n27 \nlimited to, identifying and assessing the AML/CFT risks in relation to the development and use \nof new or existing— \na. Virtual Assets (in particular, Anonymity-Enhanced Cryptocurrencies);  \nb. Virtual Asset related technologies, products or services (in particular, methods in which \nAnonymity-Enhanced Transactions can be conducted); \nc. Virtual Asset related business and professional practices;  \nd. other technologies not specific to Virtual Assets (e.g. artificial intelligence and machine \nlearning); and \ne. other emerging risks.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 27,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "d. other technologies not specific to Virtual Assets (e.g. artificial intelligence and machine \nlearning); and \ne. other emerging risks.  \n3. Business risks assessments required under this Rule III.D must be carried out—  \na. at regular intervals no longer than every three (3) months; and  \nb. in the event of a significant change or advancement in any of the areas listed in Rule \nIII.D.2. \n4. VASPs shall ensure, and be able to demonstrate to VARA on request, that the outcomes of \nbusiness risk assessments directly inform—  \na. the development and update of the VASP's AML/CFT policies, procedures, systems, and \ncontrols, including specific risk mitigation measures where appropriate; and \nb. the areas in which the VASP prioritises the allocation of resources in its AML/CFT \nactivities.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 27,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "b. the areas in which the VASP prioritises the allocation of resources in its AML/CFT \nactivities. \n5. VASPs enabling Anonymity -Enhanced Transactions as part of their VA Activities must \nimplement proportionately enhanced controls to ensure compliance with all applicable laws and \nregulations (including all Federal AML-CFT Laws), Regulations, Rules and Directives, as well as \neffectively monitor and prevent illicit uses. Such controls shall include conducting enhanced CDD \non each client using those services, which shall be verified every six (6) months. In the case where \nthe AML/CFT risks cannot be adequately mitigated, such products or services should not be \noffered. \n6. Client risk assessment.  In implementing adequate and appropriate AML/CFT policies,",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 27,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "offered. \n6. Client risk assessment.  In implementing adequate and appropriate AML/CFT policies, \nprocedures, and controls to detect and prevent illicit activities, VASPs must conduct AML/CFT \nclient risk assessments.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 27,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n28 \n7. The AML/CFT client risk assessments must be designed and implemented in order for VASPs \nto understand, identify and assess money laundering risks specific to their client base and must \ninclude, but not be limited to, identifying and assessing— \na. the criteria and methodology for the categorisations of each client's AML/CFT risk; \nb. how such assessments are planned to be documented and associated courses of action \nto prevent illicit activity in each case based on the tiers of risk and probability of \noccurrence; and",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 28,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "to prevent illicit activity in each case based on the tiers of risk and probability of \noccurrence; and \nc. requirements for maintaining comprehensive audit trails of all risk assessments. \n8. Client risk assessments required under this Rule III.D must be carried out at regular intervals no \nlonger than every three (3) months. \n \nE. Client due diligence \n1. VASPs shall adopt a risk -based application of CDD measures in accordance with the Federal \nAML-CFT Laws. \n2. VASPs shall undertake a risk -based assessment of every client  using the criteria and \nmethodology prescribed in the client risk assessment , required under Rule s III.D.6 and III.D.7 \nabove, and assign the client a risk rating proportionate to the assessed AML/CFT risks \nassociated with that client.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 28,
+    "section": "E. Client due diligence",
+    "chunk_index": 1
+  },
+  {
+    "text": "above, and assign the client a risk rating proportionate to the assessed AML/CFT risks \nassociated with that client. \n3. VASPs are required to undertake CDD measures to verify the identity of the client and the \nUBO(s) before or during the establishment of a business relationship for the purposes of \nproviding services relating to VA Activities, or before executing a transaction (whether or not \ndenominated in Virtual Assets) for a client with whom there is no business relationship. \n4. VASPs shall undertake CDD measures in the following circumstances— \na. when establishing a business relationship with a client for the purposes of providing \nservices relating to VA Activities; \nb. when carrying out occasional transactions in favour of a client for amounts equal to or",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 28,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "services relating to VA Activities; \nb. when carrying out occasional transactions in favour of a client for amounts equal to or \nexceeding AED 3,500, whether the transaction is carried out in a single transaction or in \nseveral transactions that appear to be linked;  \nc. where there is an instruction from a client to handle a potential Suspicious Transaction;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 28,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n29 \nd. where there are doubts about the veracity or adequacy of previously obtained \nidentification information of a client; or  \ne. when carrying out any transaction for  high-risk clients as characterised in the Federal \nAML-CFT Laws.  \n5. VASPs should undertake CDD measures in their ongoing supervision of business relationships \nwith clients, including— \na. auditing transactions that are carried out throughout the period of the business \nrelationship, to ensure that the transactions conducted are consistent with the",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 29,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "relationship, to ensure that the transactions conducted are consistent with the \ninformation on file regarding clients and the risks they pose, including, where necessary, \nthe source of funds; and  \nb. ensuring that the documents, data or information obtained from CDD measures are up-\nto-date and appropriate by regularly reviewing such records, particularly those of high-\nrisk clients as characterised in the Federal AML-CFT Laws. \n6. As part of the CDD process, VASPs shall verify clients’ identity by reference to the following \ndocuments, data or information from a reliable and independent source—  \na. For individuals—  \ni. full name as shown on an identification card or a travel document (along with a \ncopy of the original and valid identification card or travel document);",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 29,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "copy of the original and valid identification card or travel document); \nii. nationality; \niii. address;  \niv. place of birth;  \nv. name and address of employer; and  \nvi. if the client is a Politically Exposed Person , approval from the MLRO and a \nmember of the Senior Management is required prior to establishing a business \nrelationship with such client. \nb. For Entities which are not individuals— \ni. full name of the Entity; \nii. type of Entity; \niii. constitutional documents (e.g. memorandum of association and articles of \nassociation) attested by competent authorities within the UAE;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 29,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n30 \niv. principle place of business;  \nv. names of individuals holding Senior Management positions in the Entity; and \nvi. if the UBO is a Politically Exposed Person, approval from the MLRO and a \nmember of the Senior Management is required prior to establishing a business \nrelationship with such client.  \n7. VASPs are further required to— \na. verify that any Entity purporting to act on behalf of the client is so authorised, and verify \nthe identity of that Entity in accordance with Rule  III.E.6 of this Compliance and Risk \nManagement Rulebook;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 30,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "the identity of that Entity in accordance with Rule  III.E.6 of this Compliance and Risk \nManagement Rulebook; \nb. understand the intended purpose and nature of the business relationship with the client, \nand obtain, when necessary, information related to this purpose; and \nc. where the VASP’s client is a business or otherwise provides services to other client ele, \nunderstand the nature of the client’s business as well as the client’s ownership and \ncontrol structure, including but not limited to the following— \ni. the identity of UBO(s);  \nii. whether such structure includes any DAOs and, if so, the intended purpose of \nsuch DAOs; and \niii. the type, nature and pursuits of the clientele of a prospective client and where",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 30,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "such DAOs; and \niii. the type, nature and pursuits of the clientele of a prospective client and where \nnecessary carry out appropriate due diligence on the client’s clientele in order to \nensure compliance with the Federal AML-CFT Laws. \n8. If a VASP is unable to conduct appropriate CDD on a client, it shall not—  \na. establish or maintain a business relationship with such client; or  \nb. execute any transaction for such client.  \n9. If a VASP relies on third parties to perform CDD, it shall remain liable for ensuring such third \nparties perform CDD in accordance with all relevant Rules and Directives. VASPs that rely on \nthird parties to undertake CDD on their behalf must therefore implement adequate measures in",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 30,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "third parties to undertake CDD on their behalf must therefore implement adequate measures in \nkeeping with the nature and size of their businesses (including VA Activities) to ensure that such \nthird parties’ performance of CDD is in accordance with all relevant Rules and Directives.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 30,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n31 \n10. Enhanced CDD. If a VASP has assigned a client a high -risk rating in accordance with the client \nrisk assessment required under Rules III.D.6 and III.D.7 above, or the client's UBO is a PEP, then \nin addition to all other CDD required in this Rule III.E, the VASP must— \na. obtain— \ni. additional identification information for the client and all UBOs; \nii. additional information on the intended nature of the business relationship; and \niii. information on the reasons for a transaction; \nb. update the CDD information which it holds on the client and any UBO more regularly; \nc. identify and verify—",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 31,
+    "section": "D. If a VASP has assigned a client a high -risk rating in accorda",
+    "chunk_index": 0
+  },
+  {
+    "text": "b. update the CDD information which it holds on the client and any UBO more regularly; \nc. identify and verify— \ni. the source of funds; and \nii. the source of wealth of the client and, if applicable, all UBOs; \nd. carry out enhanced monitoring of the business relationship, by increasing the frequency \nand intensity of controls applied, and determining which groups of transactions need \nfurther examination; \ne. obtain the approval of Senior Management to commence a business relationship with \nthe client;  \nf. require the first transaction into the client's account with the VASP to be carried out \nthrough an account in the customer’s name with a licensed institution that is subject to \nAML/CFT laws and/or regulation and supervision in a jurisdiction that has standards",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 31,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "AML/CFT laws and/or regulation and supervision in a jurisdiction that has standards \nequivalent to those set out in the FATF Recommendations; and \ng. for a client who is a natural person, verify the current residential address (other than a \npost office box). \n \nF. Suspicious Transaction monitoring and reporting \n1. VASPs shall employ methods which are appropriate to their particular circumstances and VA \nActivities, to continuously monitor business relationships with clients to identify any Suspicious \nTransactions and where an AML-CFT Report is required to be made. Such methods shall ensure \nthat no 'tipping-off' or similar offence occurs. Such methods shall also ensure all Suspicious \nTransactions are immediately reported to the MLRO , in order for the MLRO to meet  the",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 31,
+    "section": "F. Suspicious Transaction monitoring and reporting",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority\n32 \nrequirements of this Rule III.F. VASPs are required to document, obtain Senior Management \napproval for, and periodically review and update such methods to ensure their effectiveness. \n2. VASPs shall put in place and regularly update indicators that can be used to identify possible\nSuspicious Transactions and where an AML-CFT Report is required to be made.\n3. Upon suspicion or reasonable grounds to suspect that the proceeds of a transaction are related\nto a crime, or the attempt or intention to use funds or proceeds for the purpose of committing,",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 32,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "to a crime, or the attempt or intention to use funds or proceeds for the purpose of committing,\nconcealing or benefitting from a crime, the MLRO shall be responsible for—\na. immediately reporting to the UAE FIU such Suspicious Transactions in accordance \nwith Rule III.F.4 of this Compliance and Risk Management Rulebook;\nb. responding to all additional information requests from the UAE FIU and/or VARA\npromptly and in any event within forty-eight (48) hours of such requests;\nc. undertaking any additional actions as may be requested by the UAE FIU and/or VARA\nwithin any specified timeframe in such requests; and\nd. in the event the MLRO is not the same individual as the CO, immediately reporting to\nthe CO that a Suspicion Transaction report has been made, provided that the provision",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 32,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "the CO that a Suspicion Transaction report has been made, provided that the provision\nof any such report would not be considered 'tipping-off' or a similar offence under any\napplicable laws or regulations.\n4. AML-CFT Reports shall be made—\na. to the UAE FIU on the GoAML platform or by any other means approved by the UAE \nFIU;\nb. in the form and containing all content required by the UAE FIU and VARA from time to\ntime; and\nc. in accordance with any Guidance which may be issued by VARA from time to time.\n5. VASPs shall continue monitoring (on a near real time basis where appropriate) any transactions\nwhich are the subject of an AML-CFT Report.\nG. FATF Travel Rule \n1. VASPs must comply with all Federal AML-CFT Laws, including but not limited to Travel Rule",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 32,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "G. FATF Travel Rule \n1. VASPs must comply with all Federal AML-CFT Laws, including but not limited to Travel Rule\nrequirements as prescribed in Federal AML-CFT Laws. In addition to all requirements in Federal",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 32,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n33 \nAML-CFT Laws, VASPs must comply with this Rule III.G as a minimum standard that may be \nsupplemented by additional requirements in Federal AML-CFT Laws. \n2. Prior to initiating any transfer of Virtual Assets with an equivalent value exceeding AED 3,500, \nVASPs must obtain and hold required and accurate  originator information and required \nbeneficiary information, and make it available on request to  VARA and/or other appropriate \nauthorities. The specific requirements for obtaining, holding and transmitting this information",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 33,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "authorities. The specific requirements for obtaining, holding and transmitting this information \nshall be as prescribed in Federal AML-CFT Laws and as may be incrementally defined by VARA \nfrom time to time. \n3. Prior to permitting any clients access to V irtual Assets received from a transfer  with an \nequivalent value exceeding AED 3,500 , a beneficiary VASP must obtain and hold required \noriginator information and required and accurate beneficiary information, and make it available \non request to VARA and /or other  appropriate authorities. The specific requirements for \nobtaining, holding and transmitting this information shall be as prescribed in Federal AML-CFT \nLaws and as may be incrementally defined by VARA from time to time.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 33,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "Laws and as may be incrementally defined by VARA from time to time. \n4. Subject to additional requirements prescribed in Federal AML-CFT Laws, the minimum required \noriginator information shall include, but not be limited to, the originator’s— \na. name; \nb. account number or VA Wallet address; and \nc. residential or business address. \n5. Subject to additional requirements prescribed in Federal AML-CFT Laws, the minimum \nrequired beneficiary information shall include, but not be limited to, the beneficiary’s— \na. name; and \nb. account number or VA Wallet address. \n6. Prior to entering into any transaction with a counterparty VASP or virtual asset service provider \nin any other jurisdiction, VASPs must complete risk-based due diligence on such counterparty in",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 33,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "in any other jurisdiction, VASPs must complete risk-based due diligence on such counterparty in \norder to mitigate AML/CFT risks. This due diligence does not need to be completed for every",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 33,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n34 \nsubsequent transaction with the counterparty unless a heightened counterparty risk is assessed \nor identified. \n7. In complying with the Travel Rule, VASPs must consider how they will handle the risks associated \nwith—  \na. deposits or withdrawals (including those which are compliant with the Travel Rule and \nthose which are not);  \nb. non-obliged entities (i.e. unhosted VA Wallets); and \nc. Anonymity-Enhanced Transactions. \n8. VASPs shall be required to demonstrate to VARA how they comply with the Travel Rule during",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 34,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "c. Anonymity-Enhanced Transactions. \n8. VASPs shall be required to demonstrate to VARA how they comply with the Travel Rule during \nthe licensing process and submit to VARA relevant policies and controls . VASPs should also \ninclude their plan to comply with the Travel Rule with virtual asset service providers in \njurisdictions where the Travel Rule is not a legislative requirement (i.e. the 'sunrise issue'). \n9. In implementing policies and controls to comply with the Travel Rule and AML/CFT Rule s, \nVASPs shall be guided by FATF Interpretive Note to Recommendation 15  and all applicable  \nregulatory requirements and guidelines as may be in force from time to time. VASPs must \nmonitor for any transaction or series of transactions that seeks to circumvent any regulatory",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 34,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "monitor for any transaction or series of transactions that seeks to circumvent any regulatory \nthresholds to bypass Travel Rule requirements. \n10. VARA may require VASP s to report on their compliance with the Travel Rule and the  \neffectiveness of their implementing policies and controls, at any time. VASPs must report on \nTravel Rule compliance in accordance with all requirements in Federal AML-CFT Laws and any \nadditional requirements as may be specified by VARA. \n \nH. Compliance with targeted financial sanctions  \n1. Screening. VASPs must screen all clients and transactions against lists of designated Entities \nmaintained under— \na. the UNSC sanctions frameworks; and \nb. Federal AML-CFT Laws. \n2. VASP are required to—",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 34,
+    "section": "H. Compliance with targeted financial sanctions",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n35 \na. implement automated screening systems to identify and flag transactions involving \ndesignated Entities from the UNSC  sanctions frameworks or Federal AML-CFT Laws; \nand \nb. ensure th at such systems are updated regularly with the latest sanctions  lists and \noperate in real-time. \n3. Freezing. VASPs are required to— \na. take immediate action to freeze any assets, including Virtual Assets and/or money , \nassociated with individuals or entities identified as designated Entities under the UNSC \nsanctions frameworks or Federal AML-CFT Laws; and",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 35,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "associated with individuals or entities identified as designated Entities under the UNSC \nsanctions frameworks or Federal AML-CFT Laws; and \nb. ensure that no withdrawals, transfers, or use of the frozen assets occur during the \nfreezing period. \n4. VASPs must establish and enforce internal policies and procedures to— \na. immediately freeze any assets, including Virtual Assets and/or money, upon detecting \na match with a designated Entity; and \nb. maintain records of all freezing actions and associated transactions for a minimum of \neight (8) years. \n5. Prohibition of transactions. VASPs must block and prohibit— \na. any transactions involving individuals, organisations, or entities listed under the UNSC \nsanctions frameworks or Federal AML-CFT Laws; and",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 35,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "a. any transactions involving individuals, organisations, or entities listed under the UNSC \nsanctions frameworks or Federal AML-CFT Laws; and \nb. any attempts by clients to bypass the UNSC sanctions frameworks or Federal AML-\nCFT Laws. \n \nI. Record keeping \n1. VASPs shall retain the following types of records relating to AML/CFT in accordance with \nFederal AML-CFT Laws— \na. Virtual Asset transaction records, including operational and statistical records, \ndocuments and information (whether or not recorded on public distributed ledgers ) \nconcerning all transactions executed or processed by the VASP;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 35,
+    "section": "I. Record keeping",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n36 \nb. CDD records, including records, documents, and information about clients (e.g. account \nfiles and business correspondence ), and results from the investigation and analysis of \nclients’ activities; \nc. information relating to third parties engaged by the VASP to undertake CDD; \nd. records relating to ongoing monitoring of business relationships with clients; and \ne. Suspicious Transaction reports made in accordance with Rule  III.F of this Compliance \nand Risk Management Rulebook. \n2. VASPs shall retain all records required in Rule III.I.1 for a period of no less than eight (8) years.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 36,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "and Risk Management Rulebook. \n2. VASPs shall retain all records required in Rule III.I.1 for a period of no less than eight (8) years. \n \nJ. Enforcement \n1. VASPs which fail to comply with Rules in this Part III of the Compliance and Risk Management \nRulebook may be subject to enforcement actions taken by VARA or other penalties as set out in \nthe Regulations and Federal AML-CFT Laws. \n2. Enforcement action(s) taken by VARA for a VASP's failure to comply with  the Rules in this \nPart III of the Compliance and Risk Management Rulebook  may be taken directly against the \nVASP, its directors, Responsible Individuals, MLRO and/or Senior Management.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 36,
+    "section": "J. Enforcement",
+    "chunk_index": 1
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n37 \nIV. Part IV – Client Money Rules \nA. Application and Interpretation \n1. \"Client Money\" means all money owned by a VASP’s client which is held or controlled by a VASP \non behalf of such client in the course of, or in connection with, the carrying on of any VA Activity, \nexcept for— \na. money which is immediately due and payable to a VASP for the VASP’s own account, \nsuch as fees for services provided to a client;  \nb. amounts payable by the VASP for expenses incurred on behalf of the client; and \nc. other charges that are due and payable to the VASP.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 37,
+    "section": "V. Part IV – Client Money Rules",
+    "chunk_index": 0
+  },
+  {
+    "text": "b. amounts payable by the VASP for expenses incurred on behalf of the client; and \nc. other charges that are due and payable to the VASP. \n2. Client Money does not include any Virtual Assets held by a VASP on behalf of a client. \n3. Client Money is held or controlled by a VASP if it is— \na. directly held by the VASP; \nb. held in an account in the name of the VASP; or \nc. held by an Entity, or in an account in the name of an Entity, controlled by the VASP.  \n4. \"Client Account\" means an account at a Third-Party Bank which— \na. holds or is established to hold the Client Money of one or more clients; and \nb. is maintained in the name of the VASP. \n5. \"Third-Party Bank\" means the bank with which a Client Account is maintained. \n \nB. Treatment of Client Money",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 37,
+    "section": "B. Treatment of Client Money",
+    "chunk_index": 1
+  },
+  {
+    "text": "5. \"Third-Party Bank\" means the bank with which a Client Account is maintained. \n \nB. Treatment of Client Money \n1. VASPs must have in place the necessary policies, systems and controls, appropriate to the nature \nand scale of their operations, to ensure compliance with this Part IV of the Compliance and Risk \nManagement Rulebook.  \n2. VASPs holding Client Money must hold it for their clients  in a Client Account . Client Money is \nnot owned by the VASP and shall not form part of the VASP’s estate in the event that the VASP \nis or becomes Insolvent. \n3. All Client Accounts must include the words \"Client Account\" in their title. \n4. VASPs must have systems and controls to ensure that the Client Money is identifiable and \nsecure at all times.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 37,
+    "section": "B. Treatment of Client Money",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n38 \n5. Where a VASP holds or controls Client Money it must ensure— \na. except where otherwise provided in Rule IV.B.6 of this Compliance and Risk \nManagement Rulebook, that the Client Money is paid into a Client Account within one \n(1) calendar day of receipt;  \nb. Client Money held or controlled on behalf of clients in the UAE is paid into Client \nAccounts maintained with Third-Party Banks in the UAE; and \nc. Client Money held or controlled on behalf of clients outside of the UAE may be deposited \ninto Client Accounts with Third-Party Banks outside of the UAE but must be moved to,",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 38,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "into Client Accounts with Third-Party Banks outside of the UAE but must be moved to, \nand maintained with, Third-Party Banks in the UAE, and VASPs must initiate such moves \nwithin twenty-four (24) hours of receipt. \n6. The requirement for a VASP to pay Client Money into a Client Account does not, subject to \nRule IV.B.7 of this Compliance and Risk Management Rulebook, apply with respect to such Client \nMoney— \na. temporarily held by the VASP before forwarding to an Entity nominated by the client; \nb. in connection with a delivery versus payment transaction where— \ni. in respect of a client purchase, Client Money from the client will be due to the \nVASP within one (1) calendar day upon the fulfilment of a delivery obligation; \nor",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 38,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "VASP within one (1) calendar day upon the fulfilment of a delivery obligation; \nor \nii. in respect of a client sale, Client Money will be due to the client within one (1) \ncalendar day following the client’s fulfilment of a delivery obligation; or \niii. held in the client’s own name where the VASP has a mandate to manage the \nClient Money on a discretionary basis. \n7. VASPs must pay Client Money of the type described in Rule IV.B.6.b of this Compliance and Risk \nManagement Rulebook into a Client Account where they have  not fulfilled their delivery or \npayment obligation within three (3) calendar days of receipt of the Client Money. \n8. VASPs must maintain adequate records of all payments of Client Money received including, in \nrespect of each payment, the— \na. date of receipt;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 38,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "8. VASPs must maintain adequate records of all payments of Client Money received including, in \nrespect of each payment, the— \na. date of receipt; \nb. name and unique identifier of the client for whom payment is to be credited; \nc. name of the Entity who made the payment;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 38,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n39 \nd. transaction identifier and/or reference; and \ne. date when the payment was presented to the VASP’s Third-Party Bank. \n9. Payment into Client Accounts. \na. VASPs must maintain systems and controls for identifying money which must not be in \na Client Account and for transferring it without delay. \nb. VASPs must not hold or deposit their own money into a Client Account, except where— \ni. it is a minimum sum required to open the account, or to keep it open; \nii. the money is received by way of mixed remittance, provided the VASP transfers",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 39,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "ii. the money is received by way of mixed remittance, provided the VASP transfers \nout that part of the payment which is not Client Money within one (1) calendar \nday of the day on which the VASP would normally expect the remittance to be \ncleared; \niii. interest credited to the account exceeds the amount payable to clients, as \napplicable, provided that the money is removed within twenty (20) calendar \ndays; or \niv. it is to meet a temporary shortfall in Client Money. \n10. Payment out of Client Accounts. \na. VASPs must have procedures for ensuring all withdrawals from a Client Account are \nauthorised.  \nb. Client Money must remain in a Client Account until it is— \ni. due and payable to the VASP; \nii. paid to the client on whose behalf the Client Money is held;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 39,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "i. due and payable to the VASP; \nii. paid to the client on whose behalf the Client Money is held; \niii. paid in accordance with a client’s instruction on whose behalf the Client Money \nis held; \niv. required to meet the payment obligations of the client on whose behalf the \nClient Money is held; or \nv. paid out in circumstances that are otherwise authorised by VARA.  \nc. VASPs must not use Client Money belonging to one client to satisfy an obligation owed \nto another client, nor for any other obligation owed to other Entities (including but not \nlimited to for liquidity, capital ratios or their own balance sheet purposes).",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 39,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n40 \nd. VASPs must have a system for ensuring no off-setting or debit balances occur in Client \nAccounts. \n11. In addition to all requirements in Rule II.B of the Market Conduct Rulebook, VASPs shall not take \nownership of Client Money under any Client Agreement. \n12. By way of limited exception to Rule IV.B.11 of this Compliance and Risk Management Rulebook, \nVASPs are permitted to take ownership of Client Money for the limited purpose of placing such \nmoney under trust, where the VASP is the founder and the VASP’s client(s) are the beneficiaries \nof that trust, and provided that—",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 40,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "money under trust, where the VASP is the founder and the VASP’s client(s) are the beneficiaries \nof that trust, and provided that— \na. the ownership of all Client Money must be transferred to the trust in accordance with \nall other provisions of this Part IV Client Money Rules of th e Compliance and Risk \nManagement Rulebook; and \nb. the VASP must continue to comply with all other provisions of this Part IV Client Money \nRules of the Compliance and Risk Management Rulebook, at all times. \n \nC. Third-Party Bank \n1. VASPs may only maintain Client Accounts at Third -Party Banks appropriately and validly \nauthorised to accept or take deposits in accordance with applicable laws and regulatory \nrequirements in the relevant jurisdiction and which must not be in the same Group as the VASP.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 40,
+    "section": "Part IV",
+    "chunk_index": 1
+  },
+  {
+    "text": "requirements in the relevant jurisdiction and which must not be in the same Group as the VASP. \n2. Payment of Client Money to a Third-Party Bank. \na. VASPs may only pass, or permit to be passed, Client Money to a Third-Party Bank if— \ni. the Client Money is to be used in respect of a transaction or series or \ntransactions for that client; and \nii. the Third-Party Bank is appropriately and validly authorised to accept or take \ndeposits in accordance with applicable laws and regulatory requirements  in its \nrelevant jurisdiction as per Rule IV.C.1 of this Compliance and Risk Management \nRulebook. \n3. When a VASP opens a Client Account with a Third-Party Bank, it must promptly obtain a written \nacknowledgement from the Third-Party Bank stating that—",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 40,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "acknowledgement from the Third-Party Bank stating that— \na. all money standing to the credit of the account is held by the VASP as agent and that \nthe Third-Party Bank is not entitled to combine the account with any other account or",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 40,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n41 \nto exercise any charge, mortgage, lien, right of set-off or counterclaim against money in \nthat account in respect of any sum owed to it on any other account of the VASP; and \nb. the title of the account sufficiently distinguishes that account from any account \ncontaining money that belongs to the VASP, and is in the form requested by the VASP. \n4. If the Third -Party Bank does not promptly provide the acknowledgement referred to in \nRule IV.C.3 of this Compliance and Risk Management Rulebook , the VASP must refrain from",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 41,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "Rule IV.C.3 of this Compliance and Risk Management Rulebook , the VASP must refrain from \nmaking further deposits of Client Money with that Third -Party Bank and withdraw any Client \nMoney in that Client Account. \n \nD. Disclosure, reporting and audit requirements \n1. Proper record keeping. \na. VASPs shall keep proper and up-to-date records regarding—  \ni. the receipt and payment of Client Money in and out of Client Accounts; and \nii. movements of Client Money within internal systems, \nto enable the reconciliation of any differences in balances or positions of Client Money. \nb. VASPs shall have appropriate procedures for identifying Client Money received. The \nprocedures should cover Client Money received through all means, including",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 41,
+    "section": "D. Disclosure, reporting and audit requirements",
+    "chunk_index": 1
+  },
+  {
+    "text": "procedures should cover Client Money received through all means, including \nelectronically or via agents of the VASP (e.g. banks, payment processors). \nc. VASPs may be requested to demonstrate evidence of above records upon VARA’s \nrequest. \n2. Client reporting. \na. VASPs must send or otherwise make available a statement to clients at least monthly, \nor as agreed with the client, which shall include— \ni. the client’s total Client Money balances held by the VASP; \nii. the amount, date and value of each credit and debit paid into and out of the \naccount since the previous statement; and \niii. any interest earned or charged on the Client Account since the previous \nstatement. \nb. The statement sent to the client must be prepared within twenty-five (25) calendar days \nof the statement date.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 41,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n42 \n \nE. Reconciliation  \n1. VASPs must maintain a system to ensure that accurate reconciliations of the Client Accounts \nare carried out daily. The reconciliation must include—  \na. a full list of individual client credit ledger balances, as recorded by the VASP;  \nb. a full list of individual client debit ledger balances, as recorded by the VASP; \nc. a full list of outstanding lodgements; \nd. a full list of Client Account cash book balances; and \ne. formal statements from Third-Party Banks showing account balances as at the date of \nreconciliation. \n2. VASPs must—",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 42,
+    "section": "E. Reconciliation",
+    "chunk_index": 0
+  },
+  {
+    "text": "e. formal statements from Third-Party Banks showing account balances as at the date of \nreconciliation. \n2. VASPs must— \na. reconcile the individual credit ledger balances, Client Account cash book balances and \nthe Third-Party Bank Client Account balances;  \nb. check that the balance in the Client Accounts as at the close of business on the previous \nday was at least equal to the aggregate balance of individual credit ledger balances as at \nthe close of business on the previous day; and \nc. ensure that all shortfalls, excess balances and unresolved differences, other than \ndifferences arising solely as a result of timing differences between the accounting \nsystems of the Third-Party Bank and the VASP, are investigated and, where applicable,",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 42,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "systems of the Third-Party Bank and the VASP, are investigated and, where applicable, \ncorrective action taken as soon as possible, including where necessary using the VASP’s \nown funds. \n3. VASPs must perform the reconciliations in Rule IV.E.2 of this Compliance and Risk Management \nRulebook on a daily basis. \n4. VASPs must ensure that the process of reconciliation does not give rise to a conflict of interest. \n5. VASPs must notify VARA where there has been a material discrepancy with the reconciliation \nwhich has not been rectified.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 42,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n43 \nF. Failure to comply \n1. VASPs which become aware that they do  not comply with any Rules in this Part IV of th e \nCompliance and Risk Management Rulebook  must notify VARA in writing of any such non -\ncompliance within one (1) calendar day. \n2. Failure to comply with any Rule s in this Part IV of th e Compliance and Risk Management \nRulebook may result in VARA taking appropriate enforcement action(s) as it deems fit and the \nVASP must comply with all corrective action(s) as instructed by VARA.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 43,
+    "section": "F. Failure to comply",
+    "chunk_index": 0
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n44 \nV. Part V – Client Virtual Assets Rules \nA. Application and Interpretation \n1. \"Client VAs\" means all Virtual Assets owned by a VASP’s client which are held or controlled by \na VASP on behalf of such client in the course of, or in connection with, the carrying on of any VA \nActivity, except for— \na. Virtual Assets immediately due and payable to a VASP for the VASP’s own account, such \nas fees for services provided to a client;  \nb. amounts payable by the VASP for expenses incurred on behalf of the client; and \nc. other charges that are due and payable to the VASP.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 44,
+    "section": "V. Part V – Client Virtual Assets Rules",
+    "chunk_index": 0
+  },
+  {
+    "text": "b. amounts payable by the VASP for expenses incurred on behalf of the client; and \nc. other charges that are due and payable to the VASP. \n2. Client VAs are held or controlled by a VASP if they are— \na. directly held by the VASP in an account or VA Wallet; \nb. held in an account or VA Wallet in the name of the VASP; \nc. held by a  legal entity, or in an account or VA Wallet   in the name of a  legal entity, \ncontrolled by the VASP; or \nd. the private keys and/or seed phrase of the VA Wallet are held or controlled by the VASP. \n \nB. Treatment of Client VAs \n1. VASPs must have in place the necessary policies, systems and controls, appropriate to the nature \nand scale of their operations, to ensure compliance with this Part V of the Compliance and Risk \nManagement Rulebook.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 44,
+    "section": "B. Treatment of Client VAs",
+    "chunk_index": 1
+  },
+  {
+    "text": "and scale of their operations, to ensure compliance with this Part V of the Compliance and Risk \nManagement Rulebook. \n2. Client VAs are not depository liabilities or assets of the VASP. Client VAs are not owned by the \nVASP and shall not form part of the VASP’s estate in the  event that the VASP is or becomes \nInsolvent. \n3. VASPs shall hold Client VAs in separate VA Wallets from all Virtual Assets of the VASP. VASPs \nmust include the label ‘Client VA Wallet’ in their books and records for all wallets holding Client \nVAs at all times. \n4. VASPs must hold Client VAs on a one-to-one basis and shall not authorise or permit \nrehypothecation of Client VAs, unless they have explicit prior consent from the client providing",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 44,
+    "section": "Part V",
+    "chunk_index": 2
+  },
+  {
+    "text": "rehypothecation of Client VAs, unless they have explicit prior consent from the client providing \ndiscretionary authority to do so, and are appropriately authorised and Licensed by VARA to carry \nout all relevant VA Activity(ies) in respect of such Virtual Assets.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 44,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n45 \n5. All proceeds related to Client VAs, such as 'airdrops', 'staking gains' or similar proceeds  shall \naccrue to the client’s benefit, unless the VASP has the client’s prior consent specified in a written \nagreement with the client  or otherwise. VASPs may decide not to collect or distribute certain \nproceeds, including where such proceeds are below a value to be determined by the VASP,  \nprovided that the VASP has disclosed this to the client and obtained acceptance in accordance \nwith all applicable laws.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 45,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "provided that the VASP has disclosed this to the client and obtained acceptance in accordance \nwith all applicable laws. \n6. In addition to all requirements in Rule II.B of the Market Conduct Rulebook, VASPs shall not take \nownership of Client VAs under any Client Agreement. \n7. By way of limited exception to Rule V.B.6 of this Compliance and Risk Management Rulebook , \nVASPs are permitted to take ownership of Client VAs for the limited purpose of placing such \nVirtual Assets under trust, where the VASP is the founder and the VASP’s client(s) are the \nbeneficiaries of that trust, and provided that— \na. the ownership of all Client VAs must be transferred to the trust no more than one (1) \ncalendar day from receipt of the Virtual Assets by the VASP; and",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 45,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "calendar day from receipt of the Virtual Assets by the VASP; and \nb. the VASP must continue to comply with all other provisions of this Part V Client Virtual \nAsset Rules of the Compliance and Risk Management Rulebook, at all times. \n \nC. Proof of reserves \n1. In addition to the Reserve Assets requirements in the Company Rulebook, VASPs shall comply \nwith a ll requirements stipulated by VARA f rom time to time, including as part of a VASP’s \nlicensing process, in order to demonstrate that assets held in reserve cover all of their liabilities \nwith respect to Client VAs. \n \nD. Reconciliation  \n1. VASPs must maintain a system to ensure that accurate reconciliations of the Virtual Assets \nowned by each client are carried out daily. The reconciliation must include—",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 45,
+    "section": "Part V",
+    "chunk_index": 2
+  },
+  {
+    "text": "owned by each client are carried out daily. The reconciliation must include—  \na. a full list of individual client credit ledger balances, as recorded by the VASP; and  \nb. a full list of individual client debit ledger balances, as recorded by the VASP. \n2. VASPs must notify VARA where there has been a material discrepancy with the reconciliation \nwhich has not been rectified.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 45,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n46 \nVI. Part VI – Anti-Bribery and Corruption \nA. General principles \n1. VASPs shall establish and maintain an effective anti-bribery and corruption policy to ensure that \nthe Board and all Staff must comply with all applicable laws and regulations relevant to anti -\nbribery and corruption in all jurisdictions in which they operate. Such policy must allow for \nreports to be made by Entities outside of the VASP and protect the identity and confidentiality \nof the Entity who has made a report at all times. \n2. VASPs must conduct all business in an honest and ethical manner and must take a zero -",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 46,
+    "section": "I. Part VI – Anti-Bribery and Corruption",
+    "chunk_index": 0
+  },
+  {
+    "text": "of the Entity who has made a report at all times. \n2. VASPs must conduct all business in an honest and ethical manner and must take a zero -\ntolerance approach to bribery and corruption. The Board and a ll Staff must act professionally, \nfairly and with integrity in all business dealings and relationships.  \n3. It is prohibited for any VASP, members of the Board and all Staff, to— \na. give, promise to give, or offer a payment, gift or hospitality to a third party or otherwise \nengage in or permit a bribery offence to occur, with the expectation or hope that an \nadvantage in business will be received or to reward a business advantage already given; \nb. give, promise to give, or offer a payment, gift or hospitality to a third party to facilitate \nor expedite a routine procedure;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 46,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "b. give, promise to give, or offer a payment, gift or hospitality to a third party to facilitate \nor expedite a routine procedure; \nc. accept a payment, gift or hospitality from a third party if it knows or suspects that such \npayment, gift or hospitality is offered or provided with an expectation that a business \nadvantage will be provided by the VASP in return; \nd. threaten or retaliate against another member of the Board or Staff who has refused to \ncommit a bribery offence or who has raised concerns; and \ne. engage in any activity that might lead to a breach of th e anti-bribery and corruption \nRules in this Part VI of the Compliance and Risk Management Rulebook. \n4. The anti-bribery and corruption Rules in this Part VI of the Compliance and Risk Management",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 46,
+    "section": "Part VI",
+    "chunk_index": 2
+  },
+  {
+    "text": "4. The anti-bribery and corruption Rules in this Part VI of the Compliance and Risk Management \nRulebook do not prohibit normal and appropriate hospitality (given or received in accordance \nwith the VASP’s own gifts and hospitality policy ) to or from third parties , provided relevant \npolicies are compliant with applicable laws. Such gifts and hospitality policy should set out clearly \nwhat is and is not appropriate to make or receive gifts and/or hospitality to and from a third \nparty.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 46,
+    "section": "Part VI",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n47 \n5. The CO will monitor the effectiveness of the anti-bribery and corruption policy on a regular basis. \nAny deficiencies identified should be dealt with as soon as possible. \n \nB. No corrupt payments \n1. It is prohibited for any VASP or any members of its Board, Staff, consultants or contractors, any \nGroup company , agent, business partner, contractor or supplier of the VASP to make any \npayment(s) to a third party where there is any reason to believe that all or any part of such \npayment will go towards a bribe or otherwise facilitate any corruption.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 47,
+    "section": "B. No corrupt payments",
+    "chunk_index": 0
+  },
+  {
+    "text": "payment will go towards a bribe or otherwise facilitate any corruption. \n2. All payments made by VASPs for services must be appropriate and justifiable for the purpose of \nlegitimate services provided.  \n \nC. Investigation and reporting \n1. VASPs must establish, maintain and publish methods of contact including, but not limited to, a \ntelephone line, for receiving reports of any violation or possible violation of any applicable laws \nand regulations relevant to anti-bribery and corruption by the VASP, or its Board or Staff on its \nbehalf. \n2. Any member of the Board or Staff must report to the CO as soon as possible if they believe or \nsuspect that an action in conflict with the anti-bribery and corruption Rules in this Part VI of the",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 47,
+    "section": "C. Investigation and reporting",
+    "chunk_index": 1
+  },
+  {
+    "text": "suspect that an action in conflict with the anti-bribery and corruption Rules in this Part VI of the \nCompliance and Risk Management Rulebook has occurred, or may occur, or has been solicited by \nany other Entity. \n3. The CO shall investigate any report of a violation or possible violation of the anti-bribery and \ncorruption Rules in this Part VI of the Compliance and Risk Management Rulebook and shall \nfollow the below procedures— \na. An investigation file should be opened. In the case of an oral report, the CO should \nprepare a written summary. \nb. The CO shall appoint an independent Entity who shall promptly commission the conduct \nof an investigation. The investigation will document all relevant facts, including Entities \ninvolved, times and dates.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 47,
+    "section": "Part VI",
+    "chunk_index": 2
+  },
+  {
+    "text": "of an investigation. The investigation will document all relevant facts, including Entities \ninvolved, times and dates.  \nc. The CO shall advise the Board of the existence of an investigation.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 47,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n48 \nd. The identity of the individual disclosing relevant information to the CO should be treated \nin accordance with applicable UAE laws and regulations.  \ne. On completion of the investigation, a written investigation report will be provided by the \nEntity employed to conduct the investigation to the CO. If any unlawful conduct is found, \nthe CO must advise the Board accordingly. \nf. If any unlawful conduct is found, the VASP shall take such remedial action as the Board \ndeems appropriate to achieve compliance with its internal anti -bribery and corruption",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 48,
+    "section": "O. If any unlawful conduct is found,",
+    "chunk_index": 0
+  },
+  {
+    "text": "deems appropriate to achieve compliance with its internal anti -bribery and corruption \npolicy and all applicable anti -bribery and corruption laws. The Entity employed to \nconduct the investigation shall prepare a written summary of the remedial actions taken. \ng. The written investigation report and a written summary of the remedial actions taken \nshall be retained by the CO for a period of no less than eight (8) years from completion \nof the remedial action. Such reports shall be made available to VARA upon request. \n \nD. Information and trainings \n1. VASPs shall implement and provide an anti-bribery and corruption training programme for the \nBoard and all Staff on a regular basis and monitor their compliance with all established",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 48,
+    "section": "D. Information and trainings",
+    "chunk_index": 1
+  },
+  {
+    "text": "Board and all Staff on a regular basis and monitor their compliance with all established \nprocedures. All members of the Board and Staff must participate in all such trainings provided \nby the VASP. \n2. VASPs shall ensure that all members of the Board and Staff to have full access at all times to \nthe most up-to-date anti-bribery and corruption policy and will be informed of any changes to \nsuch policy. \n3. Training on the anti-bribery and corruption policy should form part of the induction programme \nmade available to all new Board members and Staff. \n4. In addition to relevant requirements in the Market Conduct Rulebook, a zero-tolerance approach \nto bribery and corruption and all relevant policies must be disclosed by all VASPs to the public",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 48,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "to bribery and corruption and all relevant policies must be disclosed by all VASPs to the public \nand communicated at the outset of all business relationships as appropriate.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 48,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n49 \nE. Responsibility for the policy \n1. The Board shall have the overall responsibility for ensuring its anti-bribery and corruption policy \nis up-to-date and complies with all applicable laws and regulations in all jurisdictions where the \nVASP conducts its business. \n2. The CO has the primary and day -to-day responsibility for implementing the anti-bribery and \ncorruption policy and for monitoring its effectiveness. \n \nF. Consequences of breach \n1. Failure to comply with a VASP’s anti -bribery and corruption policy should result in severe",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 49,
+    "section": "E. Responsibility for the policy",
+    "chunk_index": 0
+  },
+  {
+    "text": "F. Consequences of breach \n1. Failure to comply with a VASP’s anti -bribery and corruption policy should result in severe \nconsequences, including internal disciplinary action and termination of employment without \nnotice.  \n2. VASPs should immediately report to VARA any finding of unlawful conduct in breach of the anti-\nbribery and corruption Rules in this Part VI of the Compliance and Risk Management Rulebook.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 49,
+    "section": "F. Consequences of breach",
+    "chunk_index": 1
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n50 \nVII. Part VII – Sponsored VASPs  \nA. Interpretation \n1. \"Regulated Sponsor\" means a VASP which is approved by VARA to sponsor other Entities to \ncarry out one or more  VA Activities in the Emirate , in accordance with this Part VII of the \nCompliance and Risk Management Rulebook. \n2. \"Sponsored VASP\" means an Entity which is sponsored by a Regulated Sponsor to carry out \none or more VA Activities in the Emirate, in accordance with this Part VII of the Compliance and \nRisk Management Rulebook.  \n \nB. Requirement to obtain prior approval",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 50,
+    "section": "I. Part VII – Sponsored VASPs",
+    "chunk_index": 0
+  },
+  {
+    "text": "Risk Management Rulebook.  \n \nB. Requirement to obtain prior approval \n1. No VASP may act as a Regulated Sponsor without approval from VARA in accordance with Rule \nVII.C of this Part VII of the Compliance and Risk Management Rulebook, below. \n2. For the avoidance of doubt, nothing in this Part VII of the Compliance and Risk Management \nRulebook shall have any effect on a VASP’s obligations to comply with all other requirements in \nthe Regulations, Marketing Regulations, Rulebooks, Directives and/or their Licence in respect of \nthe VA Activities for which it is otherwise Licensed to carry out.  \n \nC. Application process \n1. VASPs shall adhere to the application process as prescribed by VARA from time to time , when",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 50,
+    "section": "B. Requirement to obtain prior approval",
+    "chunk_index": 1
+  },
+  {
+    "text": "C. Application process \n1. VASPs shall adhere to the application process as prescribed by VARA from time to time , when \napplying for approval to be a Regulated Sponsor pursuant to this Part VII of the Compliance and \nRisk Management Rulebook. \n2. All applications for approval shall, at a minimum, consist of the following— \na. demonstration of the Regulated Sponsor’s ability to comply with this Part VII of the \nCompliance and Risk Management Rulebook; and \nb. demonstration of the Regulated Sponsor’s ability to ensure all Sponsored VASPs comply \nwith all Regulations, Marketing Regulations, Rules and Directives applicable to the VA \nActivities which the Sponsored VASPs will carry out, and on an ongoing basis, as may be \namended from time to time.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 50,
+    "section": "C. Application process",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n51 \nD. Establishing a Sponsored VASP relationship \n1. In order to establish a Sponsored VASP relationship, a Regulated Sponsor must—  \na. be the Controlling Entity of, or have the same Controlling Entity as, the Sponsored VASP;  \nb. have a written agreement with each Sponsored VASP, which shall include— \ni. what business and/or VA Activities the Sponsored VASP can carry out;  \nii. apportioning liability for compliance in areas not prescribed by VARA; \niii. state clearly when and how the agreement can be terminated;  \niv. provide the Regulated Sponsor with rights of audit over the Sponsored VASP; \nand",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 51,
+    "section": "D. Establishing a Sponsored VASP relationship",
+    "chunk_index": 0
+  },
+  {
+    "text": "iv. provide the Regulated Sponsor with rights of audit over the Sponsored VASP; \nand \nv. require the Sponsored VASP to report regularly to the Regulated Sponsor on \nthe Sponsored VASP's  compliance with its obligations under this Compliance \nand Risk Management Rulebook;  \nc. conduct detailed due diligence and assess each Sponsored VASP  before sponsoring \nthem, to ensure they're fit and proper, financially stable and suitable to carry out their \nproposed VA Activities;  \nd. ensure that establishing such relationship does not contravene Federal Competition \nLaws; and \ne. obtain approval from VARA, through the process prescribed by VARA from time to time, \nprior to the Sponsored VASP commencing any VA Activities in the Emirate under the \nSponsored VASP relationship.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 51,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "prior to the Sponsored VASP commencing any VA Activities in the Emirate under the \nSponsored VASP relationship. \n2. Legal entity in the Emirate. Regulated Sponsors shall ensure that each Sponsored VASP is and \nremains a legal entity, in one of the legal forms approved by a commercial licensing authority, in \nthe Emirate. \n3. VARA reserves the right to refuse, suspend or revoke approval of any Sponsored VASP \nrelationship on any grounds, including but not limited to, where VARA deems, in its sole and \nabsolute discretion , that such relationship may create an anti -competitive or monopolistic \nposition or otherwise threaten the integrity and/or stability of the Virtual Assets market in the \nEmirate.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 51,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n52 \nE. Regulatory status, marketing and disclosures \n1. Regulatory status . Notwithstanding Rule VII.E.2.c of this Compliance and Risk Management \nRulebook, for the purposes of Regulation III.A.1.a  of the Regulations , all Sponsored VASP s \nestablished and maintained in accordance with  this Part VII of the Compliance and Risk \nManagement Rulebook , shall be deemed as authorised and Licensed by VARA for the VA \nActivities which the application for approval under Rule VII.D of this Compliance and Risk \nManagement Rulebook relates and as approved by VARA under Rule VII.D.1.e.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 52,
+    "section": "E. Regulatory status, marketing and disclosures",
+    "chunk_index": 0
+  },
+  {
+    "text": "Management Rulebook relates and as approved by VARA under Rule VII.D.1.e. \n2. Marketing. In all Marketing, Regulated Sponsors shall ensure that Sponsored VASPs— \na. comply with the Marketing Regulations; \nb. include the name and Licence number of the Regulated Sponsor; and \nc. clearly indicate that they are a Sponsored VASP, and not a VARA Licensed VASP. \n3. Public disclosures and risk disclosure statement. In addition to all other requirements regarding \ndisclosures required under the Regulations,  Marketing Regulations , Rules or Directives,  \nRegulated Sponsors shall ensure that all Sponsored VASPs provide the following information in \nan easily accessible location, in a machine-readable format, and that it is kept accurate and up-\nto-date at all times—",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 52,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "an easily accessible location, in a machine-readable format, and that it is kept accurate and up-\nto-date at all times— \na. the name of their Regulated Sponsor and the Licence number issued to the Regulated \nSponsor by VARA; \nb. the authorisation number issued to the Sponsored VASP by VARA; \nc. all VA Activities they are authorised by VARA to carry out in the Emirate, including any \nrestrictions stated by VARA as a condition of their authorisation, and the validity period \nof such authorisation; and \nd. the name of the Sponsored VASP's Responsible Officer appointed in accordance with \nRule VII.G below. \n \nF. Compliance responsibility \n1. Regulated Sponsor s shall ensure , and be responsible for , the ongoing compliance with all",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 52,
+    "section": "F. Compliance responsibility",
+    "chunk_index": 2
+  },
+  {
+    "text": "Rule VII.G below. \n \nF. Compliance responsibility \n1. Regulated Sponsor s shall ensure , and be responsible for , the ongoing compliance with all \napplicable Regulations, Marketing Regulations, Rules and Directives by their Sponsored VASPs, \nat all times.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 52,
+    "section": "F. Compliance responsibility",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n53 \n2. Regulated Sponsors shall ensure that they have sufficient resource, knowledge and expertise to \ncomply with their obligations in this Part VII of the Compliance and Risk Management Rulebook, \nat all times, in respect of each Sponsored VASP and all Sponsored VASP relationships in total. \n3. Regulated Sponsors shall, at all times, ensure and be responsible for their Sponsored VASPs' \ncompliance with the following compulsory Rulebooks as may be updated from time to time— \na. Company Rulebook;  \nb. Compliance and Risk Management Rulebook; \nc. Technology and Information Rulebook; and",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 53,
+    "section": "Part VII",
+    "chunk_index": 0
+  },
+  {
+    "text": "a. Company Rulebook;  \nb. Compliance and Risk Management Rulebook; \nc. Technology and Information Rulebook; and \nd. Market Conduct Rulebook. \n4. Regulated Sponsors shall, at all times, ensure and be responsible for  their Sponsored VASPs' \ncompliance with all relevant Rulebooks that correspond to the VA Activities the Sponsored \nVASP is authorised by VARA to carry out, as may be amended from time to time— \na. Advisory Services Rulebook; \nb. Broker-Dealer Services Rulebook; \nc. Custody Services Rulebook; \nd. Exchange Services Rulebook; \ne. Lending and Borrowing Services Rulebook; \nf. VA Management and Investment Services Rulebook; and \ng. VA Transfer and Settlement Services Rulebook. \n5. Data protection and segregation.  In addition to all Rules in Part II of the Technology and",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 53,
+    "section": "Part II",
+    "chunk_index": 1
+  },
+  {
+    "text": "g. VA Transfer and Settlement Services Rulebook. \n5. Data protection and segregation.  In addition to all Rules in Part II of the Technology and \nInformation Rulebook, Regulated Sponsors must ensure that Personal Data collected by each \nSponsored VASP  remains segregated from that of the Regulated Sponsor , and each of the \nRegulated Sponsor's other Sponsored VASPs. \n \nG. Responsible Officer  \n1. Regulated Sponsors must ensure their Sponsored VASPs each appoint one (1) individual of \nsufficient seniority who shall be responsible for the Sponsored VASP’s compliance with all legal \nand regulatory obligations (\"Responsible Officer\"). \n2. The Responsible Officer must be— \na. a full-time employee of the Sponsored VASP;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 53,
+    "section": "Part II",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n54 \nb. notified to, and approved by, VARA during the application process in Rule VII.D of this \nCompliance and Risk Management Rulebook; and \nc. meet all other requirements in Rule I.C.2 of the Company Rulebook, as may be amended \nfrom time to time. \n3. Regulated Sponsor s must ensure that the Responsible Officer continues to meet the \nrequirements in Rule VII.G.2 of this Compliance and Risk Management Rulebook at all times, and \nshall validate and maintain a record of such validation on an annual basis. \n4. Regulated Sponsors must notify and seek approval from VARA prior to changing the Responsible",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 54,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "4. Regulated Sponsors must notify and seek approval from VARA prior to changing the Responsible \nOfficer of any Sponsored VASP, except in the event of reasonably unforeseen circumstances. In \nsuch instances, the Regulated Sponsor must notify VARA immediately and provide information \non how it will continue to meet the requirements with regard to the Responsible Officer  of the \nSponsored VASP. \n \nH. Capital and prudential requirements  \n1. In addition to all existing obligations in respect of the VA Activities for which it is Licensed, \nRegulated Sponsor s shall comply with Part VI Capital and Prudential Requirements of the \nCompany Rulebook for each Sponsored VASP with whom it has a Sponsored VASP relationship. \n \nI. Accounts",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 54,
+    "section": "H. Capital and prudential requirements",
+    "chunk_index": 1
+  },
+  {
+    "text": "Company Rulebook for each Sponsored VASP with whom it has a Sponsored VASP relationship. \n \nI. Accounts \n1. Subject to compliance with Rule VII.I.2 of this Compliance and Risk Management Rulebook below, \nRegulated Sponsors may establish each of the following accounts in their own name on behalf \nof each Sponsored VASP— \na. Client Money Accounts required in Part IV of this Compliance and Risk Management \nRulebook; \nb. business and/or operating accounts of the Sponsored VASP; and \nc. an account maintaining Paid-Up Capital in accordance with Rule VI.B.3 of the Company \nRulebook. \n2. Regulated Sponsors must ensure , and are responsible for ensuring, that e ach of the accounts \nlisted in Rule VII.I.1 of this Compliance and Risk Management Rulebook above comply with the \nfollowing—",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 54,
+    "section": "I. Accounts",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n55 \na. a separate account is established for each Sponsored VASP  with whom it has a \nSponsored VASP relationship, and no account is shared either between the Regulated \nSponsor and a Sponsored VASP, or between more than one Sponsored VASP;  \nb. the name of the Sponsored VASP is included in the title of each account; and \nc. the Regulated Sponsor  maintains segregation between all the accounts of each \nSponsored VASP, with whom it has a Sponsored VASP relationship, in all books and \nrecords. \n \nJ. Complaints handling requirements",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 55,
+    "section": "J. Complaints handling requirements",
+    "chunk_index": 0
+  },
+  {
+    "text": "Sponsored VASP, with whom it has a Sponsored VASP relationship, in all books and \nrecords. \n \nJ. Complaints handling requirements \n1. Regulated Sponsors must ensure, and are responsible for ensuring , compliance with Part III of \nthe Market Conduct Rulebook for each Sponsored VASP with whom it has a Sponsored VASP \nrelationship. \n2. Regulated Sponsors must establish , or ensure each Sponsored VASP establishes, a separate \nComplaints handling procedure required in Part III.B of the Market Conduct Rulebook for each \nSponsored VASP with whom it has a Sponsored VASP relationship. \n \nK. Governance and reporting responsibilities \n1. Governance. Regulated Sponsors must— \na. review and maintain oversight of each Sponsored VASP's activities, business and senior \nmanagement;",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 55,
+    "section": "J. Complaints handling requirements",
+    "chunk_index": 1
+  },
+  {
+    "text": "1. Governance. Regulated Sponsors must— \na. review and maintain oversight of each Sponsored VASP's activities, business and senior \nmanagement; \nb. monitor and actively manage each Sponsored VASP's performance of its obligation s \nunder the written agreement between the Sponsored VASP and the Regulated Sponsor, \nas required under Rule VII.D.1.b of this Compliance and Risk Management Rulebook;  \nc. ensure that they have the skills and resources to oversee all Sponsored VASPs at all \ntimes, including if a Sponsored VASP’s business changes and/or expands; \nd. ensure that each Sponsored VASP  continues to meet the necessary standards as \nrequired by VARA in respect of the VA Activities carried out by the Sponsored VASP; \nand",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 55,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "required by VARA in respect of the VA Activities carried out by the Sponsored VASP; \nand \ne. have adequate financial resources taking into account all business and/or VA Activities \nof all Sponsored VASPs.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 55,
+    "section": "General",
+    "chunk_index": 3
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n56 \n2. Reporting. In addition to all reporting requirements in the other Rulebooks, Regulated Sponsors \nmust provide VARA with the following information, in respect of each Sponsored VASP, on an \nannual basis— \na. complaints data; \nb. full audited accounts; and \nc. all other data as required by VARA from time to time.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 56,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n57 \nSchedule 1 – Definitions \nTerm Definition \n\"AML/CFT\" has the meaning ascribed to it in the Regulations. \n\"AML-CFT Report\" means all reports as required by the UAE FIU from time to time, \nincluding but not limited to—  \n(a)  Suspicious Transaction Report (STR); \n(b)  Suspicious Activity Report (SAR); \n(c)  High Risk Country Transaction Report (HRC); \n(d)  High Risk Country Activity Report (HRCA); \n(e)  Funds Freeze Report; and  \n(f)  Partial Name Match Report. \n\"Anonymity-Enhanced \nCryptocurrencies\" \nhas the meaning ascribed to it in the Regulations.  \n\"Anonymity-Enhanced \nTransactions\"",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 57,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "\"Anonymity-Enhanced \nCryptocurrencies\" \nhas the meaning ascribed to it in the Regulations.  \n\"Anonymity-Enhanced \nTransactions\" \nmeans transactions denominated in V irtual Asset s which are not \nAnonymity-Enhanced Cryptocurrencies, but which prevent the \ntracing of transactions or record of ownership.  \n\"BCDR Plan\" means the Business Continuity and Disaster Recovery Plan of a \nVASP. \n\"Board\" has the meaning ascribed to it in the Company Rulebook.  \n\"Capital and Prudential \nRequirements\" \nhas the meaning ascribed to it in the Company Rulebook. \n\"CDD\" means client due diligence, including but not limited to due diligence \non the clientele of a VASP’s client. \n\"Client Account\" has the meaning ascribed to it in Part IV of this Compliance and Risk \nManagement Rulebook.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 57,
+    "section": "Part IV",
+    "chunk_index": 1
+  },
+  {
+    "text": "on the clientele of a VASP’s client. \n\"Client Account\" has the meaning ascribed to it in Part IV of this Compliance and Risk \nManagement Rulebook. \n\"Client Money\" has the meaning ascribed to it in Part IV of this Compliance and Risk \nManagement Rulebook. \n\"Client VA\" has the meaning ascribed to it in Part V of this Compliance and Risk \nManagement Rulebook. \n\"CMS\" means the compliance management system of a VASP.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 57,
+    "section": "Part IV",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n58 \nTerm Definition \n\"Compliance Officer\" or \"CO\" has the meaning ascribed to it in Part I of this Compliance and Risk \nManagement Rulebook.  \n\"Company Rulebook\" means the Company Rulebook issued by VARA pursuant to the \nRegulations, as may be amended from time to time. \n\"Compliance and Risk \nManagement Rulebook\" \nmeans this Comp liance and Risk Management  Rulebook issued by \nVARA pursuant to the Regulations, as may be amended from time \nto time.  \n\"Controlling Entity\" has the meaning ascribed to it in the Company Rulebook. \n\"Decentralised Autonomous \nOrganisation\" or \"DAO\"",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 58,
+    "section": "Part I",
+    "chunk_index": 0
+  },
+  {
+    "text": "to time.  \n\"Controlling Entity\" has the meaning ascribed to it in the Company Rulebook. \n\"Decentralised Autonomous \nOrganisation\" or \"DAO\" \nhas the meaning ascribed to it in the Company Rulebook.  \n\"Directive\" has the meaning ascribed to it in the Regulations. \n\"Dubai VA Law\" means Law No. (4) of 2022 Regulating Virtual Assets in the Emirate \nof Dubai, as may be amended from time to time. \n\"Emirate\"  means all zones across the Emirate of Dubai, including Special \nDevelopment Zones and Free Zones but excluding the Dubai \nInternational Financial Centre. \n\"Entity\" means any legal entity or individual. \n\"EOCN\" means the UAE Executive Office for Control & Non-Proliferation. \n\"FATCA\" means the United States Foreign Account Tax Compliance Act. \n\"FATF\" means the Financial Action Task Force.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 58,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "\"FATCA\" means the United States Foreign Account Tax Compliance Act. \n\"FATF\" means the Financial Action Task Force.  \n\"Federal AML-CFT Laws\" has the meaning ascribed to it in the Regulations. \n\"Federal Competition Laws\" means Federal Decree -Law No. (36) of 202 3 Regulating \nCompetition, as may be in force from time to time, including all \nexecutive regulations, cabinet resolutions or cabinet decisions \nrelating to the same, as may be published and/or amended from \ntime to time. \n\"Fit and Proper Person\" means an individual who complies with all fit and proper \nrequirements in the Company Rulebook.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 58,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n59 \nTerm Definition \n\"GoAML\" means the electronic platform through which Suspicious \nTransaction reports can be submitted to the UAE FIU. \n\"Group\" has the meaning ascribed to it in the Company Rulebook. \n\"Guidance\" has the meaning ascribed to it in the Regulations. \n\"Inside Information\" has the meaning ascribed to it in the Regulations. \n\"Insolvency Proceedings\" has the meaning ascribed to it in the Regulations. \n\"Insolvent\" has the meaning ascribed to it in the Regulations. \n\"Licence\" has the meaning ascribed to it in the Regulations.  \n\"Licensed\" means having a valid Licence.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 59,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "\"Licence\" has the meaning ascribed to it in the Regulations.  \n\"Licensed\" means having a valid Licence. \n\"Market Conduct Rulebook\" means the Market Conduct Rulebook issued by VARA pursuant to \nthe Regulations, as may be amended from time to time. \n\"Money Laundering \nReporting Officer\" or \n\"MLRO\" \nhas the meaning ascribed to it in Rule III.A.1 of this Compliance and \nRisk Management Rulebook. \n\"Outsourcing\"  has the meaning ascribed to it in the Company Rulebook. \n\"Paid-Up Capital\" has the meaning ascribed to it in the Company Rulebook. \n\"PDPL\" means the Federal Decree-Law No. (45) of 2021 on the Protection \nof Personal Data. \n\"Personal Data\" has the meaning ascribed to it in the PDPL. \n\"Politically Exposed Person \" \nor \"PEP\" \nhas the meaning ascribed to it in the Company Rulebook.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 59,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "\"Politically Exposed Person \" \nor \"PEP\" \nhas the meaning ascribed to it in the Company Rulebook. \n\"Regulated Sponsor\" has the meaning ascribed to it in  Rule VII.A of this Compliance and \nRisk Management Rulebook. \n\"Regulations\" means the Virtual Assets and Related Activities Regulations 2023, \nas may be amended from time to time. \n\"Related Parties\" has the meaning ascribed to it in the Company Rulebook. \n\"Reserve Assets\" has the meaning ascribed to it in the Company Rulebook. \n\"Responsible Individuals\" has the meaning ascribed to it in the Company Rulebook.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 59,
+    "section": "General",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n60 \nTerm Definition \n\"Responsible Officer\" has the meaning ascribed to it in Rule VII.G.1 of this Compliance and \nRisk Management Rulebook. \n\"Rule\" has the meaning ascribed to it in the Regulations. \n\"Rulebook\" has the meaning ascribed to it in the Regulations. \n\"Senior Management\" has the meaning ascribed to it in the Company Rulebook. \n\"Sponsored VASP\" has the meaning ascribed to it in  Rule VII.A of this Compliance and \nRisk Management Rulebook. \n\"Staff\" has the meaning ascribed to it in the Company Rulebook. \n\"Suspicious Transaction\" means any transaction, attempted transaction, or funds which a",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 60,
+    "section": "General",
+    "chunk_index": 0
+  },
+  {
+    "text": "\"Suspicious Transaction\" means any transaction, attempted transaction, or funds which a \nVASP has reasonable grounds to suspect as constituting, in whole \nor in part, and regardless of the amount or the timing, any of the \nfollowing— \n(a) the proceeds of crime (whether designated as a \nmisdemeanour or felony, and whether committed within the \nEmirate or in another country in which it is also a crime);  \n(b) being related to the crimes of money laundering, the \nfinancing of terrorism, or the financing of illegal \norganisations; and \n(c) being intended to be used in an activity related to such \ncrimes.  \n\"Technology and Information \nRulebook\" \nmeans the Technology and Information Rulebook issued by VARA \npursuant to the Regulations, as may be amended from time to time.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 60,
+    "section": "General",
+    "chunk_index": 1
+  },
+  {
+    "text": "Rulebook\" \nmeans the Technology and Information Rulebook issued by VARA \npursuant to the Regulations, as may be amended from time to time. \n\"Third-Party Bank\" has the meaning ascribed to it in Part IV of this Compliance and Risk \nManagement Rulebook. \n\"Travel Rule\" has the meaning ascribed to it in FATF’s Updated Guidance for a \nRisk-Based Approach for Virtual Assets and Virtual Asset Service \nProviders (October 2021), as may be amended from time to time. \n\"UAE\" means the United Arab Emirates. \n\"UAE FIU\" means the UAE Financial Intelligence Unit.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 60,
+    "section": "Part IV",
+    "chunk_index": 2
+  },
+  {
+    "text": "araconnect@vara.aevصندوق بريد9292 دبي، الإمارات العربية المتحدة - سُلطة تنظيم  الأصول الافتراضية  \nvaraconnect@vara.ae - PO Box 9292, Dubai, UAE - Virtual Assets Regulatory Authority \n61 \nTerm Definition \n\"Ultimate Beneficial Owner\" \nor \"UBO\" \nhas the meaning ascribed to it in the Company Rulebook. \n\"UNSC\" means the United Nations Security Council. \n\"VA Activity\" means the activities listed in Schedule 1 of the Regulations, as may \nbe amended from time to time. \n\"VA Wallet\" has the meaning ascribed to the term \"Virtual Asset Wallet\" in the \nDubai VA Law. \n\"VARA\" means the Dubai Virtual Assets Regulatory Authority. \n\"VASP\" means an Entity Licensed by VARA to conduct VA Activity(ies) in \nthe Emirate.  \n\"Virtual Asset\" or \"VA\" has the meaning ascribed to it in the Dubai VA Law.",
+    "jurisdiction": "AE-Dubai",
+    "regulator": "VARA",
+    "document": "Compliance and Risk Management Rulebook",
+    "effective_date": "2025-05-19",
+    "page": 61,
+    "section": "General",
+    "chunk_index": 0
+  }
+]
