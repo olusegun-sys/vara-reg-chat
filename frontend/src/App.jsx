@@ -4,7 +4,10 @@ import ChatWindow from "./components/ChatWindow.jsx";
 import ChatInput from "./components/ChatInput.jsx";
 import Sidebar from "./components/Sidebar.jsx";
 import { getJurisdictions, streamChat, generateChatTitle } from "./api/client.js";
-import { getSessions, createSession, getMessages, addMessage, updateSessionTitle, deleteSession, togglePin } from "./api/supabase.js";
+import { 
+  getSessions, createSession, getMessages, addMessage, 
+  updateSessionTitle, deleteSession, togglePin 
+} from "./api/supabase.js";
 
 export default function App() {
   const [jurisdictions, setJurisdictions] = useState([]);
@@ -17,6 +20,7 @@ export default function App() {
   const [currentSessionId, setCurrentSessionId] = useState(null);
   const [messages, setMessages] = useState([]);
 
+  // Load jurisdictions on mount
   useEffect(() => {
     getJurisdictions().then(data => {
       setJurisdictions(data);
@@ -24,14 +28,19 @@ export default function App() {
     }).catch(err => setLoadError(err.message));
   }, []);
 
+  // Load chat sessions from Supabase on mount
   useEffect(() => {
     getSessions().then(data => {
       setSessions(data);
-      if (data.length > 0) setCurrentSessionId(data[0].id);
-      else handleNewChat();
+      if (data.length > 0) {
+        setCurrentSessionId(data[0].id);
+      } else {
+        handleNewChat();
+      }
     }).catch(err => console.error("Error loading sessions:", err));
   }, []);
 
+  // Load messages whenever the active session changes
   useEffect(() => {
     if (!currentSessionId) return;
     getMessages(currentSessionId).then(data => {
@@ -44,6 +53,7 @@ export default function App() {
     }).catch(err => console.error("Error loading messages:", err));
   }, [currentSessionId]);
 
+  // --- Session Management Handlers ---
   const handleNewChat = async () => {
     try {
       const newSession = await createSession("New Conversation");
@@ -78,9 +88,12 @@ export default function App() {
 
   const handleTogglePin = async (id) => {
     const session = sessions.find(s => s.id === id);
+    if (!session) return;
     const newPinnedState = !session.is_pinned;
+    
     setSessions(prev => {
       const updated = prev.map(s => s.id === id ? { ...s, is_pinned: newPinnedState } : s);
+      // Re-sort client side to match DB order
       return updated.sort((a, b) => {
         if (a.is_pinned && !b.is_pinned) return -1;
         if (!a.is_pinned && b.is_pinned) return 1;
@@ -90,6 +103,7 @@ export default function App() {
     await togglePin(id, newPinnedState);
   };
 
+  // --- Edit & Send Handlers ---
   const handleEditMessage = (content) => {
     setInputValue(content);
   };
@@ -98,12 +112,16 @@ export default function App() {
     const question = inputValue.trim();
     if (!question || isSending || !selectedJurisdiction || !currentSessionId) return;
 
+    // 1. Save user message to Supabase
     const userMsg = await addMessage(currentSessionId, "user", question);
+    
+    // 2. Add to UI immediately with a loading placeholder
     const assistantPlaceholder = { id: "temp-ai", role: "assistant", content: "", isLoading: true, sources: [] };
     setMessages(prev => [...prev, userMsg, assistantPlaceholder]);
     setInputValue("");
     setIsSending(true);
 
+    // 3. Generate smart title in background if this is the first message
     if (messages.length === 0) {
       generateChatTitle(question).then(newTitle => {
         setSessions(prev => prev.map(s => s.id === currentSessionId ? { ...s, title: newTitle } : s));
@@ -111,6 +129,7 @@ export default function App() {
       });
     }
 
+    // 4. Stream response from backend
     try {
       let fullText = "";
       let receivedSources = [];
@@ -136,7 +155,10 @@ export default function App() {
         }
       );
 
+      // 5. Save final AI message to Supabase
       const finalAiMsg = await addMessage(currentSessionId, "assistant", fullText, receivedSources);
+      
+      // 6. Update UI with real DB ID
       setMessages(prev => {
         const updated = [...prev];
         updated[updated.length - 1] = { ...updated[updated.length - 1], id: finalAiMsg.id, isLoading: false };
@@ -146,7 +168,7 @@ export default function App() {
     } catch (err) {
       setMessages(prev => {
         const updated = [...prev];
-        updated[updated.length - 1] = { role: "assistant", content: `⚠️ ${err.message}`, isLoading: false };
+        updated[updated.length - 1] = { role: "assistant", content: `⚠️ ${err.message || "Something went wrong."}`, isLoading: false };
         return updated;
       });
     } finally {
@@ -154,8 +176,13 @@ export default function App() {
     }
   }, [inputValue, isSending, selectedJurisdiction, currentSessionId, messages.length]);
 
+  // Fallback if currentSessionId gets out of sync
+  if (!currentSessionId && sessions.length > 0) {
+    setCurrentSessionId(sessions[0].id);
+  }
+
   return (
-    <div className="h-full flex bg-luxury-light font-sans">
+    <div className="h-full flex bg-luxury font-sans">
       <Sidebar 
         sessions={sessions} 
         currentSessionId={currentSessionId} 
@@ -165,8 +192,9 @@ export default function App() {
         onDelete={handleDelete} 
         onTogglePin={handleTogglePin} 
       />
+
       <div className="flex-1 flex flex-col min-w-0 bg-luxury-light">
-        <header className="bg-luxury border-b border-slate-800 px-4 sm:px-6 py-4 shrink-0 shadow-sm z-10">
+        <header className="bg-luxury border-b border-slate-800 px-4 sm:px-6 py-4 shrink-0 z-10 shadow-sm">
           <div className="max-w-3xl mx-auto flex items-center justify-between gap-3">
             <div className="min-w-0">
               <h1 className="text-base sm:text-lg font-semibold text-white truncate md:hidden">
@@ -177,14 +205,30 @@ export default function App() {
               </h1>
               <p className="text-xs text-slate-400 hidden sm:block">AI Regulatory Knowledge Base</p>
             </div>
-            <JurisdictionSelector options={jurisdictions} value={selectedJurisdiction} onChange={setSelectedJurisdiction} disabled={isSending || jurisdictions.length === 0} />
+            <JurisdictionSelector 
+              options={jurisdictions} 
+              value={selectedJurisdiction} 
+              onChange={setSelectedJurisdiction} 
+              disabled={isSending || jurisdictions.length === 0} 
+            />
           </div>
         </header>
-        
+
+        {loadError && (
+          <div className="bg-red-900/50 border-b border-red-800 px-4 py-2 shrink-0">
+            <div className="max-w-3xl mx-auto text-xs text-red-200">{loadError}</div>
+          </div>
+        )}
+
         <main className="flex-1 flex flex-col min-h-0">
           <ChatWindow messages={messages} onEdit={handleEditMessage} />
           <div className="max-w-3xl mx-auto w-full shrink-0">
-            <ChatInput value={inputValue} onChange={setInputValue} onSend={handleSend} disabled={isSending || !selectedJurisdiction} />
+            <ChatInput 
+              value={inputValue} 
+              onChange={setInputValue} 
+              onSend={handleSend} 
+              disabled={isSending || !selectedJurisdiction} 
+            />
           </div>
         </main>
       </div>

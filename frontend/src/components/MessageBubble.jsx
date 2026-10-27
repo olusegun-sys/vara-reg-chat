@@ -11,11 +11,10 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Tooltip wrapper component
   const Tooltip = ({ text, children }) => (
     <div className="relative group flex items-center justify-center">
       {children}
-      <span className="absolute -top-8 scale-0 transition-all rounded bg-slate-800 p-1.5 text-xs text-white group-hover:scale-100 whitespace-nowrap z-50 shadow-md">
+      <span className="absolute -top-8 scale-0 transition-all rounded bg-slate-800 p-1.5 text-xs text-white group-hover:scale-100 whitespace-nowrap z-50 shadow-md border border-slate-700">
         {text}
       </span>
     </div>
@@ -27,17 +26,17 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
       {/* The Bubble */}
       <div
         className={`
-          max-w-[85%] sm:max-w-[75%] rounded-2xl px-5 py-3.5 shadow-sm text-[15px]
+          max-w-[85%] sm:max-w-[85%] rounded-2xl px-5 py-4 shadow-sm text-[15px]
           ${isUser
             ? "bg-brand-600 text-white rounded-br-sm"
-            : "bg-luxury text-slate-200 border border-luxury-light rounded-bl-sm shadow-premium"}
+            : "bg-[#1E293B] text-slate-200 border border-slate-700/50 rounded-bl-sm shadow-premium"}
         `}
       >
         {isLoading ? (
           <div className="flex items-center gap-1.5 py-1">
-            <span className="typing-dot w-1.5 h-1.5 rounded-full bg-slate-400" />
-            <span className="typing-dot w-1.5 h-1.5 rounded-full bg-slate-400" />
-            <span className="typing-dot w-1.5 h-1.5 rounded-full bg-slate-400" />
+            <span className="typing-dot w-2 h-2 rounded-full bg-brand-500" />
+            <span className="typing-dot w-2 h-2 rounded-full bg-brand-500" />
+            <span className="typing-dot w-2 h-2 rounded-full bg-brand-500" />
           </div>
         ) : (
           <>
@@ -46,7 +45,7 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
                 {content}
               </p>
             ) : (
-              <div className="leading-relaxed overflow-hidden prose prose-invert max-w-none">
+              <div className="leading-relaxed overflow-hidden prose prose-invert max-w-none text-slate-200">
                 <ReactMarkdown
                   components={{
                     p: ({ node, ...props }) => <p className="mb-3 last:mb-0" {...props} />,
@@ -61,15 +60,14 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
               </div>
             )}
 
-            {/* Sources section for Assistant */}
             {sources && sources.length > 0 && (
-              <div className="mt-4 pt-3 border-t border-slate-700/50">
+              <div className="mt-4 pt-3 border-t border-slate-700">
                 <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
                   Sources
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {sources.map((src, i) => (
-                    <span key={i} className="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700">
+                    <span key={i} className="text-xs bg-slate-800/80 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700">
                       Page {src.page} {src.section !== "General" && `· ${src.section}`}
                     </span>
                   ))}
@@ -80,11 +78,9 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
         )}
       </div>
 
-      {/* Action Buttons (Only show if not loading) */}
       {!isLoading && (
         <div className={`flex items-center gap-1 mt-1.5 px-1 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
           
-          {/* Copy (Always available) */}
           <Tooltip text={copied ? "Copied!" : "Copy"}>
             <button onClick={handleCopy} className="p-1.5 text-slate-500 hover:text-slate-300 transition-colors">
               {copied ? (
@@ -95,7 +91,6 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
             </button>
           </Tooltip>
 
-          {/* Edit (User Only) */}
           {isUser && (
             <Tooltip text="Edit">
               <button onClick={() => onEdit && onEdit(content)} className="p-1.5 text-slate-500 hover:text-slate-300 transition-colors">
@@ -104,7 +99,6 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
             </Tooltip>
           )}
 
-          {/* Assistant Actions (Thumbs, Share) */}
           {!isUser && (
             <>
               <Tooltip text="Good Response">
