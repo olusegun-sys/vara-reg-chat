@@ -1,15 +1,15 @@
-﻿**Summary:** Here is the final, updated `STATE.md`. It captures the latest critical pivot: we successfully migrated from the memory-heavy local embeddings (`sentence-transformers`) to **Google Gemini Cloud Embeddings** to solve the Render 512MB Out-Of-Memory crash. 
+﻿**Summary:** Here is the fully updated `STATE.md`. It captures the current status precisely: the frontend is live, the backend is deployed, but there is one missing environment variable (`GEMINI_API_KEY`) on Render causing a 500 error. 
 
 Save this over your existing `vara-reg-chat\STATE.md`.
 
 ```markdown
 # STATE.md — Regulatory Knowledge Base Chat (POC)
 
-**Last updated:** 2026-10-27 (Migrated to Gemini Cloud Embeddings, Ready for Final Render Deploy)
+**Last updated:** 2026-10-27 (Live on Render, blocked by missing `GEMINI_API_KEY` env var)
 **Owner:** Olusegun Fadeyi (Olu)
 **Stakeholder:** Terence Bumah ("Boss Terry")
 **Client deadline:** Two-week window; POC due to Terence for client testing (TOMORROW)
-**Status:** ✅ **READY FOR FINAL DEPLOY.** Backend code is stable. Migrated to Gemini Cloud Embeddings to solve Render's 512MB RAM limit. Supabase database is wired up. 
+**Status:** ⚠️ **LIVE BUT NEEDS ONE FIX.** Frontend is deployed. Backend is deployed. Both are talking. The only thing blocking the chat is that `GEMINI_API_KEY` is missing in Render's Environment Variables, causing a `500 Internal Server Error` on chat requests.
 
 ---
 
@@ -42,19 +42,19 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 | **Framework** | FastAPI 0.115.0 + Uvicorn | Async, supports `StreamingResponse` | ✅ Live |
 | **LLM** | Groq (`openai/gpt-oss-120b`) | Free tier, OpenAI-compatible | ✅ Working |
 | **LLM Client** | `openai>=1.55.3` | Supports `stream=True` | ✅ Working |
-| **Embeddings** | **Google Gemini (`text-embedding-004`)** | Cloud-based, zero RAM footprint | ✅ Working |
+| **Embeddings** | **Google Gemini (`gemini-embedding-001`)** | Cloud-based, zero RAM footprint | ⚠️ Requires `GEMINI_API_KEY` on Render |
 | **Vector Store** | **FAISS (`faiss-cpu>=1.13.0`)** | Pre-built wheels for Python 3.14 | ✅ 202 vectors |
 | **PDF Parsing** | `pypdf==5.1.0` | Page-by-page extraction | ✅ 61 pages |
 | **Chunking** | RecursiveCharacterTextSplitter (800/150) | Preserves semantic boundaries | ✅ 202 chunks |
 
-### Frontend
+### Frontend (Live on Render)
 | Layer | Choice | Why | Status |
 |---|---|---|---|
-| **Framework** | React 18.3.1 | Stable, proven | ✅ Ready |
-| **Build tool** | Vite 5.4.11 | Fast HMR, minimal config | ✅ Ready |
-| **Styling** | Tailwind CSS 3.4.17 | Utility-first, responsive | ✅ Ready |
+| **Framework** | React 18.3.1 | Stable, proven | ✅ Live |
+| **Build tool** | Vite 5.4.11 | Fast HMR, minimal config | ✅ Live |
+| **Styling** | Tailwind CSS 3.4.17 | Utility-first, responsive | ✅ Live |
 | **Markdown** | `react-markdown` | Parses LLM output (**bold**, lists) | ✅ Working |
-| **State/Storage** | **Supabase** (`@supabase/supabase-js`) | Replaces localStorage; permanent database | ✅ Integrated |
+| **State/Storage** | **Supabase** (`@supabase/supabase-js`) | Permanent database | ✅ Integrated |
 | **Streaming** | Native `fetch` + `ReadableStream` | Parses SSE chunks in real-time | ✅ Working |
 
 ---
@@ -81,7 +81,7 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 - `backend\app\models\schemas.py` ✅ — includes `TitleRequest`, `TitleResponse`
 - `backend\app\services\llm.py` ✅ — includes `generate_answer()`, `stream_answer()`, `generate_title()`
 - `backend\app\services\retrieval.py` ✅ — Gemini embeddings, FAISS search
-- `backend\app\services\ingestion.py` ✅ — Gemini embeddings, `reset_vector_store()`
+- `backend\app\services\ingestion.py` ✅ — Gemini embeddings, `reset_vector_store()`, rate-limit handling (60s sleep)
 - `backend\scripts\ingest.py` ✅ — `r"""` fixed, `--reset` wired
 
 ### Frontend (All 15 files complete, streaming enabled, Supabase integrated)
@@ -109,12 +109,14 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 2. **BIGGEST: `pip install` failed on Python 3.14** → Chroma's `chroma-hnswlib` link error. **Resolution:** swapped Chroma → FAISS, bumped pydantic ≥2.13.0. ✅
 3. **`/api/chat` 502 `proxies` error** → `openai==1.54.0` vs `httpx>=0.28`. Bumped to `openai>=1.55.3`. ✅
 4. **Markdown rendering issue** → The LLM returned `**bold**`, but UI showed raw asterisks. **Resolution:** Installed `react-markdown`. ✅
-5. **Slow Response Time (Blocking)** → Waiting 5-10 seconds for the LLM to finish. **Resolution:** Implemented Server-Sent Events (SSE) with `StreamingResponse` in FastAPI and `ReadableStream` in the frontend. ✅
+5. **Slow Response Time (Blocking)** → Waiting 5-10 seconds for the LLM to finish. **Resolution:** Implemented Server-Sent Events (SSE) with `StreamingResponse`. ✅
 6. **Input "Red Circle" Bug** → HTML5 form validation blocked the text area. **Resolution:** Ensured `preventDefault()` on the `Enter` keydown handler. ✅
 7. **Clearing Cache Deletes Chats** → `localStorage` is wiped by browser cache clears. **Resolution:** Migrated to Supabase PostgreSQL. ✅
 8. **GitHub Push Protection Error** → Real API keys were accidentally committed. **Resolution:** Reset git history (`git init`), replaced the keys with placeholders, force-pushed. ✅
 9. **Render Deployment Port Scan Timeout** → The Start Command `--port $PORT` wasn't expanding. **Resolution:** Wrapped the command in `sh -c "uvicorn ... --port $PORT"`. ✅
 10. **Render Deployment Out of Memory (512MB)** → `sentence-transformers` loaded PyTorch at startup, exceeding 512MB. **Resolution:** Migrated to Google Gemini Cloud Embeddings, removing PyTorch entirely. ✅
+11. **Gemini Embedding Rate Limit (429)** → Free tier limit is 100 requests per minute. Batching 202 chunks too fast triggered the limit. **Resolution:** Added a 60-second sleep between batches of 40 chunks. ✅
+12. **Render Backend 500 Error `No API_KEY or ADC found`** → `GEMINI_API_KEY` is missing in Render's Environment Variables. **Resolution:** Add `GEMINI_API_KEY` to Render dashboard.
 
 ### ⚠️ Security — RESOLVED
 Groq and Gemini API keys were rotated. The `.env.example` now contains placeholders. GitHub push protection is active.
@@ -123,10 +125,10 @@ Groq and Gemini API keys were rotated. The `.env.example` now contains placehold
 
 ## 7. Breakthroughs
 
-- **Full Stack Deployment:** The backend is live on Render and successfully handling streaming requests within a 512MB memory limit.
+- **Full Stack Deployment:** Both frontend and backend are live on Render.
 - **Cloud Embeddings:** Solved the memory limit permanently by using Gemini for embeddings.
 - **ChatGPT-like Speed:** Implementing SSE streaming means users see the response start typing immediately.
-- **Persistent Storage:** Supabase integration means chat history is permanently saved in a database.
+- **Persistent Storage:** Supabase integration means chat history is permanently saved.
 - **Multi-jurisdiction architecture is real.** Every chunk tagged `jurisdiction: "AE-Dubai"`.
 
 ---
@@ -156,28 +158,26 @@ Groq and Gemini API keys were rotated. The `.env.example` now contains placehold
 **Step 1:** Paste the Universal Master Prompt.
 **Step 2:** Paste this `STATE.md`.
 **Step 3:** Say one of:
-- **"Deploy frontend to Render"** — the backend is live. Next step is deploying the React frontend to Render.
-- **"Add Nigeria (CBN)"** — to test the multi-jurisdiction feature by dropping a new PDF into `backend/data`.
+- **"Fix Render Env Vars"** — Add `GEMINI_API_KEY` to Render and redeploy.
+- **"Add Nigeria (CBN)"** — to test the multi-jurisdiction feature.
 
 ---
 
 ## 10. What's Done vs. What's Next
 
-### ✅ DONE (Backend Deployed & Supabase Integrated)
+### ✅ DONE (Live on Render)
 - All 13 backend files, ingestion (202 chunks), `/chat/stream`, `/title`, `/warmup`.
 - Backend deployed to Render.
 - Supabase PostgreSQL integrated.
-- Frontend fully rewritten to use SSE streaming and Supabase.
+- Frontend deployed to Render (Static Site).
+- Frontend uses SSE streaming and Supabase.
 - Smart 3-5 word title generation.
 - Migrated to Gemini Cloud Embeddings.
 
-### ⏳ NEXT (Final Steps)
-1. Add `GEMINI_API_KEY` to Render environment variables.
-2. Redeploy backend.
-3. **Deploy frontend to Render Static Site** 
-   - Set `VITE_API_URL=https://vara-reg-chat.onrender.com`
-   - Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
-   - Build `npm run build`, publish `dist`.
+### ⏳ NEXT (Final 2 Minutes to Green)
+1. Add `GEMINI_API_KEY` to Render backend environment variables.
+2. Redeploy.
+3. Test the live frontend URL.
 4. **Demo to Terence.**
 
 ### 🔮 FUTURE (Post-POC)
@@ -195,7 +195,7 @@ Groq and Gemini API keys were rotated. The `.env.example` now contains placehold
 - **Shell:** CMD
 - **Editor:** `start notepad++ "file"`
 - **No paid API budget** — Groq & Gemini free tiers only.
-- **Deployment:** Render (Backend is live. Frontend is pending).
+- **Deployment:** Render (Frontend & Backend Live).
 - **Database:** Supabase (Project ref: `bqdzealwfriwzxwqfqnd`).
 - **Deadline:** Wednesday (TOMORROW) for VARA POC.
 
@@ -210,15 +210,17 @@ Groq and Gemini API keys were rotated. The `.env.example` now contains placehold
 | Streaming endpoint works | **HIGH** | Verified SSE text chunks arrive in UI |
 | Supabase integration | **HIGH** | Data persists across cache clears |
 | Render Backend Deployment | **HIGH** | "Your service is live 🎉" in Render logs |
+| Render Frontend Deployment | **HIGH** | Live URL provided by Render |
 
 **Demo risks to watch:**
 - Render free tier spins down after inactivity — first request after idle might take 30s to wake up. (Solution: Ping `/api/warmup` 5 minutes before the demo).
+- Gemini Free Tier has a 100 RPM limit. The demo won't hit this, but if the client spams the chat, it might. 
 
 ---
 
 ## 13. Next Chat Opening Prompt (Copy-Paste)
 
-> "Resuming the VARA Regulatory Knowledge Base Chat project. **The backend is successfully deployed on Render and migrated to Gemini Cloud Embeddings.** The frontend is fully built and uses Supabase for database storage. Here is STATE.md. **Next action:** Add `GEMINI_API_KEY` to Render, then deploy the frontend to Render Static Site, setting the environment variables for the backend URL and Supabase keys. Guide me through the Render frontend deployment step-by-step."
+> "Resuming the VARA Regulatory Knowledge Base Chat project. **The frontend and backend are both live on Render.** The backend crashed with a 500 error because `GEMINI_API_KEY` is missing in Render's environment variables. Here is STATE.md. **Next action:** Walk me through adding `GEMINI_API_KEY` to Render and redeploying so the chat works."
 
 ---
 
