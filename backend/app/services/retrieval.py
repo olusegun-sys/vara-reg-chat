@@ -30,7 +30,7 @@ def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List
         return []
 
     result = genai.embed_content(
-        model="models/text-embedding-004",
+        model="models/gemini-embedding-001",
         content=question,
         task_type="retrieval_query"
     )

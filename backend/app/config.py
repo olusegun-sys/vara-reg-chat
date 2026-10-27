@@ -25,6 +25,7 @@ DATA_DIR = BASE_DIR / "data"
 # Groq, DeepSeek, OpenAI, Together, etc. all speak this format.
 # Switching providers = change these three env vars, code stays identical.
 LLM_API_KEY = os.getenv("LLM_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.groq.com/openai/v1")
 LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b")
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))  # 0.1 = focused, less creative

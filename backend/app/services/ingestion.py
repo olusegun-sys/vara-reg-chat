@@ -1,4 +1,5 @@
 import json
+import time
 from pathlib import Path
 from typing import List, Dict, Any
 import re
@@ -13,7 +14,11 @@ from app import config
 
 genai.configure(api_key=config.GEMINI_API_KEY)
 
+
 def load_pdf_pages(pdf_path: Path) -> List[Dict[str, Any]]:
+    """
+    Extract text from each page of the PDF, preserving page numbers.
+    """
     reader = PdfReader(str(pdf_path))
     pages = []
     for idx, page in enumerate(reader.pages, start=1):
@@ -22,11 +27,19 @@ def load_pdf_pages(pdf_path: Path) -> List[Dict[str, Any]]:
             pages.append({"page": idx, "text": text})
     return pages
 
+
 def detect_section(text: str) -> str:
+    """
+    Best-effort detection of a section heading inside a chunk.
+    """
     match = re.search(r"(Part\s+[IVX]+|Section\s+[A-Z]|[A-Z]\.\s+[A-Z][a-z].{0,60})", text)
     return match.group(1).strip() if match else "General"
 
+
 def chunk_pages(pages: List[Dict[str, Any]], chunk_size: int, chunk_overlap: int) -> List[Dict[str, Any]]:
+    """
+    Split page text into overlapping chunks, keeping page + section metadata.
+    """
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
@@ -44,23 +57,55 @@ def chunk_pages(pages: List[Dict[str, Any]], chunk_size: int, chunk_overlap: int
             })
     return chunks
 
+
 def embed_chunks(chunks: List[Dict[str, Any]], model_name: str = None) -> List[List[float]]:
+    """
+    Embed chunks using Gemini (batch processing with strict rate limiting).
+
+    Why batch size 40 and sleep 60s:
+    - Gemini Free Tier allows 100 requests per minute.
+    - Processing 40 chunks per batch = 40 requests.
+    - Sleeping 60 seconds between batches guarantees the rolling window clears,
+      so we never exceed 100 requests in any 60-second period.
+    - Total time for 202 chunks: ~5 minutes (6 batches × 40 + 5 sleeps × 60s).
+    """
     texts = [c["text"] for c in chunks]
     embeddings = []
-    batch_size = 100
+    batch_size = 40
+    total_batches = (len(texts) + batch_size - 1) // batch_size
+
     for i in range(0, len(texts), batch_size):
-        batch = texts[i:i+batch_size]
-        result = genai.embed_content(
-            model="models/text-embedding-004",
-            content=batch,
-            task_type="retrieval_document"
-        )
-        embeddings.extend(result['embedding'])
+        batch = texts[i:i + batch_size]
+        current_batch = i // batch_size + 1
+
+        print(f"  [embed] Processing batch {current_batch} of {total_batches} ({len(batch)} chunks)...")
+
+        try:
+            result = genai.embed_content(
+                model="models/gemini-embedding-001",
+                content=batch,
+                task_type="retrieval_document"
+            )
+            embeddings.extend(result['embedding'])
+        except Exception as e:
+            print(f"  [embed] Error on batch {current_batch}: {e}")
+            raise e
+
+        # Sleep 60 seconds between batches to respect the 100 RPM limit
+        if current_batch < total_batches:
+            print("  [embed] Sleeping 60 seconds to respect API rate limits...")
+            time.sleep(60)
+
     return embeddings
 
+
 def reset_vector_store() -> None:
+    """
+    Delete the FAISS index and metadata sidecar.
+    """
     index_path = Path(config.FAISS_INDEX_PATH)
     metadata_path = Path(config.FAISS_METADATA_PATH)
+
     removed = []
     if index_path.exists():
         index_path.unlink()
@@ -68,19 +113,37 @@ def reset_vector_store() -> None:
     if metadata_path.exists():
         metadata_path.unlink()
         removed.append(str(metadata_path))
+
     if removed:
         print(f"[reset] Deleted: {', '.join(removed)}")
+    else:
+        print("[reset] Nothing to delete — vector store is already empty.")
 
-def store_in_faiss(chunks, embeddings, jurisdiction, regulator, document_title, effective_date) -> int:
+
+def store_in_faiss(
+    chunks: List[Dict[str, Any]],
+    embeddings: List[List[float]],
+    jurisdiction: str,
+    regulator: str,
+    document_title: str,
+    effective_date: str,
+) -> int:
+    """
+    Persist chunks + embeddings into a FAISS index and a JSON metadata sidecar.
+    """
     index_path = Path(config.FAISS_INDEX_PATH)
     index_path.parent.mkdir(parents=True, exist_ok=True)
+
     vectors = np.array(embeddings, dtype="float32")
     dim = vectors.shape[1]
 
     if index_path.exists():
         index = faiss.read_index(str(index_path))
         if index.d != dim:
-            raise ValueError(f"Dimension mismatch: existing={index.d}, new={dim}")
+            raise ValueError(
+                f"Embedding dimension mismatch: existing index has {index.d}, "
+                f"new embeddings have {dim}. Delete the index and re-ingest."
+            )
     else:
         index = faiss.IndexFlatL2(dim)
 
@@ -88,7 +151,7 @@ def store_in_faiss(chunks, embeddings, jurisdiction, regulator, document_title, 
     faiss.write_index(index, str(index_path))
 
     metadata_path = Path(config.FAISS_METADATA_PATH)
-    existing = []
+    existing: List[Dict[str, Any]] = []
     if metadata_path.exists():
         with open(metadata_path, "r", encoding="utf-8") as f:
             existing = json.load(f)
@@ -110,14 +173,21 @@ def store_in_faiss(chunks, embeddings, jurisdiction, regulator, document_title, 
 
     return len(chunks)
 
+
 def ingest_document(jurisdiction: str, doc_config: Dict[str, str]) -> int:
+    """
+    Full ingestion pipeline for one document.
+    """
     pdf_path = config.DATA_DIR / doc_config["file"]
     if not pdf_path.exists():
-        raise FileNotFoundError(f"PDF not found: {pdf_path}")
+        raise FileNotFoundError(
+            f"PDF not found: {pdf_path}\n"
+            f"Expected file in: {config.DATA_DIR}"
+        )
 
     print(f"[ingest] Loading {pdf_path.name}...")
     pages = load_pdf_pages(pdf_path)
-    print(f"[ingest] Extracted {len(pages)} pages.")
+    print(f"[ingest] Extracted {len(pages)} pages with text.")
 
     chunks = chunk_pages(pages, config.CHUNK_SIZE, config.CHUNK_OVERLAP)
     print(f"[ingest] Created {len(chunks)} chunks.")
@@ -127,6 +197,14 @@ def ingest_document(jurisdiction: str, doc_config: Dict[str, str]) -> int:
     print(f"[ingest] Generated {len(embeddings)} embeddings.")
 
     regulator = config.JURISDICTIONS[jurisdiction]["regulator"]
-    count = store_in_faiss(chunks, embeddings, jurisdiction, regulator, doc_config["title"], doc_config["effective_date"])
-    print(f"[ingest] Stored {count} chunks in FAISS.")
+    count = store_in_faiss(
+        chunks,
+        embeddings,
+        jurisdiction,
+        regulator,
+        doc_config["title"],
+        doc_config["effective_date"],
+    )
+    print(f"[ingest] Stored {count} chunks in FAISS at {config.FAISS_INDEX_PATH}")
+    print(f"[ingest] Metadata written to {config.FAISS_METADATA_PATH}")
     return count
