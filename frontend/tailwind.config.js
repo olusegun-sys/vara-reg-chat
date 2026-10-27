@@ -7,8 +7,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'], // Matches DeepSeek's clean UI look
-        serif: ['Lora', 'serif'],      // Luxurious, mature headers
+        sans: ['Inter', 'sans-serif'],
+        serif: ['Lora', 'serif'],
       },
       colors: {
         brand: {
@@ -21,12 +21,13 @@ export default {
         },
         luxury: {
           DEFAULT: '#0F172A', // Deep Midnight Navy (Sidebar)
-          light: '#1E293B',
-          accent: '#38BDF8',  // Sharp Sky Blue highlight
+          light: '#1E293B',   // Lighter navy for the main chat background
+          accent: '#38BDF8',  // Sky Blue highlight
         },
       },
       boxShadow: {
-        'premium': '0 4px 20px -2px rgba(15, 23, 42, 0.08)',
+        'premium': '0 4px 20px -2px rgba(15, 23, 42, 0.2)',
+        'glow': '0 0 15px -3px rgba(56, 189, 248, 0.3)',
       }
     },
   },
