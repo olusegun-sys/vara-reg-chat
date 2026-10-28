@@ -26,7 +26,7 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
       {/* The Bubble */}
       <div
         className={`
-          max-w-[85%] sm:max-w-[85%] rounded-2xl px-5 py-4 shadow-sm text-[15px]
+          max-w-[90%] sm:max-w-[85%] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 shadow-sm text-[15px]
           ${isUser
             ? "bg-brand-600 text-white rounded-br-sm"
             : "bg-[#1E293B] text-slate-200 border border-slate-700/50 rounded-bl-sm shadow-premium"}
@@ -60,15 +60,17 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
               </div>
             )}
 
+            {/* Cleaned up Sources Section */}
             {sources && sources.length > 0 && (
-              <div className="mt-4 pt-3 border-t border-slate-700">
-                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                  Sources
+              <div className="mt-4 pt-3 border-t border-slate-700/60">
+                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                  Sources cited
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5">
                   {sources.map((src, i) => (
-                    <span key={i} className="text-xs bg-slate-800/80 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700">
-                      Page {src.page} {src.section !== "General" && `· ${src.section}`}
+                    <span key={i} className="inline-flex items-center text-[11px] bg-slate-800/80 text-slate-300 px-2 py-1 rounded border border-slate-700/50">
+                      <span className="font-medium text-brand-400 mr-1">p.{src.page}</span>
+                      <span className="truncate max-w-[120px]">{src.section !== "General" ? src.section : src.document}</span>
                     </span>
                   ))}
                 </div>
@@ -80,7 +82,7 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
 
       {!isLoading && (
         <div className={`flex items-center gap-1 mt-1.5 px-1 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
-          
+          {/* ... (keep your existing Action Buttons exactly as they are) ... */}
           <Tooltip text={copied ? "Copied!" : "Copy"}>
             <button onClick={handleCopy} className="p-1.5 text-slate-500 hover:text-slate-300 transition-colors">
               {copied ? (

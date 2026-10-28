@@ -48,12 +48,6 @@ def health():
 def warmup():
     """
     Manually load the embedding model into memory.
-    
-    Why this exists:
-    - Render's free tier spins down after 15 minutes.
-    - The first query takes 30-60s to load PyTorch and the embedding model.
-    - Hitting this endpoint 5 minutes before the demo wakes up the server and loads the model,
-      so the first real user query is fast (2-5 seconds).
     """
     try:
         # Import here to avoid circular imports and only load when called
@@ -79,7 +73,6 @@ def jurisdictions():
 def chat(req: ChatRequest):
     """
     Standard chat endpoint (blocking).
-    Kept for completeness, though the frontend uses /chat/stream for the UI.
     """
     if req.jurisdiction not in config.JURISDICTIONS:
         raise HTTPException(status_code=400, detail=f"Unknown jurisdiction: {req.jurisdiction}")
@@ -114,7 +107,6 @@ def chat(req: ChatRequest):
 def chat_stream(req: ChatRequest):
     """
     Streaming chat endpoint using Server-Sent Events (SSE).
-    Why: Makes the UI feel instant by sending the text word-by-word.
     """
     if req.jurisdiction not in config.JURISDICTIONS:
         raise HTTPException(status_code=400, detail=f"Unknown jurisdiction: {req.jurisdiction}")
@@ -134,3 +126,29 @@ def title(req: TitleRequest):
     """Generate a short conversation title."""
     title_text = llm.generate_title(req.question)
     return TitleResponse(title=title_text)
+
+
+@router.get("/debug-search")
+def debug_search(q: str, jurisdiction: str = "AE-Dubai"):
+    """
+    Temporary endpoint to see exactly what chunks retrieval returns.
+    Usage: /api/debug-search?q=What is the capital requirement?
+    """
+    try:
+        chunks = retrieval.retrieve_chunks(q, jurisdiction)
+        return {
+            "query": q,
+            "num_chunks_found": len(chunks),
+            "chunks": [
+                {
+                    "page": c["page"],
+                    "section": c["section"],
+                    "document": c["document"],
+                    "distance": c.get("distance", 0),
+                    "text_snippet": c["text"][:150] + "..." 
+                }
+                for c in chunks
+            ]
+        }
+    except Exception as e:
+        return {"error": str(e), "query": q}
