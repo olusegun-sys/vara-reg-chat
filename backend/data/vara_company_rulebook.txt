@@ -1,0 +1,487 @@
+19 May 2025
+
+## Contents  
+
+INTRODUCTION 5  
+
+I. PARTI-COMPANY STRUCTURE 6  
+
+A. Company ownership structure 6  
+
+B. The Board 8  
+
+C. Responsible Individuals 11  
+
+D. Senior Management 11  
+
+E. Company Secretary 12  
+
+II. PARTII- CORPORATE GOVERNANCE 14  
+
+A. Competence 14  
+
+B. Segregation of duties 14  
+
+C. Conflicts of interest 15  
+
+D. Information disclosure 16  
+
+E. Group governance 16  
+
+F. Insiders' transactions 17  
+
+G. Transactions with Related Parties 17  
+
+H. Loans to the Board or Staff 19  
+
+III. PARTIII-FIT AND PROPER REQUIREMENTS 20  
+
+A. General principles 20  
+
+B. Qualification 21  
+
+C. Industry experience 22  
+
+D. Management experience 22  
+
+E. Financial status or solvency 22  
+
+F. Honesty, integrity and reputation 23  
+
+G. Continuing requirements 24
+
+25  
+
+A. Application & scope. 25  
+
+B. Risk assessment, due diligence and controls. 27  
+
+C. Internal governance - Outsourcing Policy and register. 29  
+
+D. Outsourcing agreements. 30  
+
+E. Sub-Outsourcing. 34  
+
+F. Cross-border Outsourcing. 36  
+
+G. Audit rights. 37  
+
+H. Regulatory notifications. 38  
+
+V. PART V - ENVIRONMENTAL, SOCIAL AND GOVERNANCE. 40  
+
+A. Application. 40  
+
+B. ESG disclosure levels. 41  
+
+C. Voluntary ESG Disclosure requirements. 41  
+
+D. Compliance ESG Disclosure requirements. 41  
+
+E. Mandatory ESG Disclosure requirements. 42  
+
+F. Virtual Asset mining and data-intensive activities. 42  
+
+G. Confidentiality. 43  
+
+H. Service providers to VASPs. 43  
+
+VI. PART VI - CAPITAL AND PRUDENTIAL REQUIREMENTS. 44  
+
+A. Application. 44  
+
+B. Paid-Up Capital. 44  
+
+C. Net Liquid Assets. 45  
+
+D. Insurance. 46  
+
+E. Reserve Assets. 47  
+
+F. Notifications and other requirements. 47  
+
+VII. PART VII - INSOLVENCY AND WIND DOWN. 48
+
+48 B. Insolvency. 49 VIII. PART VIII - MATERIAL CHANGE TO BUSINESS OR CONTROL. 50 A. No Material Change. 50 B. Cessation of business. 50 C. Change of Control. 51 D. Mergers and acquisitions. 52 SCHEDULE 1 - DEFINITIONS. 54
+
+1  
+
+## Introduction  
+
+The Dubai Virtual Assets Regulatory Authority ("VARA") was established and authorised by Law No. (4) of 2022 Regulating Virtual Assets in the Emirate of Dubai ("Dubai VA Law") to regulate Virtual Asset Service Providers ("VASPs").  
+
+This Company Rulebook is issued pursuant to, and forms part of, the Virtual Assets and Related Activities Regulations 2023, as may be amended from time to time ("Regulations"), issued by VARA, and applies to all VASPs Licensed by VARA to carry out any VA Activity in the Emirate.  
+
+This Company Rulebook applies in addition to all other requirements in the Regulations as may be in force from time to time. As such, VASPs Licensed by VARA to carry out any VA Activity must also comply with the following Rulebooks applicable to all VASPs—  
+
+Compliance and Risk Management Rulebook; Technology and Information Rulebook; Market Conduct Rulebook; and All Rulebooks specific to the VA Activities that a VASP is Licensed by VARA to carry out.  
+
+Capitalised terms in this Company Rulebook have the meanings ascribed to them in the Regulations or as otherwise defined herein or provided in Schedule 1.  
+
+Unless otherwise stated, all requirements in this Company Rulebook are Rules and have binding effect.
+
+1  
+
+## Part I - Company Structure  
+
+## Introduction  
+
+Parts I- III of this Company Rulebook govern the way a VASP structures and manages its company, Board, Senior Management and Staff and the ongoing maintenance of satisfactory internal control and management systems. Rules in Parts I- III of this Company Rulebook set out requirements regarding  
+
+company structure and Board structure; responsibilities of the Board and Senior Management; induction and training for the Board and Staff; and when individuals will be deemed to be Fit and Proper Persons.  
+
+The corporate governance needs of a VASP may vary from one to another depending upon a thorough analysis of its particular structure and business operations. The Board and the Senior Management are ultimately responsible for the adequacy and effectiveness of the internal control system implemented for that VASP.  
+
+## A. Company ownership structure  
+
+1. General requirement. VASPs shall maintain a company structure which is clear and transparent for the purposes of effective oversight by VARA and that ensures a sound and effective operation of the business of the VASP, including its VA Activities, which is conducive to the fair and orderly functioning of any market involving Virtual Assets. 2. Legal entity in the Emirate. VASPs shall have and maintain a legal entity in the Emirate in one of the legal forms approved by a commercial licensing authority in the Emirate. 3. Ownership. VASPs shall maintain a company structure with a clear chain of ownership, delegated authority and all associated voting powers, such that VARA can clearly identify any Controlling Entity(ies) and the Ultimate Beneficial Owners ("UBOs"). 4. Governance. If a VASP adopts a complex company structure including but not limited to trusts and nominee arrangements, and/or structures involving Decentralised Autonomous Organisations ("DAOs") or other organisational forms with decentralised governance, then it is required to furnish information to VARA relating to the following, during the licensing process
+
+1. Board structure. a. VASPs shall ensure the Board comprises suitably qualified individuals with the requisite skills, knowledge and expertise taking into consideration the scope of their responsibilities and the VA Activities carried out by the VASP. Each member of the Board must be assessed by the VASP and approved by VARA as being a Fit and Proper Person according to the criteria set out in Part III of this Company Rulebook. b. VASPs shall— i. adopt a clear and effective procedure for— 1. selecting and appointing members to the Board, including the filling of any vacancies on the Board; 2. removal of members of the Board; and ii. ensure that all procedures relevant to this Rule I.B.1.b of the Company Rulebook are included in the VASP's constitutional documents. c. The Board shall assess and confirm each member of the Board is a Fit and Proper Person at least annually. If a VASP has reason to believe a member of the Board no longer remains a Fit and Proper Person at any time, the Board shall promptly assess such member. If such member of the Board no longer remains a Fit and Proper Person, the Board shall remove such member with written notice and appoint a successor in accordance with Rule I.B.1.b of this Company Rulebook. d. VASPs shall ensure that any changes to the constitution of the Board comply with Rules I.B.1.a and I.B.1.b of this Company Rulebook. e. The Board shall establish a process to elect a chairman. The chairman shall have the authority to oversee and be responsible for the overall effective functioning of the Board, and any committees it has established, in accordance with Rule I.B of this Company Rulebook. f. The Board shall carry out annual assessments, alone or with the assistance of external experts, of the Board as a whole, its committees and individual members to review relevant performances.
+
+2. Responsibilities of the Board. a. The Board shall establish and regularly update the VASP's procedural rules and other constitutional documents setting out its organisation, responsibilities and procedures. b. The Board and each of its members shall assume full responsibility for i. the operation, business and affairs of the VASP, such that these are conducted in a manner which is conducive to the fair and orderly functioning of any market involving Virtual Assets; ii. the VASP's compliance with all applicable laws and regulatory requirements (including but not limited to Regulations, Rules and Directives); and iii. implementing a professional compliance culture within the VASP. c. The Board shall engage in regular and effective communication with relevant committees, Senior Management, Staff, any other individuals within the VASP and Group Entities to ensure that it is continually and timely apprised of the status of the business, operations and financial position of the VASP. d. The Board shall establish and maintain detailed and clear policies and procedures i. to set out the process of authorisations within the Senior Management and its subordinates; ii. to identify the authority of each member of the Senior Management; and iii. to identify reporting lines of the Senior Management and its subordinates. e. In performing its duties in official capacity, the Board may delegate its authority to relevant committees and Senior Management. In doing so, the Board shall supervise its delegated authority and remain primarily responsible for its duties. The Board shall establish and maintain effective systems and procedures to supervise the Staff who act under the authority delegated by the Board. f. The Board shall, at least annually, review the performance of the VASP, the practical and professional experience and suitability of its members and the Senior Management in the context of the latest industry standards in the global Virtual Asset sector. g. The Board shall ensure that all Entities performing functions on behalf of the VASP and contractors hired by the VASP have access to, and understand adequate up-to-date information regarding, the applicable policies and procedures implemented within the VASP in acting in their official capacities. h. The Board shall i. define clear reporting requirements to ensure that internal and external reports can be prepared in a timely manner; and ii. establish and maintain effective record retention policies to comply with all applicable laws and regulations and to enable the VASP, its auditors and other interested Entities such as VARA to carry out routine and ad hoc reviews or investigations.
+
+3. Board training. a. VASPs shall ensure new Board members receive training programme(s) on their company structure, corporate governance, business and other subjects that would assist them in performing their duties, with a particular focus on i. the background, strategy and objectives of the VASP; ii. the financial and operational aspects of the VASP's business, including its VA Activities; iii. the obligations, duties, liabilities and rights of the members of the Board; iv. the functions and obligations of any Board committees; and v. key risks relating to the global Virtual Asset sector. b. The Board shall i. review the scope of the training programme and the accuracy of its contents annually; and ii. revise the training programme if necessary. c. VASPs shall provide regular, timely and up-to-date training courses to all members of the Board in matters directly related to the interests of the VASP and Virtual Asset markets as a whole, including but not limited to matters set out in Rule I.B.3.a of this Company Rulebook.
+
+1. VASPs shall appoint two (2) individuals of sufficient seniority who shall be responsible for the VASP's compliance with all legal and regulatory obligations ("Responsible Individuals").  
+
+2. Each Responsible Individual shall be a. a full-time employee of the VASP; b. a Fit and Proper Person; c. a resident of the UAE or a holder of a UAE passport; and d. notified to, and approved by, VARA during the licensing process.  
+
+3. VASPs shall ensure that its Responsible Individuals continue to meet the requirements in Rule I.C.2 of this Company Rulebook at all times, and shall validate and maintain a record of such validation on an annual basis.  
+
+4. VASPs must notify and seek approval from VARA prior to any change in their Responsible Individuals, except in the event of reasonably unforeseen circumstances, in such instances the VASPs must notify VARA immediately and provide information on how they will continue to meet the requirements with regard to Responsible Individuals.  
+
+### D. Senior Management  
+
+1. VASPs shall establish, document and maintain a management structure which clearly sets out the roles, responsibilities, authority and accountability of the Senior Management.  
+
+2. VASPs shall ensure its Senior Management comprises suitably qualified individuals with the requisite skills, knowledge and expertise as may be reasonably expected in the global Virtual Asset sector.  
+
+3. The Board shall a. adopt a clear process and procedure for selecting and appointing members to the Senior Management; and b. ensure that such process and procedure are included in the VASP's constitutional documents.  
+
+4. The Senior Management shall a. act under the direction and oversight of the Board; and 2. a. except in the case of the Compliance Officer ("CO") and/or the head of any internal audit functions, hold a position on the Board; b. subject to prior written approval of the Board and screening of conflicts of interest conducted by the Board, hold a position on the board of Entities other than the VASP; and c. not hold an employee position in any other Entities except with the prior written consent of the Board.  
+
+6. If a member of the Senior Management has been serving on the board of another Entity prior to joining the VASP, such member may continue to serve on the board of that Entity provided that the Board is satisfied that, after conducting relevant screening, no conflicts of interest would arise from the VASP's appointment of such member.  
+
+7. The Senior Management shall furnish all necessary information that the Board may require to supervise and assess the performance of the Senior Management, which assessment shall be carried out by the Board at least annually.  
+
+### E. Company Secretary  
+
+1. Notwithstanding any applicable requirements in the constitutional documents of the VASP, the Board must appoint a company secretary independent of the Senior Management, who reports directly to the Board ("Company Secretary"). The authorities and remuneration of the Company Secretary shall be determined under a Board resolution, unless the constitutional documents of the VASP provide otherwise.  
+
+2. The Company Secretary shall a. document the Board meetings and prepare their minutes, which shall include the discussions and deliberations that took place during these meetings, the place and start and end time of these meetings, registering the Board resolutions and voting results,
+
+1. and keeping them in a special and organised record, including the names of attendees and any expressed reservations. These minutes shall be signed by all attending members; b. keep all reports submitted to the Board and those prepared thereby; c. provide Board members with the Board meeting agenda of the meeting and the related papers, documents, and information and any additional information related to subjects contained in clauses of the agenda requested by any Board member; d. make sure that Board members comply with actions approved by the Board; e. notify Board members of the Board meetings dates well in advance of the meeting date; f. submit drafts of the minutes to Board members to express their opinion thereon before signing it; g. make sure that the Board members, completely and immediately, receive a full copy of the minutes of the Board meetings, information and documents related to each meeting; h. keep the minutes of meetings of the Board and its committees; i. inform Staff, including Senior Management, about resolutions of the Board and its committees relevant to their function or roles and report on their implementation and application; j. support the Board in any activities or processes requested by the Board; k. coordinate between Board members and Senior Management; and l. regulate the disclosure record of the Board in accordance with applicable requirements in the Market Conduct Rulebook and provide assistance and advice to the Board members.  
+
+3. The Board may appoint an external Entity as Company Secretary provided that such appointment will be considered as an Outsourcing and must comply with Part IV of this Company Rulebook.
+
+1. VASPs shall establish and maintain policies and procedures to ensure that all members of the Board, Senior Management and Staff are suitably qualified in their relevant post. Criteria for such internal assessment shall include, but are not limited to— a. academic credentials; b. professional qualifications; c. professional experience; d. awards and honours received; and e. memberships of professional and service organisations.  
+
+2. The Board can only appoint to supervisory positions Staff with relevant experience and qualifications as may be reasonably expected taking into account the responsibilities of the role and the VA Activities of the VASP.  
+
+### B. Segregation of duties  
+
+1. The Board shall ensure that policy formulation, supervisory and advisory functions and other internal review functions are effectively segregated from operational duties in order to— a. ensure that supervisory and other internal controls are effectively maintained; and b. avoid undetected errors or abuses of certain functions.  
+
+2. The Board shall ensure that operational duties including sales, dealing, accounting, settlement and safekeeping of Virtual Assets are effectively segregated to minimise potential for conflicts, errors or abuses.  
+
+3. The Board shall ensure that compliance and internal audit functions are effectively segregated from and independent of the operational and related supervisory functions. The CO and any head of the internal audit function should report directly to the Board.
+
+1. VASPs shall use all reasonable efforts to avoid conflicts of interest between any of the following— a. their Group; b. the VASP; c. their Board; d. their Staff; e. their clients; and/or f. their investors. In the event that the VASP cannot avoid conflicts of interest after using all reasonable efforts, it shall ensure that such conflicts of interest are disclosed to its affected clients, and such clients should be fairly treated by the VASP. 2. If a VASP, a member of the Board or any of its Staff has an interest that may reasonably impair its objectivity, in a transaction with or for a client or a relationship which gives rise to an actual or potential conflicts of interest in relation to the transaction, the VASP shall— a. promptly disclose the nature of such conflict to its affected client; and b. to the extent that the affected client's interests can be sufficiently protected, manage and minimise such conflict by adopting appropriate measures to ensure fair treatment to its affected client, including establishing and maintaining information barriers to separate Staff into different teams. 3. VASPs shall establish and implement appropriate written internal policies and procedures for the identification and management or resolution (as applicable) of any actual or potential conflicts of interest. VASPs shall maintain a special register for conflicts of interest in which the conflicts and management or remedial measures taken are recorded in detail. 4. When a member of the Board discloses to the Board that they have a material interest in a transaction, the remaining members of the Board present at the Board meeting shall consider whether it is appropriate for that Board member to continue to participate in the Board meeting after reviewing whether the conflict may affect the objectivity of that member and/or their ability to perform their tasks towards the company properly. If the remaining members of the 
+
+5. Where a VASP represents itself as being independent when conducting a VA Activity— a. it shall not receive fees, commissions or any benefits, paid or provided (whether directly or indirectly) by any Entity other than the end client in relation to the provision of services related to such VA Activity; and b. it shall not have any close links or other legal or economic relationships with third parties which are likely to impair its independence to favour a particular third party in relation to its provision of services related to such VA Activity.  
+
+## D. Information disclosure  
+
+1. The Board shall establish and maintain effective policies and procedures to disclose all necessary information to the VASP's shareholders and relevant stakeholders clearly, correctly and in an orderly manner in order to obtain a comprehensive view of the overall performance and financial position of the VASP.  
+
+2. The website of the VASP shall include all information required to be disclosed to the public in accordance with all applicable laws, Regulations, Rules and Directives, including but not limited to all public disclosures required under the Market Conduct Rulebook and all other Rulebooks applicable to the VASP, and any other details and information that can be published through other disclosure methods.  
+
+3. The Board shall review the VASP's disclosure policies and procedures periodically, and ensure and procure its compliance to the best practices in the Virtual Asset industry.  
+
+## E. Group governance  
+
+1. VASPs shall establish a framework for governing their Subsidiaries within the Group. The Board shall be responsible for determining how Subsidiary governance is addressed and conducted.
+
+2. The Board shall approve the governance framework for the Subsidiaries that sets out the powers within the Subsidiaries and ensure that the boards of the Subsidiaries implement the governance framework for their respective Subsidiary.  
+
+3. The governance framework shall include a. planning of the rights and the roles of the VASP; b. company policies and procedures adopted by the Subsidiaries; c. participation of the Board with the boards of the Subsidiaries prior to the VASP exercising its right to elect members to the boards of the Subsidiaries; and d. restrictions imposed on the Board members not to use any information obtained as a member of the board of a Group Entity for the purposes of another company within the Group.  
+
+4. VASPs shall verify the performance of the governance framework of the Subsidiaries.  
+
+### F. Insiders' transactions  
+
+1. The Board shall implement rules to govern and monitor the transactions of Board members and its Staff in order to ensure compliance with the Regulations and the Market Conduct Rulebook.  
+
+### G. Transactions with Related Parties  
+
+1. VASPs shall not enter into transactions with any Related Party without the prior written consent of the Board where the value of the transaction exceeds five percent (5%) of their issued share capital. If there is a significant change to the terms of these transactions, further written consent of the Board is required before the VASP enters into the transaction under the changed terms. 2. The Related Party who has an interest in a transaction described in Rule II.G.1 of this Company Rulebook shall not participate in voting in terms of the decision taken by the Board in respect of such transactions. 3. The following Entities shall be liable for damages to the VASP if a transaction with a Related Party is concluded in contravention of this Rule II.G of the Company Rulebook, or if it is proven that the transaction is unfair or involves a conflict of interest and incurs damages or otherwise detrimental to the best interests of the VASP's shareholders— a. that Related Party with whom the transaction was entered into; and b. the Board if the decision was issued by consensus. 4. If the decision was only issued by the majority of the Board, the dissenting Board members shall not be held liable in the event that they have recorded their objection in the Board minutes. If a Board member is absent from the meeting in which the decision was issued, they are still responsible for the decision unless they prove that they were unaware of the decision or if they had constructive knowledge of it but could not object thereto. 5. In the event that a VASP enters into a transaction with a Related Party— a. the Board shall provide VARA with prior notice which shall identify the Related Party and provide details of the transaction, including the nature and the benefit of the involvement of that Related Party in the transaction, together with a written confirmation that the terms of the transaction with that Related Party are fair, reasonable, and proportional to the interests of the shareholders of the VASP; b. it shall allow clients and shareholders to review its company records and any documents relating to those transactions; and c. VARA and/or the VASP's clients and shareholders may take or join any legal action before a competent court regarding the transactions concluded with that Related Party to compel the parties of the transaction to provide all information and documents relating to those transactions, whether directly to prove the facts set out in the case relevant to it or to lead to the discovery of information that will help in the detection of the facts, and seek cancellation of the transaction and oblige that Related Party to return the profit or benefit gained back to the VASP, in addition to any compensation ordered to be payable by that Related Party. 6. VASPs shall maintain a register of transactions with Related Parties where the names of such Related Parties shall be recorded together with relevant transactions and actions taken in relation thereto in detail. 7. In addition to the requirement in Rule II.G.6 above and all other reporting requirements in the Compliance and Risk Management Rulebook, VASPs shall report all transactions with Related Parties to VARA monthly, or otherwise upon request by VARA, including the details of those transactions. 8. VASPs shall provide any documents and other information relating to transactions with Related Parties as reasonably requested by VARA to for the purposes of supervising the VASP's compliance with this Rule II.G of the Company Rulebook.  
+
+### H. Loans to the Board or Staff  
+
+1. VASPs shall notify VARA and obtain approval prior to making any loan to a member of the Board, Senior Management or Responsible Individual.  
+
+2. When making such notification, VASPs shall include full details of a. the name of the member of the Board, Senior Management or Responsible Individual receiving the loan; b. the amount of the loan; and c. the purpose of the loan.
+
+1. A Fit and Proper Person must— a. possess the necessary academic qualifications and in all cases, have relevant professional knowledge and/or industry qualifications, in each case, having regard to the nature of the functions to be performed; b. be honest, reputable, have integrity and uphold the ethical standards reasonably expected of their role; c. possess adequate relevant global Virtual Asset sector and management experience, or such experience in another relevant sector; d. possess a good understanding of the regulatory framework which governs the nature of the job or role and the market; and e. be financially sound. 2. In assessing whether an individual is a Fit and Proper Person, VASPs should consider— a. the nature, scale and complexity of their business, including all VA Activities, and the nature and range of activities undertaken by such individual in the ordinary course of business; and b. whether such individual has the knowledge, skills, and experience to perform the specific role that the individual is intended to perform. 3. In assessing an individual for a position within the Board, VASPs should ensure that, if such individual is appointed to the Board, the Board as a whole will at all times possess adequate knowledge, skills and experience to undertake the business activities of the VASP. 4. In assessing whether an individual is a Fit and Proper Person, VARA will— a. consider all relevant factors in assessing the application of the fit and proper principles contained herein on a case-by-case basis, taking into account— i. the conditions of the Licence held by the VASP; ii. the business model of the VASP; iii. the market within which the VASP operates; 1. look to the substance of the requirements and the materiality of any failure to meet such requirements. 5. VARA will not grant approval if it is not satisfied that the individual is a Fit and Proper Person. 6. If an individual does not meet any individual elements set out in Part III of this Company Rulebook, VARA may nonetheless be satisfied that such individual is a Fit and Proper Person taking into account all relevant factors.  
+
+## B. Qualification  
+
+1. In assessing whether an individual is a Fit and Proper Person and qualified for the role for which the individual is being considered, the following factors shall be considered— a. whether the individual possesses a degree in the field relevant to the role. For the avoidance of doubt, this does not prevent someone who does not possess a degree in the relevant field to be employed for the role if such individual has relevant professional or industry qualification(s) and/or experience; and b. whether the individual has industry qualifications directly relevant to the activities to be performed by such individual in the role and it is demonstrable that such individual generally understands— i. the structure of the regulatory framework that applies to the job activities; ii. the particular Regulations, Rules, Directives and Guidance that apply to the functions that the individual would perform; iii. the fiduciary obligations owed to clients by the individual or the VASP; iv. the VA Activities which the individual helps the VASP to undertake; and v. the market in which the individual's services are provided.  
+
+1. Relevant industry experience refers to hands-on working experience acquired through the carrying on of VA Activities in the Emirate or activities of a similar nature in other industries and/or jurisdictions. 2. In assessing the relevance of an individual's experience, VASPs must consider whether the substance of the experience is directly relevant or crucial to the VA Activities to be carried out by such individual. 3. In assessing whether an individual has sufficient relevant industry experience, VASPs may consider such individual's overall career history accumulated as a whole. D. Management experience 1. In assessing whether an individual has management experience suitable for a role in the Board or the Senior Management, VASPs must consider whether such individual has hands-on working experience in supervising and managing essential VA Activities and staff in a business setting. To this end, management experience which is purely administrative would be less relevant. E. Financial status or solvency 1. An individual will not be considered to be a Fit and Proper Person if such individual— a. is an undisclosed bankrupt, currently subject to bankruptcy proceedings or a bankrupt who has recently been discharged; b. is subject to receivership or other similar proceedings; and c. has failed to meet any judgment debt, having regard to the circumstances of such failure and the recency of such failure.  
+
+1. In assessing an individual's honesty, integrity and reputation, VARA will have regard to all matters it deems relevant, including, but not limited to, the following, which may have occurred in the Emirate or in other jurisdictions— a. whether the individual has been convicted of any criminal offence, with particular consideration given to offences of dishonesty, fraud, financial crime or an offence under laws relating to companies, banking, insolvency, money laundering and insider dealing; b. whether the individual has been the subject of any adverse finding or any settlement in civil proceedings, with particular consideration given to investment or other financial business, misconduct, fraud or the formation or management of a body corporate; c. whether the individual has been the subject of any existing or previous investigation or disciplinary proceedings or has been notified of any potential disciplinary proceedings or any investigation which might lead to those proceedings; d. whether the individual is or has been in breach of any regulatory requirements; e. whether the individual has been the subject of any justified complaint relating to VA Activities or similar business activities in any jurisdiction; f. whether the individual has been a director or a member of the senior management of a business that has gone into insolvency, liquidation or administration while the individual has been connected with that business or within one (1) year of that connection; g. whether the individual has been a party to a scheme of arrangement or entered into any form of compromise with a creditor involving any amount greater than AED 50,000; h. whether the individual has been dismissed for cause from employment or from a position of trust, fiduciary appointment, or otherwise found to be deficient in discharging their duties; i. whether the individual has been disqualified from acting as a director or in any managerial capacity; and j. whether, in the past, the individual has been candid and truthful in all dealings with any regulatory body and whether the individual demonstrates a readiness and willingness to 
+
+2. For the avoidance of doubt, conviction for a criminal offence would not automatically bar an individual from being a Fit and Proper Person. VARA may consider the seriousness of the prior conviction and the circumstances surrounding the offence, including the explanation offered by such individual, the relevance of the offence to the individual's role, the passage of time since the offence was committed, evidence of such individual's rehabilitation, and any measures or controls the individual and/or the VASP will have in place in response to such conviction.  
+
+3. In considering the reputation of an individual, VARA shall consider whether the individual's reputation has or might have an adverse impact upon the performance or perception in the market of the VASP.  
+
+### G. Continuing requirements  
+
+1. When VASPs assess whether an individual remains a Fit and Proper Person, they shall assess the role such individual is actually performing at the time the assessment is done.  
+
+2. In addition to all of its other powers of enforcement, if VARA is of the view that an individual is no longer a Fit and Proper Person, it may— a. revoke or suspend the approval granted to such individual or the Licence of the relevant VASP; b. publicly or privately reprimand such individual; c. prohibit such individual from applying again; d. impose a fine or other non-financial penalties in the event of a material breach of this Part III of the Company Rulebook; e. require the VASP to implement additional measures or controls; and f. take any other enforcement action as determined by VARA.
+
+1. Application & scope  
+
+## Part IV - Outsourcing Management  
+
+## Introduction  
+
+Whilst VARA recognises the potential benefit to VASPs of Outsourcing certain business activities to third-party Service Providers, Outsourcing poses a number of challenges from an operational and regulatory perspective. Outsourcing may increase a VASP's dependency on a third party and potentially reduce its control over proprietary and client-related information and systems. This creates risks for the VASP in respect of business disruption, security of data and, in some cases, may create risks to investors in Virtual Assets and the wider market.  
+
+## A. Application & scope  
+
+1. Application & scope a. In scopeSubject to Rules IV.A.1.b and IV.A.1.c, this Part IV shall apply to all Outsourcing arrangements of VASPs. b. Out of scope The following shall not be treated as Outsourcing i. a Function that is legally required to be performed by a Service Provider (e.g. statutory audit); ii. market information services (e.g. provision of data); iii. global network infrastructures; and iv. the acquisition of services that would otherwise not be undertaken by the VASP (e.g. advice from a lawyer, cleaning and gardening, post-room services, receptionists and switchboard operators), goods (e.g. office supplies, furniture) or utilities (e.g. electricity, gas, water, telephone line). c. Non-core systems or business An Outsourcing by a VASP to a Service Provider in relation to non-core systems which do not relate to its core business, or any service or task where a defect or failure in their performance would not materially impair the continuing compliance by the VASP with 
+
+2. Prohibited Outsourcing. VASPs must not enter into any Outsourcing arrangement that would materially impair— a. the quality of their internal controls; or b. the ability of VARA and other competent authorities to exercise their statutory rights or to monitor, supervise or audit the VASP's compliance with all applicable laws or regulatory requirements.  
+
+3. Specified officers. VASPs may enter into Outsourcing arrangements with respect to each of their MLRO, CISO and/or Data Protection Officer, provided that— a. any such Outsourcing complies with this Part IV of the Company Rulebook at all times; b. individuals appointed to any of the roles of MLRO, CISO and/or Data Protection Officer agree to individual responsibility to VARA during the licensing process or prior to being appointed; c. to the extent that such individual holds roles with more than one (1) VASP, VARA shall take this into consideration when assessing the individual's ability to perform the duties required of their role and may impose requirements on the individual to maintain separation between such roles, including but not limited to implementing information barriers; and d. whilst VASPs can Outsource such roles, they are encouraged to resource them in-house and VARA may in its sole discretion require a VASP to resource any of those roles with a full-time employee, either during the licensing process or any time thereafter.  
+
+4. Outsourcing - other legal and regulatory obligations. a. To the extent applicable, VASPs must comply with the CBUAE Circular No. (14) of 2021 Outsourcing Regulation for Banks, as may be amended from time to time. b. VASPs must also consider, to the extent applicable to its Outsourcing arrangements— i. guiding principles for Outsourcing in financial services issued by the Technical Committee of the International Organisation of Securities Commissions, the 
+
+1. Notwithstanding the above, VASPs must comply with all Rules, Directives and Guidance with respect to Outsourcing as may be specified by VARA from time to time, which shall supersede the other guidance and regulations mentioned in this Rule IV.A.4 of the Company Rulebook.  
+
+5. Accountability. VASPs shall be ultimately responsible for compliance with their legal and regulatory obligations and shall be accountable to VARA for any and all Functions that such VASPs may Outsource to a Service Provider to the same extent as if the Function was performed in-house by the VASP.  
+
+## B. Risk assessment, due diligence and controls  
+
+1. Risk based approach. VARA recognises that Outsourcing arrangements exhibit a varying degree of risk and expects VASPs to take this into account in assessing and managing the relevant risks. Measures taken by a VASP must be commensurate with the degree of risk associated with the Outsourcing arrangements. Material Outsourcers shall be subject to additional requirements as set out in this Part IV of the Company Rulebook.  
+
+2. Risk assessments. a. VASPs should have a process to assess the risk in relation to each Outsourcing arrangement they propose to enter into (including the variation or renewal of Outsourcing arrangements) and to identify if any such Outsourcing constitutes a Material Outsourcing. This assessment should be conducted prior to the commencement of an Outsourcing relationship and at least annually for the duration of such relationship.
+
+1. In respect of Outsourcing arrangements, the assessment of risk is dependent on the specific circumstances of each VASP. In assessing risk, factors that should be considered include, but are not limited to, the following— i. impact on the financial position, business operation, continuity of services, clients' best interests, and reputation of the VASP upon the Service Provider's failure to perform; ii. impact of the Outsourced activity on the ability of the VASP to comply with legal and regulatory requirements; iii. the scope, complexity and criticality of the service to be Outsourced; iv. impact of the Outsourced activity on internal control Functions of the VASP; v. cost of Outsourcing as a proportion to the total operating costs of the VASP; vi. the regulatory status of the Service Provider; vii. risks that are relevant to the geographical location of a Service Provider, including but not limited to those contained in Rule IV.F of this Company Rulebook; and viii. the degree of difficulty and time required to find an alternative Service Provider or to bring the Outsourced service in-house.  
+
+## 3. Due diligence.  
+
+a. Prior to selecting a Service Provider, VASPs must perform detailed due diligence in relation to the Service Provider to ensure that the Service Provider has the ability and capacity to undertake the provision of the Outsourcing effectively, reliably and to a high standard. This should include an assessment of the Service Provider's quality of services, technical, managerial and human resources capacity, financial soundness, reputation and experience, licensing or regulatory status, extent of reliance on and control of subcontractors, compatibility with the VASP's corporate culture and business strategies, familiarity with the Virtual Asset industry and capacity to keep pace with innovation in the market. Other considerations that may be relevant include aggregate exposure to a particular Service Provider, costs and possible conflicts of interest.
+
+1. During the conduct of an Outsourcing, VASPs should regularly (and in any event at least annually and as circumstances warrant) review the selected Service Provider to ascertain whether the Service Provider remains competent to provide the Outsourced service to the standards required.  
+
+### C. Internal governance - Outsourcing Policy and register  
+
+1. Prior to the Outsourcing of services and on an ongoing basis, VASPs should establish and maintain comprehensive Outsourcing policies, contingency plans and Outsourcing risk management programmes ("Outsourcing Policy").  
+
+2. Outsourcing Policy. a. An Outsourcing Policy should include, but not be limited to the following a. An Outsourcing Policy should include, but not be limited to the following— i. the framework for a comprehensive assessment of risks involved in Outsourcing and identifying whether a proposed Outsourcing is a Material Outsourcing or not; ii. procedures for identifying, measuring, managing, mitigating, controlling and reporting the risks of an Outsourcing arrangement and any conflicts of interest; iii. the objectives of the Outsourcing and criteria for approving an Outsourcing arrangement; iv. procedures that clearly identify the Staff involved in the VASP and their roles and responsibilities with regard to Outsourcing arrangements; v. procedures that clearly identify the responsibilities of each party in respect of the Outsourcing and in particular what responsibilities have been retained by the VASP; vi. procedures to deal effectively with any act or omission by the Service Provider that leads, or might lead, to a breach of any law or regulation, and enact required remediation measures promptly; and vii. a review mechanism to ensure the Outsourcing policy can be updated as necessary to align with industry and regulatory developments as well as the VASP's strategic development needs.
+
+1. VASPs must maintain a comprehensive register of all Outsourcing arrangements, including both those of the VASP itself and its Group, which must include the following key information for each Outsourcing arrangement, at a minimum— i. the name of each Service Provider; ii. a description of the scope of the Outsourced service; iii. location where the Outsourced service is being performed; iv. start and end date of the Outsourcing agreement; v. key points of contact for the Service Provider; vi. whether the Outsourcing arrangement is a Material Outsourcing; vii. whether the Outsourcing involves storage or processing of Personal Data (beyond the exchange of business contact information between the VASP and the Service Provider for administration purposes); and viii. whether the Outsourcing arrangement involves any confidential information.  
+
+3. Oversight of Outsourcing - monitoring the service. a. VASPs must manage identified risks associated with the Outsourcing activity and such Service Provider's compliance with its contractual obligations as well as managing their relationship with the Service Provider, having regard to the risks presented by the Outsourced activity to the ongoing business of the VASP and its regulatory obligations. b. Monitoring should be assigned to Staff with appropriate expertise and cover the Service Provider's contractual performance, financial soundness and risk profile, any material issues encountered in the provision of services and any remedial steps and mitigation measures taken in respect thereof. The monitoring and control processes and procedures of VASPs should be subject to regular reviews and audits to evaluate effectiveness and adequacy.  
+
+### D. Outsourcing agreements  
+
+1. VASPs must ensure all Outsourcing arrangement are undertaken in the form of a legally binding written agreement which clearly sets out the relevant rights, liabilities and obligations of the Service Provider and the VASP. The contents and level of contractual protection required should
+
+2. The following matters should be taken into consideration by the VASP when negotiating the provisions of any Outsourcing agreement— a. performance standards to be achieved in respect of the Outsourced service, and consequences for failing to achieve such standards; b. delineation of intellectual property, proprietary information and asset ownership and rights; c. business continuity and contingency planning for the Outsourced service; d. controls and process for changes to the Outsourcing arrangement; e. guarantees or indemnities from the Service Provider; and f. mechanism to resolve disputes that might arise under the Outsourcing arrangement.  
+
+3. Mandatory provisions for any Outsourcing. The following matters must be included in all legal agreements governing an Outsourcing— a. a clear description of the Outsourced Function to be provided; b. contractual assurance that the Service Provider is able to maintain processes and procedures for the continuous operation of the Outsourcing required by the VASP, in line with all applicable laws and regulatory requirements; c. contractual requirements to maintain an appropriate level of information security, risk management and service delivery commensurate with the profile of the Outsourcing arrangement; d. contractual requirements to protect confidential information and client data (as further specified in Rule IV.D.5 of this Company Rulebook below); e. provisions allowing that the data that is owned or controlled by the VASP can be accessed at any time by the VASP or a competent authority and, in particular, in the case of resolution or discontinuation of business operations of the Service Provider or if it is insolvent;
+
+1. notwithstanding Rule IV.E of this Company Rulebook below, conditions to be imposed in relation to sub-Outsourcing; g. clearly set out the obligations of existing Service Provider on termination to securely destroy data relating to the VASP or its clients; and h. the Outsourcing agreement should expressly allow the VASP to terminate the arrangement, in accordance with applicable laws, including in the following situations- i. where the Service Provider is in breach of applicable laws, regulations or in material breach of contractual provisions; ii. where there are material weaknesses regarding the management and security of confidential, personal or otherwise sensitive data or information; and iii. where instructions are given by a competent authority (including VARA) to terminate the Outsourcing agreement or where such competent authority expresses significant concern regarding the adequacy or prudence of any such Outsourcing agreement.  
+
+Mandatory provisions for a Material Outsourcing. In addition to the mandatory provisions set out in Rule IV.D.3 of this Company Rulebook above, the following matters must be included in any legal agreement governing a Material Outsourcing- - a. the start date and end date, where applicable, of the agreement and the notice periods for the Service Provider and the VASP; b. the parties' financial obligations; c. the right of the VASP to monitor the Service Provider's performance on an ongoing basis; d. the agreed service levels or performance standards, which should include precise performance targets for the Outsourced Function to allow for timely monitoring so that appropriate corrective action can be taken without undue delay if the agreed service levels are not met, including consequences if service levels or performance standards are not met;
+
+1. the reporting obligations of the Service Provider to the VASP, including— i. the communication (without undue delay) by the Service Provider of any breach of the VASP's data (including confidential information); or ii. any development that may have a material impact on the Service Provider's ability to effectively carry out the Material Outsourcing in line with the agreed service levels, in compliance with all applicable laws and regulatory requirements and, as appropriate, the obligations to submit reports of the internal audit Function of the Service Provider; f. the requirements to implement and test business contingency plans; g. the obligation of the Service Provider to cooperate with the competent authorities of the VASP, including other Entities appointed by them; h. the right of the VASP and competent authorities to inspect and audit the Service Provider as further specified in Rule IV.G.2 of this Company Rulebook; i. termination and exit assistance arrangements to ensure the smooth transfer of the Outsourced service either to another Service Provider or back to the VASP with minimal disruption. To this effect, the Outsourcing agreement should— i. clearly set out the obligations of the existing Service Provider in providing cooperation, reasonable assistance and transitional services on termination of the Outsourcing agreement, including the return, destruction or transfer of data; and ii. include a transition period, where necessary, during which the Service Provider, after the termination of the Outsourcing arrangement, continues to provide the service to reduce disruption; j. the requirement for the Service Provider to hold relevant and adequate insurance; and k. the location(s) (i.e. regions or countries) where Material Outsourcing will be provided and/or where relevant data will be kept and processed, including the possible storage location, and the conditions to be met, including a requirement to notify the VASP if the Service Provider proposes to change the location(s).
+
+5. Client confidentiality and data. a. VASPs must take appropriate steps to monitor their relationships with Service Providers and ensure that adequate measures are taken to safeguard the confidentiality and integrity of client data. b. Notwithstanding all other requirements in the Technology and Information Rulebook, VASPs must ensure that Outsourcing arrangements comply with all applicable UAE laws and regulations in respect of managing and processing data (e.g. the PDPL). This includes requiring the Service Provider to procure, in the event a Service Provider subcontracts part of the service to a sub-contractor, the sub-contractor's compliance with all applicable laws and regulations. VASPs should ensure Service Providers are not permitted to provide any third party with access to confidential data of the VASP or its clients without obtaining the VASP's prior written consent. c. VASPs should take into account any applicable legal, regulatory or contractual obligations to notify clients or any competent authority in the event of an unauthorised data access or breach. In the event of an unauthorised data access or breach, where the VASP is required to notify clients or a competent authority under applicable legal or regulatory obligations, the VASP shall notify VARA within the same legally required time periods. d. VASPs should ensure that all client data should be destroyed or returned to the VASP in event of any termination of the Outsourcing arrangements, subject to applicable laws and regulatory requirements (e.g. recordkeeping requirements).  
+
+### E. Sub-Outsourcing  
+
+1. Before entering into any Outsourcing arrangements, VASPs must consider the additional risk that may be posed if the Service Provider is allowed to further contract part of the service to third parties.
+
+2. Sub-Outsourcing - all Outsourcing arrangements. a. Consent should be given to sub-Outsourcing only if the subcontractor undertakes to i. comply with all applicable laws, regulatory requirements and contractual obligations; and ii. provide the same contractual rights of access and audit as those granted to the VASP and where applicable its regulators (including VARA) by the Service Provider. b. VASPs should ensure that no sub-Outsourcing engaged by the Service Provider will impede the Service Provider's ability to comply with its contractual obligations to the VASP, including requirements on confidentiality of client data, information access and audit rights, and business continuity planning.  
+
+3. Sub-Outsourcing - Material Outsourcing. The following requirements apply in relation to sub-Outsourcing in relation to all or part of a Material Outsourcing i. the Outsourcing agreement should specify whether or not sub-Outsourcing is permitted; and ii. if sub-Outsourcing is permitted, the written Outsourcing agreement should 1. specify any types of activities that are not permitted to be sub-Outsourced; 2. specify the conditions to be complied with in the case of sub-Outsourcing; 3. specify that the Service Provider is obliged to oversee those services that it has subcontracted to ensure that all contractual obligations between the Service Provider and the VASP are continuously met; 4. include an obligation of the Service Provider to inform the VASP of any planned sub-Outsourcing, or material changes thereof, in particular where that might affect the ability of the Service Provider to meet its responsibilities under the Outsourcing agreement; 5. ensure, where appropriate, that the VASP has the right to object to an intended sub-Outsourcing, or material changes thereof, or that explicit approval is required; and 6. include provisions such that the VASP has the contractual right to terminate the agreement in the case of undue sub-Outsourcing (e.g. where the sub-Outsourcing materially increases the risks for the VASP or where the Service Provider sub-Outsources without notifying the VASP).  
+
+### F. Cross-border Outsourcing  
+
+1. VASPs must take into account additional considerations in respect of Outsourcing to a Service Provider located outside of the UAE, including but not limited to the following factors in respect of the relevant jurisdiction which may affect the ability of an overseas Service Provider to fulfil the terms of an Outsourcing agreement or the ability of the VASP to monitor and control the Outsourced Function— a. economic, political or social conditions; b. differing legal or regulatory systems; c. sophistication of the technology and infrastructure; and d. reputational risk.  
+
+2. VASPs must take active steps in managing such risks, including conducting additional due diligence on potential Service Providers located outside of the UAE to understand whether they will be able to safeguard confidential information and client data and effectively monitor the overseas Service Provider, as well as execute business continuity plans and exit arrangements. VASPs must ensure, by means of adequate contractual and practical arrangements, that overseas Service Providers implement and maintain robust and appropriate levels of information security and service delivery throughout the duration of the Outsourcing relationship.  
+
+3. VASPs must ensure all applicable data protection laws are complied with in cross-border Outsourcing arrangements, including those in respect of international transfers of Personal Data.  
+
+4. VASPs should consider the need to notify (and obtain consent from) their clients in respect of cross-border Outsourcing arrangements, including the jurisdiction in which the service is to be performed and any rights of access available to overseas authorities. 5. In circumstances where an overseas authority requests access to the VASP's information, the VASP should notify VARA and any affected clients as soon as possible, subject to the VASP's compliance with applicable laws. 6. VASPs must notify VARA prior to undertaking any cross-border Outsourcing and must ensure that the Outsourcing arrangement would not impede VARA's ability to exercise its statutory rights and responsibilities, such as the rights of access and audit to information of the VASP.  
+
+## G. Audit rights  
+
+1. Audit rights - all Outsourcing arrangements, VASPs should ensure within the written Outsourcing arrangement that it is able to review the Outsourced Function. The written Outsourcing arrangements should refer to the information gathering and investigatory powers of competent authorities under applicable laws, and VASPs should also preserve those rights with regard to Service Providers located in third countries.  
+
+2. Audit rights - Material Outsourcing. VASPs should ensure within the written Outsourcing agreement in relation to a Material Outsourcing that they and their competent authorities (including VARA), and any other Entity appointed by them or the competent authorities, are granted, the following i. full access to all relevant business premises (e.g. head offices and operation centres), including the full range of relevant devices, systems, networks, information and data used for providing the service, including related financial information, personnel and the Service Provider's external auditors; and ii. unrestricted rights of inspection and auditing related to the Outsourcing arrangement, to enable them to monitor the Outsourcing arrangement and to ensure compliance with all applicable regulatory and contractual requirements.  
+
+3. Pooled audits. a. Without prejudice to their ultimate responsibility regarding Outsourcing arrangements, VASPs may use— i. pooled audits organised jointly with other clients of the same Service Provider and performed by them and these clients or by a third party appointed by them, to use audit resources more efficiently; and ii. third party certifications and third party or internal audit reports, made available by the Service Provider, if they ensure that the scope of the certification or audit report covers the systems, key controls and the compliance with relevant regulatory requirements and assess the content of the certifications or audit reports on an ongoing basis and verify that the reports or certifications are valid, adequate and current. b. VASPs should assess whether third-party certifications and reports as referred to in Rule IV.G.3 of this Company Rulebook are adequate and sufficient to comply with their regulatory obligations and should not rely solely on these reports over time. VASPs should also retain the contractual right to perform individual audits at their discretion with regard to the Material Outsourcing.  
+
+### H. Regulatory notifications  
+
+1. Notwithstanding all other notification requirements set out herein, VASPs must immediately notify VARA when they become aware of a material breach of the terms of a Material Outsourcing agreement they have with any Service Provider, or other material development in respect of a Material Outsourcing arrangement that has, or is likely to have, a significant impact on the operations, financial condition or reputation of the VASP. 2. VASPs are required to notify VARA immediately of any issues that may have arisen that would materially affect their compliance with their legal and regulatory obligations. 3. When a VASP intends to enter into any new Material Outsourcing arrangement or materially vary an existing Material Outsourcing arrangement, the VASP should notify VARA in advance providing relevant details of any such arrangement or amendment. In their notifications, VASPs 4. VARA may object to any Material Outsourcing and/or raise areas of concern, which the VASP must remedy to VARA's satisfaction prior to entering into any new Material Outsourcing arrangement or materially varying an existing Material Outsourcing arrangement.
+
+1. VASPs shall satisfy ESG disclosure requirements as set out in this Part V of the Company Rulebook. 2. During the licensing process, VARA will determine the ESG disclosure level required of each VASP, which shall be communicated to the VASP by VARA and required as a condition of the VASP's Licence. 3. In making such determination, VARA may consider, but shall not be limited to, the following factors with respect to the VASP and its Group— a. the number of Staff members or other personnel engaged by the VASP; b. turnover and/or other financial information; and c. business models and VA Activities. 4. VASPs may choose at any time to comply with a higher ESG disclosure level than that set by VARA as a condition of its Licence. 5. To the extent possible, VASPs should maintain the same ESG standard across its Group. Notwithstanding the preceding provisions of this Rule V.A of the Company Rulebook, such standards should be set and maintained at the highest level of any jurisdiction which is applicable to a VASP's Group, including in respect of the VASP's activities in the Emirate.  
+
+1. VARA has established three different levels of ESG disclosure requirements, which it may add to or amend from time to time— a. Voluntary ESG Disclosure; b. Compliance ESG Disclosure; and c. Mandatory ESG Disclosure with Voluntary ESG Disclosure being the lowest and Mandatory ESG Disclosure being the highest.  
+
+### C. Voluntary ESG Disclosure requirements  
+
+1. VARA may issue non-binding Guidance setting out 'best practice standards' regarding the conduct of specified VASPs or classes of VASPs in respect of ESG issues. Such 'best practice standards' could include considerations of sustainability that are consistent with such Entities' investment management strategies (if applicable), and diversity and inclusion practices within a VASP.  
+
+2. VASPs who comply with the Voluntary ESG Disclosure requirements understand that any compliance with the Guidance issued in accordance with Rule V.C.1 of this Company Rulebook is voluntary, though encouraged. However, VARA may require relevant VASPs to provide transparency into their ESG practices on a Compliance ESG Disclosure basis.  
+
+### D. Compliance ESG Disclosure requirements  
+
+1. VASPs required to comply with a Compliance ESG Disclosure level will be required to explain their ESG strategies in the UAE (including but not limited to investment or operational strategies relating to Virtual Asset mining or staking) or otherwise provide relevant information, for the purpose of increasing transparency into a VASP's ESG practices.  
+
+2. VARA may require VASPs to make their ESG strategies or relevant information public and/or otherwise made available to Virtual Asset market participants.
+
+1. VASPs required to comply with a Mandatory ESG Disclosure level must, establish practices and procedures to raise awareness of ESG-related activities and opportunities including providing relevant information on their websites and/or social media sites.  
+
+2. VASPs which are required to comply with a Mandatory ESG Disclosure level must publish an annual ESG report which shall disclose, at a minimum— a. governance policies, metrics and targets relating to how the VASP identifies, assesses, and manages risks and opportunities relating to sustainability, diversity and inclusion; b. details on how material risks and opportunities relating to sustainability, diversity and inclusion are factored into the VASP's overall business strategies and VA Activity processes, including, where relevant, the data and/or methodologies used in identifying investments (whether or not denominated in Virtual Assets) and talent; and c. factual summaries on the environmental and climate-related impact of data-intensive activities in the Virtual Asset sector.  
+
+3. VASPs which are required to comply with a Mandatory ESG Disclosure level shall make publicly available, in a prominent place on their website, up-to-date information related to the diversity and inclusion initiatives undertaken by such VASPs.  
+
+### F. Virtual Asset mining and data-intensive activities  
+
+1. Notwithstanding a VASP's ESG disclosure level, all VASPs which have investments in Virtual Asset mining or staking businesses or conduct or facilitate Virtual Asset mining or staking activities (including by way of selling equipment) shall make publicly available in a prominent place on their website, up-to-date information related to— a. the use of renewable and/or waste energy (e.g. hydroelectric energy, flared gas) by the VASP or its Group in the course of conducting Virtual Asset mining or staking activities (e.g. any renewable energy certificates purchased by the VASP and/or relevant Entities); and b. initiatives relating to decarbonisation (e.g. purchase of carbon offsets) and emission reduction of Virtual Asset mining or staking activities.  
+
+2. VARA may also require VASPs to provide the information referred to in Rule V.F.1 of this Company Rulebook in relation to other data-intensive activities.  
+
+## G. Confidentiality  
+
+1. VARA shall maintain information presented in ESG reports, or other ESG disclosures, on a confidential basis, provided VARA may, in its sole discretion, publicly disclose information gathered in such ESG reports, or during such other requests, on an anonymous basis.  
+
+2. VASPs submitting ESG reports are deemed to consent to such anonymous, public disclosures, provided such disclosures are not required to be anonymous if they relate to an enforcement action commenced by VARA in accordance with the Regulations.  
+
+### H. Service providers to VASPs  
+
+1. When selecting service providers, VASPs should carefully consider the impact of their decision to contract with a service provider on all stakeholders. This includes taking into account the VASP's social and environmental responsibilities and whether the decision to contract with a service provider would have any negative impact on the VASP's ability to discharge such responsibilities.  
+
+2. With regard to service providers and, if applicable, their sub-contractors, VASPs should be satisfied that the service provider acts in an ethical and socially responsible manner and adheres to international standards on environmental protection and appropriate working conditions.
+
+1. VASPs shall comply with the Rules in this Part VI of the Company Rulebook ("Capital and Prudential Requirements").  
+
+## Part VI - Capital and Prudential Requirements  
+
+### A. Application  
+
+1. VASPs shall comply with the Rules in this Part VI of the Company Rulebook ("Capital and Prudential Requirements").  
+
+### B. Paid-Up Capital  
+
+1. VASPs shall, at all times, hold and maintain paid-up capital in the following amounts ("Paid-Up Capital")—  
+
+VA Activity Paid-Up Capital Requirement Advisory Services AED 100,000. Broker-Dealer Services using a VASP Licensed by VARA to provide Custody Services or otherwise approved during the licensing process: the higher of (i) AED 400,000; or (ii) 15% of fixed annual overheads. In all other instances, the higher of (i) AED 600,000; or (ii) 25% of fixed annual overheads. As specified in the VA Issuance Rulebook, or any Annex thereto. Custody Services The higher of (i) AED 600,000; or (ii) 25% of fixed annual overheads. Exchange Services using a VASP Licensed by VARA to provide Custody Services or otherwise approved during the licensing process: the higher of (i) AED 800,000; or (ii) 15% of fixed annual overheads. In all other instances, the higher of (i) AED 1,500,000; or (ii) 25% of fixed annual overheads. The higher of (i) AED 500,000; or (ii) 25% of fixed annual overheads.
+
+2. Where a VASP is Licensed by VARA to carry out more than one VA Activity, the VASP must hold the amount of Paid-Up Capital specified in Rule VI.B.1 of this Company Rulebook for each VA Activity for which the VASP is Licensed. In such instances, the VASP shall calculate the Paid-Up Capital required for each VA Activity using the fixed annual overheads for that VA Activity only, provided that in combination all Paid-Up Capital is mutually exclusive and collectively exhaustive such that the total fixed annual overheads of the VASP are accounted for in aggregate. VASPs must reconcile Paid-Up Capital on a monthly basis.  
+
+3. Paid-Up Capital shall, at all times, be held and maintained in a. a trust account with a licensed bank in the UAE with VARA stated as the beneficiary; b. a surety bond furnished by a surety company authorised to conduct business in the UAE, which shall have no end date and state VARA as a beneficiary; or c. any other manner as may be specified by VARA upon granting a Licence.  
+
+## C. Net Liquid Assets  
+
+1. VASPs shall at all times hold and maintain sufficient current liquid assets such that their surplus over current liabilities is worth at least 1.2 times their monthly operating expenses ("Net Liquid Assets") as represented by the following calculation— Net Liquid Assets ≥ 1.2 x monthly operating expenses  
+
+2. When calculating their Net Liquid Assets under Rule VI.C.1 of this Company Rulebook, VASPs must include such portion of their Operational Exposure to Virtual Assets (as agreed with VARA 3. Net Liquid Assets shall be reconciled on a daily basis and reported to VARA monthly. 4. Net Liquid Assets may be maintained in the following assets only— a. cash and cash equivalents, as defined in internationally recognised accounting standards; and b. Virtual Assets referencing USD or AED, as approved by VARA.  
+
+### D. Insurance  
+
+1. VASPs must hold and maintain the following types of insurance adequate to the size and complexity of the business and VA Activities and in the manner specified by VARA in its Licence ("Insurance")— a. professional indemnity insurance; b. directors' and officers' insurance; c. commercial crime insurance or similar types of insurance for all Virtual Assets stored in hot wallets; and d. any other type of insurance as assessed by VARA to be appropriate for a VASP's business and VA Activities and stipulated in the conditions to its Licence.  
+
+2. All Insurance must be held and maintained with a regulated insurer.  
+
+3. Insurance may be held in the name of another Entity in the VASP's Group, provided that the relevant policy— a. explicitly states the VASP as an insured party; and b. states the level of cover applicable to the VASP.  
+
+4. VARA may apply discretion during the licensing process if, for proven and demonstrated reasons the requirements in Rule VI.D.1 of this Company Rulebook cannot be met, provided that VASPs shall be required to protect against the risks that such Insurance is designed to cover through other means which will be specified by VARA as a condition of a Licence.
+
+1. VASPs shall, at all times, maintain reserve assets equivalent to one hundred percent (100%) of the liabilities owed to clients with respect to all VA Activities ("Reserve Assets"). 2. VASPs must hold Reserve Assets on a one-to-one basis in the same Virtual Asset that liabilities are owed to its clients. 3. Reserve Assets must be reconciled on a daily basis and audited by an independent third-party auditor no less than every six (6) months. VASPs shall include such audit reports as part of the subsequent quarterly report to VARA required in the Compliance and Risk Management Rulebook.  
+
+### F. Notifications and other requirements  
+
+1. VASPs shall notify VARA immediately if, at any time, it is unable to maintain or fails to meet the Paid-Up Capital, Net Liquid Assets, Insurance or Reserve Assets requirements above and such notification shall include details of a. all deficit amounts; b. the causes of the failure; c. remedial actions that have been, and will be, taken to rectify the breach; and d. the expected timeline for such remedial actions to be completed.  
+
+2. VASPs shall provide updates to VARA on a daily basis in respect of any notification under Rule VI.F.1 of this Company Rulebook above, unless otherwise directed by VARA or until the VASP confirms and VARA is satisfied that it has rectified all failures and is in compliance with all requirements.  
+
+3. Notwithstanding all other requirements in the Compliance and Risk Management Rulebook, VASPs shall establish and maintain clear procedures to monitor and identify all sources of risks or potential risks that may impact its operation and shall consider the potential adverse impact of such risks on its level of Paid-Up Capital, Net Liquid Assets, Insurance or Reserve Assets.  
+
+4. VARA may require VASPs to hold and maintain additional Paid-Up Capital, Net Liquid Assets, Insurance or Reserve Assets based on the size, scope, geographic exposure, complexity and nature of the VA Activities and operations of a VASP.
+
+1. All VASPs shall have and maintain a wind down plan ("Wind Down Plan"), which shall include the following— a. processes for identifying and mitigating any material risk or obstacles to winding down in an orderly and timely manner; b. an evaluation of the resources that are needed to facilitate an orderly and timely wind down; c. internal controls and procedures to ensure the safekeeping and prompt onward transferring of clients' Virtual Assets (including returning Virtual Assets to clients); d. personnel management and exit arrangements; e. communications strategy (including the provision of clear and timely disclosures to all clients); f. knowledge transfer as required to support migration of VA Activities and all relevant operations to alternate VASPs; g. system redundancies and retention of records; h. continue to maintain a surety bond until completion of the wind down process; i. discontinue taking on new clients; j. identify and itemise all current and contingent liabilities; k. ensure that the sale of Client Money and/or Client VAs is explicitly excluded from, and not necessary for, implementing or completing the Wind Down Plan, or any other plan, procedures or scheme directed by an Insolvency Appointee, or the sale of the VASP's assets or business as a going concern; and  
+
+## Part VII - Insolvency and Wind Down  
+
+## Introduction  
+
+The purpose of this Part VII is to provide for the safeguarding and stable operations of Virtual Asset markets by introducing procedures for:  
+
+a VASP that elects to discontinue its business or operations; and a VASP that is Insolvent or subject to Insolvency Proceedings.  
+
+## A. Wind down plan  
+
+1. All VASPs shall have and maintain a wind down plan ("Wind Down Plan"), which shall include the following— a. processes for identifying and mitigating any material risk or obstacles to winding down in an orderly and timely manner; b. an evaluation of the resources that are needed to facilitate an orderly and timely wind down; c. internal controls and procedures to ensure the safekeeping and prompt onward transferring of clients' Virtual Assets (including returning Virtual Assets to clients); d. personnel management and exit arrangements; e. communications strategy (including the provision of clear and timely disclosures to all clients); f. knowledge transfer as required to support migration of VA Activities and all relevant operations to alternate VASPs; g. system redundancies and retention of records; h. continue to maintain a surety bond until completion of the wind down process; i. discontinue taking on new clients; j. identify and itemise all current and contingent liabilities; k. ensure that the sale of Client Money and/or Client VAs is explicitly excluded from, and not necessary for, implementing or completing the Wind Down Plan, or any other plan, procedures or scheme directed by an Insolvency Appointee, or the sale of the VASP's assets or business as a going concern; and 1. ensure VARA has the power and ability to intervene and/or assume the direction and/or control of Client Money and/or Client VAs at VARA's election, including but not limited to where the VASP is in breach of any Regulation, Rule or Directive.  
+
+2. In the event that a VASP elects to discontinue its business or operations where it is not Insolvent or subject to Insolvency Proceedings, the VASP must a. notify VARA not later than one (1) day after such decision; b. provide VARA its latest up-to-date Wind Down Plan at the time of such notification; c. implement the Wind Down Plan, subject to any amendments or additions notified to it by VARA; d. make any further changes notified to it by VARA at any stage throughout the implementation and completion of the Wind Down Plan; and e. report to VARA every week throughout the implementation and completion of the Wind Down Plan; and f. provide all other updates and/or reports as requested by VARA at any time.  
+
+### B. Insolvency  
+
+1. In the event a VASP is subject to Insolvency Proceedings, the VASP shall co-operate fully with the Insolvency Appointee to implement the Wind Down Plan as set out in Rule VII.A.1 of this Company Rulebook, or any other plan, procedures or scheme as the Insolvency Appointee deems to be commensurate with the duties and obligations imposed by the relevant Insolvency Proceedings.
+
+1. VASPs shall obtain VARA's written approval prior to— a. facilitating any development or occurrence of Material Change to themselves; or b. entering into any business or conducting any VA Activity, directly or indirectly, except for those business(es) and VA Activity(ies) in which the VASP and its Subsidiaries are engaged on the date of the Licence being granted and authorised by VARA. 2. VASPs shall not create, incur, assume, permit to exist or otherwise become liable with respect to any debt that could be reasonably expected to cause a Material Change. 3. VASPs shall not cause any occurrence of a Material Change. In the event that the acquisition or disposal by a VASP could reasonably be expected to cause a Material Change, such VASP shall immediately cease the acquisition or disposal. 4. Without obtaining VARA's prior written approval, VASPs may not implement any changes to its VA Activities authorised under the Licence, including the— a. addition of any VA Activity; or b. material modification of the scope of any VA Activity. 5. VASPs shall ensure that any change in their business plan covering internal controls, organisational structure, contingency plans and related matters could not be reasonably expected to cause a Material Change. 6. VASPs shall ensure that any change under Rules VIII.A.1-5 of this Company Rulebook in aggregate could not reasonably be expected to cause a Material Change.  
+
+## Part VIII - Material Change to Business or Control  
+
+### A. No Material Change  
+
+1. VASPs shall obtain VARA's written approval prior to— a. facilitating any development or occurrence of Material Change to themselves; or b. entering into any business or conducting any VA Activity, directly or indirectly, except for those business(es) and VA Activity(ies) in which the VASP and its Subsidiaries are engaged on the date of the Licence being granted and authorised by VARA.  
+
+2. VASPs shall not create, incur, assume, permit to exist or otherwise become liable with respect to any debt that could be reasonably expected to cause a Material Change.  
+
+3. VASPs shall not cause any occurrence of a Material Change. In the event that the acquisition or disposal by a VASP could reasonably be expected to cause a Material Change, such VASP shall immediately cease the acquisition or disposal.  
+
+4. Without obtaining VARA's prior written approval, VASPs may not implement any changes to its VA Activities authorised under the Licence, including the— a. addition of any VA Activity; or b. material modification of the scope of any VA Activity.  
+
+5. VASPs shall ensure that any change in their business plan covering internal controls, organisational structure, contingency plans and related matters could not be reasonably expected to cause a Material Change.  
+
+6. VASPs shall ensure that any change under Rules VIII.A.1-5 of this Company Rulebook in aggregate could not reasonably be expected to cause a Material Change.  
+
+### B. Cessation of business  
+
+1. VARA may revoke or suspend a Licence (in relation to all or certain VA Activities), if a VASP does not— a. carry out all or some of the VA Activities authorised under the Licence for an extended period; and b. notify VARA of its plan to reinstate or carry out relevant VA Activities.
+
+2. In the event that a VASP intends to cease to carry out any VA Activities authorised under its Licence, it shall notify VARA and request a revocation of either— a. in the event that all VA Activities authorised under a Licence are to be ceased, the Licence; or b. in the event that only some of the VA Activities authorised under a Licence are to be ceased, the VA Activities to be ceased. 3. VASPs shall notify VARA as soon as reasonably practicable and in any event not later than thirty (30) Working Days before such intended cessation.  
+
+### C. Change of Control  
+
+1. No action shall be taken, except with the prior written approval of VARA, that may result in a change of Control of a VASP. 2. Prior to any change of Control, the VASP, together with the Entity seeking to acquire Control of the VASP, shall submit a written application to VARA in a form and substance acceptable to VARA, including but not limited to detailed information about the Entity. 3. VARA may determine upon application that any Entity does not, or upon the taking of some proposed action will not, Control another Entity. Such determination shall be made within thirty (30) Working Days or such further period as VARA may prescribe. The filing of an application pursuant to this Part VIII of the Company Rulebook in good faith by any Entity shall relieve the applicant from any obligation or liability imposed by this Part VIII of the Company Rulebook with respect to the subject of the application until VARA has acted upon the application. VARA may revoke or modify its determination whenever, in its sole and absolute discretion, revocation or modification is consistent with this Part VIII of the Company Rulebook. VARA may consider the following factors in making such a determination— a. whether such Entity's purchase of shares is made solely for investment purposes and not to acquire Control over the VASP; b. whether such Entity could direct the Board or Staff, or otherwise influence the policies of the VASP;
+
+4. VARA shall approve or deny every application for a change of Control of a VASP hereunder within thirty (30) Working Days from the filing of an application deemed by VARA to be complete. Such period of thirty (30) Working Days may be extended by VARA, for such additional reasonable period of time as may be required to enable compliance with the requirements and conditions of this Part VIII of the Company Rulebook.  
+
+5. In determining whether to approve a proposed change of Control, VARA shall, among other factors, take into consideration the public interest and the needs and convenience of the public in the Emirate.  
+
+### D. Mergers and acquisitions  
+
+1. No action shall be taken, except with the prior written approval of VARA, that may result in a merger or acquisition of all or a substantial part of the assets of a VASP.  
+
+2. Prior to any such merger or acquisition, an application containing a written plan of merger or acquisition shall be submitted to VARA by the Entities that are to merge or by the acquiring Entity, as applicable. Such plan shall be in form and substance satisfactory to VARA, and shall specify each Entity to be merged, the surviving Entity, or the Entity acquiring all or substantially all of the assets of the VASP, as applicable, and shall describe the terms and conditions of the merger or acquisition and the mode of carrying it into effect.  
+
+3. VARA shall approve or deny a proposed merger or a proposed acquisition of all or a substantial part of the assets of a VASP within thirty (30) Working Days after the filing of an application that contains a written plan of merger or acquisition and is deemed by VARA to be complete. Such period of thirty (30) Working Days may be extended by VARA, for such additional
+
+4. In determining whether to approve a proposed merger or acquisition, VARA shall, among other factors, take into consideration the public interest and the needs and convenience of the public in the Emirate.
+
+Schedule 1 – Definitions  
+
+Term Definition "Advisory Services" has the meaning ascribed to it in Schedule 1 of the Regulations. "Board" means the board of directors of a VASP. "Broker-Dealer Services" has the meaning ascribed to it in Schedule 1 of the Regulations. "Capital and Prudential Requirements" has the meaning ascribed to it in Rule VI.A.1 of this Company Rulebook. "Category 1 VA Issuance" has the meaning ascribed to it in the VA Issuance Rulebook. "CBUAE" means the Central Bank of the United Arab Emirates. "Chief Information Security Officer" or "CISO" has the meaning ascribed to it in the Technology and Information Rulebook. "Client Money" has the meaning ascribed to it in the Compliance and Risk Management Rulebook. "Client VA" has the meaning ascribed to it in the Compliance and Risk Management Rulebook. "Company Rulebook" means this Company Rulebook issued by VARA pursuant to the Regulations, as may be amended from time to time. "Company Secretary" has the meaning ascribed to it in Rule I.E.1 of this Company Rulebook. "Compliance and Risk Management Rulebook" means the Compliance and Risk Management Rulebook issued by VARA pursuant to the Regulations, as may be amended from time to time. "Compliance ESG Disclosure" means the compliance ESG disclosure level defined in Part V of this Company Rulebook. "Compliance Officer" or "CO" has the meaning ascribed to it in the Compliance and Risk Management Rulebook. "Control" means the possession, directly or indirectly (including but not limited to by way of acting jointly or in concert with one or more Entities), of the power to influence, direct or cause the direction of the management and policies of a VASP whether through the ownership of shares of such VASP, the shares of any Entity that possesses such power, or any other means. Control shall be presumed to exist if an Entity, directly or indirectly (including but not limited to by way of acting jointly or in concert with one or more Entities), owns, controls, or holds with power to vote with twenty-five percent (25%) or more of the voting shares of a VASP or of any Entity that owns, controls, or holds with power to vote with twenty-five percent (25%) or more of the voting shares of such VASP, or who have the right to appoint or dismiss the majority of the Board or Senior Management. No Entity shall be deemed to control another Entity solely by reason of them being an officer or director of such other Entity. "Controlling Entity" means an Entity which has Control over a VASP. "Critical or Important Function" means a Function whose discontinued or defective performance would materially impair— (a) the continuing compliance of a VASP with the conditions and obligations of its Licence; (b) its compliance with its other legal obligations; (c) its financial performance; or (d) the soundness or continuity of its core business activities. "Custody Services" has the meaning ascribed to it in Schedule 1 of the Regulations. "Data Protection Officer" or "DPO" has the meaning ascribed to it in the Technology and Information Rulebook. "Decentralised Autonomous Organisation" or "DAO" means, generally, any organisation autonomously governed or otherwise managed by a decentralised network, group or collection of Entities, by way of public or private voting mechanisms, whether utilising Distributed Ledger Technology or other means. "Directive" has the meaning ascribed to it in the Regulations. "Distributed Ledger Technology" or "DLT" has the meaning ascribed to it in the Dubai VA Law. "Dubai VA Law" means Law No. (4) of 2022 Regulating Virtual Assets in the Emirate of Dubai, as may be amended from time to time. "Emirate" means all zones across the Emirate of Dubai, including Special Development Zones and Free Zones but excluding the Dubai International Financial Centre. "Entity" means any legal entity or individual. "ESG" means environmental, social and governance. "Exchange Services" has the meaning ascribed to it in Schedule 1 of the Regulations. "Fit and Proper Person" means an individual who complies with all fit and proper requirements in Part III of this Company Rulebook. "Function" means a service, process, activity or role. "Group" means a VASP and any Entity under the same Control with the VASP. "Guidance" has the meaning ascribed to it in the Regulations. "Insolvency Appointee" means a liquidator, receiver, administrator, compulsory manager, trustee or similar officer appointed in respect of an Entity or its assets. "Insolvency Proceedings" has the meaning ascribed to it in the Regulations. "Insolvent" has the meaning ascribed to it in the Regulations. "Insurance" has the meaning ascribed to it in Rule VI.D.1 of this Company Rulebook. "Lending and Borrowing Services" has the meaning ascribed to it in Schedule 1 of the Regulations. "Licence" has the meaning ascribed to it in the Regulations. "Licensed" means having a valid Licence. "Mandatory ESG Disclosure" means the mandatory ESG disclosure level defined in Part V of this Company Rulebook. "Market Conduct Rulebook" means the Market Conduct Rulebook issued by VARA pursuant to the Regulations, as may be amended from time to time. "Material Change" means a change in, or relating to, a VASP with respect to its business and operations (including its VA Activities) and its Group which, taken as a whole, could reasonably be expected to have a significant effect on the VASP's business model, operations, VA Activities, and/or ability to comply with all applicable laws and regulatory requirements. "Material Outsourcing" is an Outsourcing that includes a Function that is a Critical or Important Function. "Money Laundering Reporting Officer" or "MLRO" has the meaning ascribed to it in the Compliance and Risk Management Rulebook. "Net Liquid Assets" has the meaning ascribed to it in Rule VI.C.1 of this Company Rulebook. "Operational Exposure" means an amount representing the value of Virtual Assets at risk of loss, dissipation, devaluation or inaccessibility in the event of operational, procedural, counterparty, settlement or other failure experienced by the VASP. "Outsourcing" means an arrangement where a Service Provider performs a process, service or activity on behalf of a firm which the firm would otherwise carry out itself on a recurrent or ongoing basis. It is intended to include only those services that were or can be delivered by internal Staff and management, and may include both regulated and unregulated Functions. "Outsourcing Policy" has the meaning ascribed to it in Rule IV.C.1 of this Company Rulebook. "Paid-Up Capital" has the meaning ascribed to it in Rule VI.B.1 of this Company Rulebook. "PDPL" means the Federal Decree-Law No. (45) of 2021 on the Protection of Personal Data. "Personal Data" has the meaning ascribed to it in the PDPL. "Politically Exposed Person" has the meaning ascribed to it in Cabinet Decision No. (10) of 2019 Concerning the Implementing Regulation of Decree Law No. (20) of 2018 on Anti-Money Laundering and Combating the Financing of Terrorism and Illegal Organisations, as may be amended from time to time. "Regulations" means the Virtual Assets and Related Activities Regulations 2023, as may be amended from time to time. "Related Party" means the chairman of the Board, members of the Board, members of the Senior Management, Staff and the companies in which any of such Entities owns ten percent (10%) or more of its share capital or other ownership interest, as well as the Subsidiaries or affiliate companies of such companies. "Reserve Assets" has the meaning ascribed to it in Rule VI.E.1 of this Company Rulebook. "Responsible Individuals" has the meaning ascribed to it in Rule I.C.1 of this Company Rulebook. "Rule" has the meaning ascribed to it in the Regulations. "Rulebook" has the meaning ascribed to it in the Regulations. "Senior Management" means the executive management of a VASP responsible and accountable to the Board for the sound and prudent day-to-day management of the VASP, generally including but not limited to, the chief executive officer, chief financial officer, chief risk officer, and heads of the compliance and internal audit functions, or as equivalent roles may be titled. "Service Provider" means an Entity that contracts with a VASP for the provision of any aspect of the VASP's functions. The Service Provider may be within or outside the Emirate and may be an independent third party or an Entity related to the VASP. "Staff" means all individuals working for a VASP including the members of the Senior Management but excluding members of the Board. If an individual is both a member of the Senior Management and a member of the Board, then such individual is also considered as Staff. "Subsidiary" means a company of which an Entity, or such Entity's Subsidiary(ies), own(s) directly or indirectly more than fifty percent (50%) of the voting capital or similar right of ownership. "Technology and Information Rulebook" means the Technology and Information Rulebook issued by VARA pursuant to the Regulations, as may be amended from time to time. "UAE" means the United Arab Emirates. "Ultimate Beneficial Owner" or "UBO" means— (a) individuals who ultimately own or have Control; or (b) if no individual satisfies (a) above, then an individual with the highest position in Senior Management. "VA Activity" means the activities listed in Schedule 1 of the Regulations, as may be amended from time to time. "VA Issuance Rulebook" means the Virtual Asset Issuance Rulebook issued by VARA pursuant to the Regulations, as may be amended from time to time. "VA Management and Investment Services" has the meaning ascribed to it in Schedule 1 of the Regulations. "VA Transfer and Settlement Services" has the meaning ascribed to it in Schedule 1 of the Regulations. "VARA" means the Dubai Virtual Assets Regulatory Authority. "VASP" means an Entity Licensed by VARA to conduct VA Activity(ies) in the Emirate. "Virtual Asset" or "VA" has the meaning ascribed to it in the Dubai VA Law. "Voluntary ESG Disclosure" means the voluntary ESG disclosure level defined in Part V of this Company Rulebook. "Wind Down Plan" has the meaning ascribed to it in Rule VII.A.1 of this Company Rulebook. "Working Day" means any day which is not a weekend or public holiday in the Emirate.
