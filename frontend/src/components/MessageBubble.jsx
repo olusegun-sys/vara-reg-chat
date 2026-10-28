@@ -26,7 +26,7 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
       {/* The Bubble */}
       <div
         className={`
-          max-w-[90%] sm:max-w-[85%] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 shadow-sm text-[15px]
+          max-w-[85%] sm:max-w-[85%] rounded-2xl px-5 py-4 shadow-sm text-[15px]
           ${isUser
             ? "bg-brand-600 text-white rounded-br-sm"
             : "bg-[#1E293B] text-slate-200 border border-slate-700/50 rounded-bl-sm shadow-premium"}
@@ -64,13 +64,20 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
             {sources && sources.length > 0 && (
               <div className="mt-4 pt-3 border-t border-slate-700/60">
                 <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                  Sources cited
+                  Documents Referenced
                 </p>
                 <div className="flex flex-wrap gap-1.5">
-                  {sources.map((src, i) => (
-                    <span key={i} className="inline-flex items-center text-[11px] bg-slate-800/80 text-slate-300 px-2 py-1 rounded border border-slate-700/50">
-                      <span className="font-medium text-brand-400 mr-1">p.{src.page}</span>
-                      <span className="truncate max-w-[120px]">{src.section !== "General" ? src.section : src.document}</span>
+                  {/* 
+                    We only show unique documents. Because we are using .txt files 
+                    for the demo, page numbers are all "1". So we hide the page numbers 
+                    to avoid looking broken. 
+                  */}
+                  {[...new Set(sources.map(s => s.document))].map((docName, i) => (
+                    <span key={i} className="inline-flex items-center text-[11px] bg-slate-800/80 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700/50">
+                      <svg className="w-3 h-3 mr-1.5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                      </svg>
+                      {docName}
                     </span>
                   ))}
                 </div>
@@ -82,7 +89,7 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
 
       {!isLoading && (
         <div className={`flex items-center gap-1 mt-1.5 px-1 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
-          {/* ... (keep your existing Action Buttons exactly as they are) ... */}
+          
           <Tooltip text={copied ? "Copied!" : "Copy"}>
             <button onClick={handleCopy} className="p-1.5 text-slate-500 hover:text-slate-300 transition-colors">
               {copied ? (
