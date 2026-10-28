@@ -17,7 +17,7 @@ export default function App() {
   const [loadError, setLoadError] = useState(null);
 
   const [sessions, setSessions] = useState([]);
-  const [currentSessionId, setCurrentSessionId] = useState(null);
+  const [currentSessionId, setCurrentSessionId] = useState(null); // Start as null (Home state)
   const [messages, setMessages] = useState([]);
   
   // Mobile sidebar state
@@ -33,13 +33,16 @@ export default function App() {
   useEffect(() => {
     getSessions().then(data => {
       setSessions(data);
-      if (data.length > 0) setCurrentSessionId(data[0].id);
-      else handleNewChat();
+      // REMOVED: The automatic selection of the first session. 
+      // We want the user to start on a blank home page.
     }).catch(err => console.error("Error loading sessions:", err));
   }, []);
 
   useEffect(() => {
-    if (!currentSessionId) return;
+    if (!currentSessionId) {
+      setMessages([]); // Clear messages if no session is selected
+      return;
+    }
     getMessages(currentSessionId).then(data => {
       setMessages(data.map(m => ({
         id: m.id,
@@ -50,16 +53,11 @@ export default function App() {
     }).catch(err => console.error("Error loading messages:", err));
   }, [currentSessionId]);
 
-  const handleNewChat = async () => {
-    try {
-      const newSession = await createSession("New Conversation");
-      setSessions(prev => [newSession, ...prev]);
-      setCurrentSessionId(newSession.id);
-      setMessages([]);
-      setInputValue("");
-    } catch (err) {
-      console.error("Failed to create chat:", err);
-    }
+  const handleNewChat = () => {
+    // Just clear the current session, don't create in DB until first message
+    setCurrentSessionId(null);
+    setMessages([]);
+    setInputValue("");
   };
 
   const handleSelectSession = (id) => {
@@ -75,9 +73,7 @@ export default function App() {
   const handleDelete = async (id) => {
     setSessions(prev => prev.filter(s => s.id !== id));
     if (currentSessionId === id) {
-      const remaining = sessions.filter(s => s.id !== id);
-      if (remaining.length > 0) setCurrentSessionId(remaining[0].id);
-      else handleNewChat();
+      setCurrentSessionId(null); // Go back to home state
     }
     await deleteSession(id);
   };
@@ -104,9 +100,24 @@ export default function App() {
 
   const handleSend = useCallback(async () => {
     const question = inputValue.trim();
-    if (!question || isSending || !selectedJurisdiction || !currentSessionId) return;
+    if (!question || isSending || !selectedJurisdiction) return;
 
-    const userMsg = await addMessage(currentSessionId, "user", question);
+    let activeSessionId = currentSessionId;
+    
+    // If we are on the home state (no session), create one now in Supabase
+    if (!activeSessionId) {
+      try {
+        const newSession = await createSession("New Conversation");
+        setSessions(prev => [newSession, ...prev]);
+        setCurrentSessionId(newSession.id);
+        activeSessionId = newSession.id;
+      } catch (err) {
+        console.error("Failed to create chat:", err);
+        return;
+      }
+    }
+
+    const userMsg = await addMessage(activeSessionId, "user", question);
     const assistantPlaceholder = { id: "temp-ai", role: "assistant", content: "", isLoading: true, sources: [] };
     setMessages(prev => [...prev, userMsg, assistantPlaceholder]);
     setInputValue("");
@@ -114,8 +125,8 @@ export default function App() {
 
     if (messages.length === 0) {
       generateChatTitle(question).then(newTitle => {
-        setSessions(prev => prev.map(s => s.id === currentSessionId ? { ...s, title: newTitle } : s));
-        updateSessionTitle(currentSessionId, newTitle);
+        setSessions(prev => prev.map(s => s.id === activeSessionId ? { ...s, title: newTitle } : s));
+        updateSessionTitle(activeSessionId, newTitle);
       });
     }
 
@@ -144,7 +155,7 @@ export default function App() {
         }
       );
 
-      const finalAiMsg = await addMessage(currentSessionId, "assistant", fullText, receivedSources);
+      const finalAiMsg = await addMessage(activeSessionId, "assistant", fullText, receivedSources);
       setMessages(prev => {
         const updated = [...prev];
         updated[updated.length - 1] = { ...updated[updated.length - 1], id: finalAiMsg.id, isLoading: false };
@@ -161,10 +172,6 @@ export default function App() {
       setIsSending(false);
     }
   }, [inputValue, isSending, selectedJurisdiction, currentSessionId, messages.length]);
-
-  if (!currentSessionId && sessions.length > 0) {
-    setCurrentSessionId(sessions[0].id);
-  }
 
   return (
     <div className="h-full flex bg-luxury font-sans">
@@ -184,7 +191,6 @@ export default function App() {
         <header className="bg-luxury border-b border-slate-800 px-4 sm:px-6 py-3 shrink-0 z-10 shadow-sm">
           <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
             
-            {/* Hamburger Menu (Mobile Only) & Title */}
             <div className="flex items-center gap-3 min-w-0 flex-1">
               <button 
                 onClick={() => setIsSidebarOpen(true)}
@@ -198,15 +204,16 @@ export default function App() {
 
               <div className="min-w-0 flex-1">
                 <h1 className="text-base sm:text-lg font-semibold text-white truncate">
-                  {sessions.find(s => s.id === currentSessionId)?.title || "New Conversation"}
+                  {currentSessionId 
+                    ? sessions.find(s => s.id === currentSessionId)?.title || "New Conversation"
+                    : "VARA Intelligence"}
                 </h1>
                 <p className="text-[11px] text-slate-400 hidden sm:block">
-                  VARA Intelligence
+                  {currentSessionId ? "AI Regulatory Knowledge Base" : "Welcome"}
                 </p>
               </div>
             </div>
             
-            {/* Right: Jurisdiction */}
             <div className="shrink-0">
               <JurisdictionSelector 
                 options={jurisdictions} 

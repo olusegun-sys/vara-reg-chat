@@ -1,11 +1,11 @@
-﻿**Summary:** Here is the fully updated `STATE.md`. It reflects the final, absolute pre-demo state: the database is fully loaded with all 4 rulebooks (487 chunks), the UI has been updated to show clean, unique document citations instead of messy page numbers, and the app is completely stable.
+﻿**Summary:** Here is the fully updated `STATE.md`. It captures the final pre-demo state: the database is fully loaded with all 4 rulebooks (487 chunks), the UI is fully polished, chat privacy is isolated, and the backend now includes a **Query Rewriter** to handle vague user questions.
 
 Save this over your existing `vara-reg-chat\STATE.md`.
 
 ```markdown
 # STATE.md — Regulatory Knowledge Base Chat (POC)
 
-**Last updated:** 2026-10-28 (Final Pre-Demo State: Clean Document Citations, 487 Chunks, UI Polished)
+**Last updated:** 2026-10-28 (Final Pre-Demo State: Query Rewriter Added, Clean UI, 487 Chunks)
 **Owner:** Olusegun Fadeyi (Olu)
 **Stakeholder:** Terence Bumah ("Boss Terry")
 **Client deadline:** Two-week window; POC due to Terence for client testing (TODAY)
@@ -70,22 +70,21 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 1. **Streaming (SSE) Architecture:** The `/api/chat/stream` endpoint yields Server-Sent Events. The frontend reads the stream and updates the text word-by-word.
 2. **Cloud Embeddings (Cohere):** Replaced Gemini to bypass hard rate limits.
 3. **Database Storage & Privacy (Supabase):** Chat history is saved via Supabase. A unique `vara_browser_id` is generated in `localStorage` for every new browser. When Terry opens the link, he gets a fresh, private session, completely isolated from your history.
-4. **Premium UI/UX:** Total dark mode. Sidebar is deep navy. Chat input is a glowing, rounded pill.
-5. **Mobile Responsiveness:** Added a hamburger menu to toggle the sidebar on mobile devices. Cleaned up the header alignment.
-6. **Clean Source Citations:** Because the demo uses `.txt` files (where page numbers aren't accurate), the UI groups sources by Document Name instead of spamming `p.1`.
-7. **Action Buttons:** Messages have copy, edit (for users), and thumbs up/down/share (for AI).
-8. **Reset-able ingestion.** `--reset` flag prevents duplicate vectors.
-9. **Smart Titles.** `/api/title` uses `llama-3.1-8b-instant` for fast sidebar titles.
-10. **Encoding Fix:** Generated `.txt` files via Python (`fix_text.py`) to guarantee UTF-8 encoding before ingestion.
+4. **Query Rewriter:** Before retrieving chunks, a fast LLM call (`llama-3.1-8b-instant`) rewrites vague user questions into regulatory keywords. This ensures high accuracy even if the user asks a poorly phrased question.
+5. **Premium UI/UX:** Total dark mode. Sidebar is deep navy. Chat input is a glowing, rounded pill.
+6. **Mobile Responsiveness:** Added a hamburger menu to toggle the sidebar on mobile devices. Cleaned up the header alignment.
+7. **Clean Source Citations:** Because the demo uses `.txt` files (where page numbers aren't accurate), the UI groups sources by Document Name instead of spamming `p.1`.
+8. **Action Buttons:** Messages have copy, edit (for users), and thumbs up/down/share (for AI).
+9. **Encoding Fix:** Generated `.txt` files via Python (`fix_text.py`) to guarantee UTF-8 encoding before ingestion.
 
 ---
 
 ## 5. File Inventory (Current State)
 
 ### Backend (All working, hardened, streaming, deployed)
-- `backend\app\api\routes.py` ✅ — `/chat/stream`, `/health`, `/jurisdictions`, `/title`, `/warmup`, `/debug-search`
+- `backend\app\api\routes.py` ✅ — `/chat/stream`, `/health`, `/jurisdictions`, `/title`, `/warmup`, `/debug-search` (now uses query rewriting)
 - `backend\app\models\schemas.py` ✅ — `TitleRequest`, `TitleResponse`
-- `backend\app\services\llm.py` ✅ — `generate_answer()`, `stream_answer()`, `generate_title()` with retry logic
+- `backend\app\services\llm.py` ✅ — `generate_answer()`, `stream_answer()`, `generate_title()`, `rewrite_query()` with retry logic
 - `backend\app\services\retrieval.py` ✅ — Cohere embeddings, FAISS search
 - `backend\app\services\ingestion.py` ✅ — Cohere embeddings, TXT/PDF support, `reset_vector_store()`
 - `backend\scripts\ingest.py` ✅ — `r"""` fixed, `--reset` wired
@@ -141,6 +140,7 @@ Groq and Cohere API keys were rotated. `.strip()` applied to config to prevent w
 - **Persistent Storage:** Supabase integration means chat history is permanently saved.
 - **Premium UI/UX:** Unified Midnight Blue dark theme, mobile hamburger menu, and clean source pills.
 - **Expanded Corpus:** Ingested all 4 core VARA rulebooks. The database now has 487 clean chunks.
+- **Robust Queries:** Added the Query Rewriter to fix vague questions before searching the database.
 
 ---
 
@@ -185,6 +185,7 @@ Groq and Cohere API keys were rotated. `.strip()` applied to config to prevent w
 - Smart 3-5 word title generation.
 - Migrated to Cohere Cloud Embeddings.
 - Premium Midnight Blue UI with mobile hamburger menu, action buttons, and clean unique document citations.
+- Added Query Rewriter to fix vague user questions before searching.
 
 ### ⏳ NEXT (Final Step)
 1. Demo to Terence. (App is live and ready).
@@ -222,6 +223,7 @@ Groq and Cohere API keys were rotated. `.strip()` applied to config to prevent w
 | Render Backend Deployment | **HIGH** | "Your service is live 🎉" in Render logs |
 | Render Frontend Deployment | **HIGH** | Live URL provided by Render |
 | Premium UI | **HIGH** | Dark theme, tooltips, mobile menu applied |
+| Query Rewriter | **HIGH** | Tested locally, improves vague questions |
 
 **Demo risks to watch:**
 - Render free tier spins down after inactivity — first request after idle might take 30s to wake up. (Solution: Ping `/api/warmup` 5 minutes before the demo).
@@ -230,7 +232,7 @@ Groq and Cohere API keys were rotated. `.strip()` applied to config to prevent w
 
 ## 13. Next Chat Opening Prompt (Copy-Paste)
 
-> "Resuming the VARA Regulatory Knowledge Base Chat project. **The app is fully live, deployed, stable, and private.** Backend uses Cohere Cloud Embeddings and Groq streaming. It now has 4 rulebooks ingested (487 chunks). Frontend is a premium Midnight Blue dark theme with Supabase storage, mobile menu, and action buttons. Chat history is now isolated per browser. Here is STATE.md. **Next action:** Prepare the final business pitch and demo script for Terence today."
+> "Resuming the VARA Regulatory Knowledge Base Chat project. **The app is fully live, deployed, stable, and private.** Backend uses Cohere Cloud Embeddings and Groq streaming. It now has 4 rulebooks ingested (487 chunks) and uses an LLM query rewriter for vague questions. Frontend is a premium Midnight Blue dark theme with Supabase storage, mobile menu, and action buttons. Chat history is now isolated per browser. Here is STATE.md. **Next action:** Prepare the final business pitch and demo script for Terence today."
 
 ---
 
