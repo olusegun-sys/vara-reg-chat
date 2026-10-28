@@ -1,15 +1,15 @@
-﻿**Summary:** Here is the fully updated `STATE.md`. It captures the current reality perfectly: the app is live and stable for the demo, we've resolved all the UI/UX and privacy requests, and we have a clear path for restoring the other 3 rulebooks post-demo.
+﻿**Summary:** Here is the fully updated `STATE.md`. It reflects the final, absolute pre-demo state: the database is fully loaded with all 4 rulebooks (487 chunks), the UI has been updated to show clean, unique document citations instead of messy page numbers, and the app is completely stable.
 
 Save this over your existing `vara-reg-chat\STATE.md`.
 
 ```markdown
 # STATE.md — Regulatory Knowledge Base Chat (POC)
 
-**Last updated:** 2026-10-28 (Final Pre-Demo State: Privacy Fixed, Mobile Menu Added, Stable 202-Chunk Database)
+**Last updated:** 2026-10-28 (Final Pre-Demo State: Clean Document Citations, 487 Chunks, UI Polished)
 **Owner:** Olusegun Fadeyi (Olu)
 **Stakeholder:** Terence Bumah ("Boss Terry")
 **Client deadline:** Two-week window; POC due to Terence for client testing (TODAY)
-**Status:** ✅ **STABLE, PRIVATE, & DEPLOYED.** Backend live on Render (Cohere embeddings, Risk Management PDF). Frontend live on Render (Midnight Blue theme, mobile hamburger menu). Supabase integrated with anonymous browser session isolation. Ready for Terry demo.
+**Status:** ✅ **STABLE, PRIVATE, & DEPLOYED.** Backend live on Render (Cohere embeddings, 487 chunks covering 4 VARA rulebooks). Frontend live on Render (Midnight Blue theme, mobile hamburger menu). Supabase integrated with anonymous browser session isolation. Ready for Terry demo.
 
 ---
 
@@ -19,14 +19,19 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 
 **Why it exists:** Banks and VASPs struggle to navigate sprawling regulatory rulebooks. An uncited answer is worthless in compliance. This tool answers *only* from the document, cites every claim, and refuses when the answer isn't in the source.
 
-**Current Corpus:** VARA Compliance and Risk Management Rulebook (19 May 2025). 
-*(Note: The Company, Technology, and Market Conduct rulebooks were removed to ensure absolute stability for the demo. The ingestion script is fully capable of scaling to all rulebooks post-demo).*
+**Current Corpus (4 VARA Rulebooks, 19 May 2025):**
+1. Compliance and Risk Management Rulebook
+2. Company Rulebook
+3. Technology and Information Rulebook
+4. Market Conduct Rulebook
+
+**Design goal:** Multi-jurisdiction from day one. Adding CBN (Nigeria), FCA (UK), or SEC (US) later must require zero backend code changes.
 
 ---
 
 ## 2. Project Vision (per Terence)
 
-- **Immediate:** Working POC that answers questions about the Risk Management rulebook, deployed to Render, shared with client today.
+- **Immediate:** Working POC that answers questions about all VARA rulebooks, deployed to Render, shared with client today.
 - **Short-term:** Multi-jurisdiction knowledge base. 
 - **Long-term:** Product for banks, fintechs, and VASPs — organization-wide regulatory knowledge base.
 
@@ -43,9 +48,9 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 | **LLM** | Groq (`openai/gpt-oss-120b`) | Free tier, OpenAI-compatible | ✅ Working |
 | **LLM Client** | `openai>=1.55.3` | Supports `stream=True` | ✅ Working |
 | **Embeddings** | **Cohere (`embed-english-v3.0`)** | Solves Gemini 1000 req/day limit, very fast | ✅ Working |
-| **Vector Store** | **FAISS (`faiss-cpu>=1.13.0`)** | Pre-built wheels for Python 3.14 | ✅ 202 vectors |
-| **PDF Parsing** | `pypdf==5.1.0` | Page-by-page extraction | ✅ 61 pages |
-| **Chunking** | RecursiveCharacterTextSplitter (800/150) | Preserves semantic boundaries | ✅ 202 chunks |
+| **Vector Store** | **FAISS (`faiss-cpu>=1.13.0`)** | Pre-built wheels for Python 3.14 | ✅ 487 vectors |
+| **PDF/TXT Parsing**| `pypdf==5.1.0` + native `open()` | PDF and plain-text extraction | ✅ 200+ pages |
+| **Chunking** | RecursiveCharacterTextSplitter (800/150) | Preserves semantic boundaries | ✅ 487 chunks |
 
 ### Frontend (Live on Render)
 | Layer | Choice | Why | Status |
@@ -66,10 +71,12 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 2. **Cloud Embeddings (Cohere):** Replaced Gemini to bypass hard rate limits.
 3. **Database Storage & Privacy (Supabase):** Chat history is saved via Supabase. A unique `vara_browser_id` is generated in `localStorage` for every new browser. When Terry opens the link, he gets a fresh, private session, completely isolated from your history.
 4. **Premium UI/UX:** Total dark mode. Sidebar is deep navy. Chat input is a glowing, rounded pill.
-5. **Mobile Responsiveness:** Added a hamburger menu to toggle the sidebar on mobile devices. Cleaned up the header alignment and source pills.
-6. **Action Buttons:** Messages have copy, edit (for users), and thumbs up/down/share (for AI).
-7. **Reset-able ingestion.** `--reset` flag prevents duplicate vectors.
-8. **Smart Titles.** `/api/title` uses `llama-3.1-8b-instant` for fast sidebar titles.
+5. **Mobile Responsiveness:** Added a hamburger menu to toggle the sidebar on mobile devices. Cleaned up the header alignment.
+6. **Clean Source Citations:** Because the demo uses `.txt` files (where page numbers aren't accurate), the UI groups sources by Document Name instead of spamming `p.1`.
+7. **Action Buttons:** Messages have copy, edit (for users), and thumbs up/down/share (for AI).
+8. **Reset-able ingestion.** `--reset` flag prevents duplicate vectors.
+9. **Smart Titles.** `/api/title` uses `llama-3.1-8b-instant` for fast sidebar titles.
+10. **Encoding Fix:** Generated `.txt` files via Python (`fix_text.py`) to guarantee UTF-8 encoding before ingestion.
 
 ---
 
@@ -95,7 +102,7 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 
 **Components:**
 - `src/components/Sidebar.jsx` — Mobile slide-out (hamburger menu), Pin/Rename/Delete actions, no "Powered by AI" footer.
-- `src/components/MessageBubble.jsx` — ReactMarkdown, clean source pills, action tooltips.
+- `src/components/MessageBubble.jsx` — ReactMarkdown, clean unique document citations, action tooltips.
 - `src/components/ChatInput.jsx` — Glowing rounded pill, auto-growing textarea, removed bottom disclaimer text.
 - `src/components/ChatWindow.jsx` — Dark background, luxurious empty state.
 - `src/components/JurisdictionSelector.jsx` — Compact, rounded dropdown for AE-Dubai.
@@ -117,7 +124,7 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 10. **Render Deployment Out of Memory (512MB)** → `sentence-transformers` loaded PyTorch at startup. **Resolution:** Migrated to cloud embeddings. ✅
 11. **Gemini Embedding Rate Limits (429)** → Migrated to Cohere. ✅
 12. **Cohere API Key Header Error** → Trailing newline in Render env var caused `Illegal header value`. **Resolution:** Added `.strip()` to `config.py` and fixed Render dashboard. ✅
-13. **Corrupted Text Encoding** → Notepad++ saved `.txt` files in ANSI/UTF-16. **Resolution:** Reverted to the stable 202-chunk Risk Management PDF. The fix for this is documented for post-demo. ✅
+13. **Corrupted Text Encoding** → Notepad++ saved `.txt` files in ANSI/UTF-16. **Resolution:** Used a Python script (`fix_text.py`) to generate clean UTF-8 text files for all 4 rulebooks. ✅
 14. **Shared Chat History** → `guest-user-001` hardcoded, exposing your chats to anyone with the link. **Resolution:** Implemented unique `vara_browser_id` in `localStorage` for every new browser. ✅
 
 ### ⚠️ Security — RESOLVED
@@ -133,6 +140,7 @@ Groq and Cohere API keys were rotated. `.strip()` applied to config to prevent w
 - **ChatGPT-like Speed:** Implementing SSE streaming means users see the response start typing immediately.
 - **Persistent Storage:** Supabase integration means chat history is permanently saved.
 - **Premium UI/UX:** Unified Midnight Blue dark theme, mobile hamburger menu, and clean source pills.
+- **Expanded Corpus:** Ingested all 4 core VARA rulebooks. The database now has 487 clean chunks.
 
 ---
 
@@ -149,7 +157,7 @@ Groq and Cohere API keys were rotated. `.strip()` applied to config to prevent w
 **Response:** `{"title": "Compliance Officer Duties"}`
 
 ### `GET /api/health`
-**Response:** `{"status":"ok","vector_store_loaded":true,"chunk_count":202,...}`
+**Response:** `{"status":"ok","vector_store_loaded":true,"chunk_count":487,...}`
 
 ### `GET /api/warmup`
 **Response:** `{"status":"warm","message":"Embedding model loaded successfully"}`
@@ -162,7 +170,6 @@ Groq and Cohere API keys were rotated. `.strip()` applied to config to prevent w
 **Step 2:** Paste this `STATE.md`.
 **Step 3:** Say one of:
 - **"Pitch to Terence"** — The app is fully complete. Let's finalize the business pitch and demo script for today.
-- **"Fix text encoding and add remaining rulebooks"** — post-demo task to expand the database.
 - **"Add Nigeria (CBN)"** — to test the multi-jurisdiction feature by dropping a new PDF into `backend/data`.
 
 ---
@@ -170,23 +177,23 @@ Groq and Cohere API keys were rotated. `.strip()` applied to config to prevent w
 ## 10. What's Done vs. What's Next
 
 ### ✅ DONE (Live on Render, Premium UI, Privacy Fixed)
-- All 13 backend files, ingestion (202 stable chunks for Risk Management), `/chat/stream`, `/title`, `/warmup`.
+- All 13 backend files, ingestion (487 stable chunks across 4 rulebooks), `/chat/stream`, `/title`, `/warmup`.
 - Backend deployed to Render.
 - Supabase PostgreSQL integrated with unique browser ID isolation.
 - Frontend deployed to Render (Static Site).
 - Frontend uses SSE streaming and Supabase.
 - Smart 3-5 word title generation.
 - Migrated to Cohere Cloud Embeddings.
-- Premium Midnight Blue UI with mobile hamburger menu, action buttons, and cleaned-up header/sources.
+- Premium Midnight Blue UI with mobile hamburger menu, action buttons, and clean unique document citations.
 
 ### ⏳ NEXT (Final Step)
 1. Demo to Terence. (App is live and ready).
 2. Pitch the vision and business model.
 
 ### 🔮 FUTURE (Post-POC)
-- Fix encoding script to ingest the other 3 VARA rulebooks successfully (Company, Technology, Market Conduct).
 - Add CBN (Nigeria) — uncomment config, drop PDFs, `python scripts\ingest.py --reset`.
 - Enable Supabase Auth (Row Level Security) for cross-device login.
+- Swap FAISS → Qdrant for filtered search at scale.
 
 ---
 
@@ -209,7 +216,7 @@ Groq and Cohere API keys were rotated. `.strip()` applied to config to prevent w
 | Milestone | Confidence | Evidence |
 |---|---|---|
 | Backend compiles | **HIGH** | `compileall` clean |
-| Ingestion works | **HIGH** | `Total chunks stored: 202` (Cohere) |
+| Ingestion works | **HIGH** | `Total chunks stored: 487` (Cohere) |
 | Streaming endpoint works | **HIGH** | Verified SSE text chunks arrive in UI |
 | Supabase privacy | **HIGH** | Browser ID isolates chats per device |
 | Render Backend Deployment | **HIGH** | "Your service is live 🎉" in Render logs |
@@ -218,13 +225,12 @@ Groq and Cohere API keys were rotated. `.strip()` applied to config to prevent w
 
 **Demo risks to watch:**
 - Render free tier spins down after inactivity — first request after idle might take 30s to wake up. (Solution: Ping `/api/warmup` 5 minutes before the demo).
-- Only ask the AI questions about Risk Management during the demo.
 
 ---
 
 ## 13. Next Chat Opening Prompt (Copy-Paste)
 
-> "Resuming the VARA Regulatory Knowledge Base Chat project. **The app is fully live, deployed, stable, and private.** Backend uses Cohere Cloud Embeddings and Groq streaming. Frontend is a premium Midnight Blue dark theme with Supabase storage, mobile menu, and action buttons. Chat history is now isolated per browser. Here is STATE.md. **Next action:** Prepare the final business pitch and demo script for Terence today."
+> "Resuming the VARA Regulatory Knowledge Base Chat project. **The app is fully live, deployed, stable, and private.** Backend uses Cohere Cloud Embeddings and Groq streaming. It now has 4 rulebooks ingested (487 chunks). Frontend is a premium Midnight Blue dark theme with Supabase storage, mobile menu, and action buttons. Chat history is now isolated per browser. Here is STATE.md. **Next action:** Prepare the final business pitch and demo script for Terence today."
 
 ---
 

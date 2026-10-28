@@ -40,6 +40,44 @@ def _get_client() -> OpenAI:
     )
 
 
+def rewrite_query(question: str) -> str:
+    """
+    Rewrite a user's question into a clear, search-optimized query.
+    
+    Why this exists:
+    - Users often ask vague questions (e.g., "what are the rules for brokers?").
+    - The vector search needs specific terms to find the right chunks.
+    - We use the fast, cheap llama-3.1-8b-instant model to expand the query
+      with regulatory synonyms before we embed it.
+    """
+    client = _get_client()
+    
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            temperature=0.0,
+            max_tokens=60,
+            messages=[
+                {
+                    "role": "system", 
+                    "content": "You are a search query optimizer for a VARA (Virtual Assets Regulatory Authority) compliance database. "
+                               "Take the user's question and rewrite it into a short, keyword-rich search query. "
+                               "Expand vague terms into regulatory synonyms. For example, 'capital' -> 'Paid-Up Capital and Prudential Requirements', "
+                               "'complaints' -> 'client complaints handling and resolution times'. "
+                               "Output ONLY the rewritten query, nothing else."
+                },
+                {"role": "user", "content": question}
+            ],
+        )
+        rewritten = response.choices[0].message.content.strip()
+        print(f"[query_rewrite] Original: '{question}' -> Rewritten: '{rewritten}'")
+        return rewritten
+    except Exception as e:
+        # If the LLM fails, just use the original question
+        print(f"[query_rewrite] Failed to rewrite query: {e}")
+        return question
+
+
 def generate_answer(question: str, chunks: List[Dict[str, Any]]) -> str:
     if not chunks:
         return "I don't have that information in the provided document."
@@ -57,7 +95,6 @@ def generate_answer(question: str, chunks: List[Dict[str, Any]]) -> str:
             ],
         )
     except Exception as exc:
-        # Retry once for network blips
         print(f"[llm] Generate failed, retrying: {exc}")
         time.sleep(1)
         response = client.chat.completions.create(

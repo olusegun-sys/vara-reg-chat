@@ -1,11 +1,6 @@
 """
 HTTP routes — the API surface the frontend calls.
-
-Why this file is thin:
-- All logic lives in services/. Routes only: validate input, call services, format response.
-- This makes routes easy to read and services easy to test in isolation.
 """
-
 import uuid
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
@@ -27,9 +22,6 @@ router = APIRouter()
 
 @router.get("/health", response_model=HealthResponse)
 def health():
-    """
-    Liveness + readiness check.
-    """
     try:
         count = retrieval.get_chunk_count()
         loaded = count > 0
@@ -46,11 +38,7 @@ def health():
 
 @router.get("/warmup")
 def warmup():
-    """
-    Manually load the embedding model into memory.
-    """
     try:
-        # Import here to avoid circular imports and only load when called
         from app.services.retrieval import _get_model
         _get_model()
         return {"status": "warm", "message": "Embedding model loaded successfully"}
@@ -60,9 +48,6 @@ def warmup():
 
 @router.get("/jurisdictions", response_model=list[JurisdictionInfo])
 def jurisdictions():
-    """
-    Return all jurisdictions defined in config.
-    """
     return [
         JurisdictionInfo(code=code, regulator=info["regulator"], name=info["name"])
         for code, info in config.JURISDICTIONS.items()
@@ -71,17 +56,19 @@ def jurisdictions():
 
 @router.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
-    """
-    Standard chat endpoint (blocking).
-    """
     if req.jurisdiction not in config.JURISDICTIONS:
         raise HTTPException(status_code=400, detail=f"Unknown jurisdiction: {req.jurisdiction}")
 
-    chunks = retrieval.retrieve_chunks(req.question, req.jurisdiction)
+    # 1. Rewrite the query for better search results
+    search_query = llm.rewrite_query(req.question)
+
+    # 2. Retrieve the context using the REWRITTEN query
+    chunks = retrieval.retrieve_chunks(search_query, req.jurisdiction)
     if not chunks:
         raise HTTPException(status_code=404, detail="No relevant content found in the document.")
 
     try:
+        # 3. Generate the answer using the ORIGINAL question
         answer = llm.generate_answer(req.question, chunks)
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"LLM provider error: {str(e)}")
@@ -105,16 +92,16 @@ def chat(req: ChatRequest):
 
 @router.post("/chat/stream")
 def chat_stream(req: ChatRequest):
-    """
-    Streaming chat endpoint using Server-Sent Events (SSE).
-    """
     if req.jurisdiction not in config.JURISDICTIONS:
         raise HTTPException(status_code=400, detail=f"Unknown jurisdiction: {req.jurisdiction}")
 
-    # 1. Retrieve the context
-    chunks = retrieval.retrieve_chunks(req.question, req.jurisdiction)
+    # 1. Rewrite the query for better search results
+    search_query = llm.rewrite_query(req.question)
+
+    # 2. Retrieve the context using the REWRITTEN query
+    chunks = retrieval.retrieve_chunks(search_query, req.jurisdiction)
     
-    # 2. Return a streaming response that pipes text from Groq to the browser
+    # 3. Stream the answer using the ORIGINAL question
     return StreamingResponse(
         llm.stream_answer(req.question, chunks),
         media_type="text/event-stream"
@@ -123,21 +110,19 @@ def chat_stream(req: ChatRequest):
 
 @router.post("/title", response_model=TitleResponse)
 def title(req: TitleRequest):
-    """Generate a short conversation title."""
     title_text = llm.generate_title(req.question)
     return TitleResponse(title=title_text)
 
 
 @router.get("/debug-search")
 def debug_search(q: str, jurisdiction: str = "AE-Dubai"):
-    """
-    Temporary endpoint to see exactly what chunks retrieval returns.
-    Usage: /api/debug-search?q=What is the capital requirement?
-    """
     try:
-        chunks = retrieval.retrieve_chunks(q, jurisdiction)
+        # Also apply the rewrite to the debug endpoint so you can see the difference
+        search_query = llm.rewrite_query(q)
+        chunks = retrieval.retrieve_chunks(search_query, jurisdiction)
         return {
-            "query": q,
+            "original_query": q,
+            "rewritten_query": search_query,
             "num_chunks_found": len(chunks),
             "chunks": [
                 {
