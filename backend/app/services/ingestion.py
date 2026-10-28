@@ -6,47 +6,40 @@ import re
 
 import faiss
 import numpy as np
-import cohere
+import google.generativeai as genai
 from pypdf import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from app import config
 
-co = cohere.Client(api_key=config.COHERE_API_KEY)
+genai.configure(api_key=config.GEMINI_API_KEY)
 
 
 def load_pdf_pages(pdf_path: Path) -> List[Dict[str, Any]]:
     """
-    Extract text from each page of a PDF, OR read a .txt file directly.
+    Extract text from each page of the PDF, preserving page numbers.
     """
-    pages = []
-    
-    if pdf_path.suffix.lower() == ".txt":
-        try:
-            with open(pdf_path, "r", encoding="utf-8") as f:
-                text = f.read()
-            if text.strip():
-                # Treat the whole txt file as one massive page
-                pages.append({"page": 1, "text": text})
-        except Exception as e:
-            print(f"[ingest] Warning: could not read {pdf_path.name} as text: {e}")
-        return pages
-
-    # Original PDF logic
     reader = PdfReader(str(pdf_path))
+    pages = []
     for idx, page in enumerate(reader.pages, start=1):
         text = page.extract_text() or ""
-        if text.strip(): 
+        if text.strip():
             pages.append({"page": idx, "text": text})
     return pages
 
 
 def detect_section(text: str) -> str:
+    """
+    Best-effort detection of a section heading inside a chunk.
+    """
     match = re.search(r"(Part\s+[IVX]+|Section\s+[A-Z]|[A-Z]\.\s+[A-Z][a-z].{0,60})", text)
     return match.group(1).strip() if match else "General"
 
 
 def chunk_pages(pages: List[Dict[str, Any]], chunk_size: int, chunk_overlap: int) -> List[Dict[str, Any]]:
+    """
+    Split page text into overlapping chunks, keeping page + section metadata.
+    """
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
@@ -67,13 +60,18 @@ def chunk_pages(pages: List[Dict[str, Any]], chunk_size: int, chunk_overlap: int
 
 def embed_chunks(chunks: List[Dict[str, Any]], model_name: str = None) -> List[List[float]]:
     """
-    Embed chunks using Cohere. 
-    Cohere Trial allows 100,000 tokens per minute. 
-    We use a batch size of 40 (roughly ~50k tokens) and sleep 60s to stay safe.
+    Embed chunks using Gemini (batch processing with strict rate limiting).
+
+    Why batch size 40 and sleep 60s:
+    - Gemini Free Tier allows 100 requests per minute.
+    - Processing 40 chunks per batch = 40 requests.
+    - Sleeping 60 seconds between batches guarantees the rolling window clears,
+      so we never exceed 100 requests in any 60-second period.
+    - Total time for 202 chunks: ~5 minutes (6 batches × 40 + 5 sleeps × 60s).
     """
     texts = [c["text"] for c in chunks]
     embeddings = []
-    batch_size = 40  # Reduced from 90 to avoid token limits
+    batch_size = 40
     total_batches = (len(texts) + batch_size - 1) // batch_size
 
     for i in range(0, len(texts), batch_size):
@@ -82,25 +80,18 @@ def embed_chunks(chunks: List[Dict[str, Any]], model_name: str = None) -> List[L
 
         print(f"  [embed] Processing batch {current_batch} of {total_batches} ({len(batch)} chunks)...")
 
-        max_retries = 3
-        for attempt in range(max_retries):
-            try:
-                response = co.embed(
-                    texts=batch,
-                    model="embed-english-v3.0",
-                    input_type="search_document"
-                )
-                embeddings.extend(response.embeddings)
-                break  # Success
-            except Exception as e:
-                if attempt < max_retries - 1:
-                    print(f"  [embed] Batch {current_batch} failed ({type(e).__name__}). Retrying in 20s...")
-                    time.sleep(20)
-                else:
-                    print(f"  [embed] Batch {current_batch} failed after {max_retries} attempts: {e}")
-                    raise e
+        try:
+            result = genai.embed_content(
+                model="models/gemini-embedding-001",
+                content=batch,
+                task_type="retrieval_document"
+            )
+            embeddings.extend(result['embedding'])
+        except Exception as e:
+            print(f"  [embed] Error on batch {current_batch}: {e}")
+            raise e
 
-        # Sleep 60 seconds between batches to respect the 100k TPM limit
+        # Sleep 60 seconds between batches to respect the 100 RPM limit
         if current_batch < total_batches:
             print("  [embed] Sleeping 60 seconds to respect API rate limits...")
             time.sleep(60)
@@ -109,6 +100,9 @@ def embed_chunks(chunks: List[Dict[str, Any]], model_name: str = None) -> List[L
 
 
 def reset_vector_store() -> None:
+    """
+    Delete the FAISS index and metadata sidecar.
+    """
     index_path = Path(config.FAISS_INDEX_PATH)
     metadata_path = Path(config.FAISS_METADATA_PATH)
 
@@ -134,6 +128,9 @@ def store_in_faiss(
     document_title: str,
     effective_date: str,
 ) -> int:
+    """
+    Persist chunks + embeddings into a FAISS index and a JSON metadata sidecar.
+    """
     index_path = Path(config.FAISS_INDEX_PATH)
     index_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -178,6 +175,9 @@ def store_in_faiss(
 
 
 def ingest_document(jurisdiction: str, doc_config: Dict[str, str]) -> int:
+    """
+    Full ingestion pipeline for one document.
+    """
     pdf_path = config.DATA_DIR / doc_config["file"]
     if not pdf_path.exists():
         raise FileNotFoundError(
@@ -192,7 +192,7 @@ def ingest_document(jurisdiction: str, doc_config: Dict[str, str]) -> int:
     chunks = chunk_pages(pages, config.CHUNK_SIZE, config.CHUNK_OVERLAP)
     print(f"[ingest] Created {len(chunks)} chunks.")
 
-    print("[ingest] Embedding with Cohere (cloud, no local model)...")
+    print("[ingest] Embedding with Gemini (cloud, no local model)...")
     embeddings = embed_chunks(chunks)
     print(f"[ingest] Generated {len(embeddings)} embeddings.")
 

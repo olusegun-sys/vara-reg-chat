@@ -3,12 +3,11 @@ from typing import List, Dict, Any
 
 import faiss
 import numpy as np
-import cohere
+import google.generativeai as genai
 
 from app import config
 
-co = cohere.Client(api_key=config.COHERE_API_KEY)
-
+genai.configure(api_key=config.GEMINI_API_KEY)
 
 def _load_index_and_metadata() -> tuple:
     try:
@@ -24,20 +23,21 @@ def _load_index_and_metadata() -> tuple:
 
     return index, metadata
 
-
 def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List[Dict[str, Any]]:
     top_k = top_k or config.TOP_K_RESULTS
     index, metadata = _load_index_and_metadata()
     if index.ntotal == 0:
         return []
 
-    # Use Cohere to embed the question
-    response = co.embed(
-        texts=[question],
-        model="embed-english-v3.0",
-        input_type="search_query"
+    result = genai.embed_content(
+        model="models/gemini-embedding-001",
+        content=question,
+        task_type="retrieval_query"
     )
-    query_vec = np.array(response.embeddings, dtype="float32")
+    query_vec = np.array([result['embedding']], dtype="float32")
+
+    if query_vec.shape[1] != index.d:
+        raise ValueError(f"Embedding dimension mismatch: index={index.d}, query={query_vec.shape[1]}")
 
     candidates = min(top_k * 5, index.ntotal)
     distances, indices = index.search(query_vec, candidates)
@@ -59,7 +59,6 @@ def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List
         if len(chunks) >= top_k:
             break
     return chunks
-
 
 def get_chunk_count() -> int:
     try:
