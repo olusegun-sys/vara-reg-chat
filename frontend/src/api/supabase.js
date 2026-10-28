@@ -9,15 +9,25 @@ if (!supabaseUrl || !supabaseKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-// For this POC, we will use a hardcoded ID to tie sessions to this browser.
-// When we add Auth later, we swap this for supabase.auth.getUser().
-const GUEST_USER_ID = "guest-user-001";
+// Generate or retrieve a unique browser ID.
+// This ensures every person who opens the link sees their own private chat history,
+// not the history of the person who created the link.
+function getBrowserId() {
+  let id = localStorage.getItem("vara_browser_id");
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem("vara_browser_id", id);
+  }
+  return id;
+}
+
+const USER_ID = getBrowserId();
 
 export async function getSessions() {
   const { data, error } = await supabase
     .from("chat_sessions")
     .select("*")
-    .eq("user_id", GUEST_USER_ID)
+    .eq("user_id", USER_ID)
     .order("is_pinned", { ascending: false })
     .order("created_at", { ascending: false });
     
@@ -28,7 +38,7 @@ export async function getSessions() {
 export async function createSession(title = "New Conversation") {
   const { data, error } = await supabase
     .from("chat_sessions")
-    .insert([{ user_id: GUEST_USER_ID, title }])
+    .insert([{ user_id: USER_ID, title }])
     .select()
     .single();
     
