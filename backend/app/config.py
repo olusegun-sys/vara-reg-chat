@@ -17,21 +17,22 @@ load_dotenv()
 
 # --- Paths ---
 # BASE_DIR points to the backend/ folder regardless of where Python is run from.
+# Why: relative paths like ./data break if someone runs the script from a different directory.
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 
 # --- LLM Provider Settings (OpenAI-compatible) ---
-# Groq, DeepSeek, OpenAI, Together, etc. all speak this format.
-LLM_API_KEY = os.getenv("LLM_API_KEY", "")
-LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.groq.com/openai/v1")
-LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b")
-LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))  
-LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "2048"))    
+# .strip() is crucial here. It removes accidental trailing spaces or newlines
+# that can happen when copying/pasting keys into dashboards like Render.
+LLM_API_KEY = os.getenv("LLM_API_KEY", "").strip()
+LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.groq.com/openai/v1").strip()
+LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b").strip()
+LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
+LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "2048"))
 
 # --- Embeddings (Cohere) ---
-# Cohere is used for cloud embeddings to avoid PyTorch RAM overhead 
-# and strict rate limits (Gemini has a hard 1000 req/day limit).
-COHERE_API_KEY = os.getenv("COHERE_API_KEY", "")
+# We use Cohere to avoid PyTorch RAM overhead and strict rate limits.
+COHERE_API_KEY = os.getenv("COHERE_API_KEY", "").strip()
 EMBEDDING_MODEL = "embed-english-v3.0"
 
 # --- Vector Store (FAISS) ---
@@ -47,7 +48,7 @@ FAISS_METADATA_PATH = os.getenv(
 # --- Chunking & Retrieval ---
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "800"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "150"))
-TOP_K_RESULTS = int(os.getenv("TOP_K_RESULTS", "7"))  
+TOP_K_RESULTS = int(os.getenv("TOP_K_RESULTS", "7"))
 
 # --- Jurisdiction Registry ---
 JURISDICTIONS = {
