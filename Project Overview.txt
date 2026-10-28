@@ -1,11 +1,11 @@
-﻿**Summary:** Here is the fully updated `STATE.md`. It reflects the final pre-demo status: privacy is fixed via browser ID isolation, the UI is fully polished for mobile and desktop, and the backend is locked to the stable 202-chunk Risk Management database. 
+﻿**Summary:** Here is the fully updated `STATE.md`. It captures the current reality perfectly: the app is live and stable for the demo, we've resolved all the UI/UX and privacy requests, and we have a clear path for restoring the other 3 rulebooks post-demo.
 
 Save this over your existing `vara-reg-chat\STATE.md`.
 
 ```markdown
 # STATE.md — Regulatory Knowledge Base Chat (POC)
 
-**Last updated:** 2026-10-28 (Final Pre-Demo State: Browser Privacy Fix, Mobile UI Polish, Stable 202-Chunk Database)
+**Last updated:** 2026-10-28 (Final Pre-Demo State: Privacy Fixed, Mobile Menu Added, Stable 202-Chunk Database)
 **Owner:** Olusegun Fadeyi (Olu)
 **Stakeholder:** Terence Bumah ("Boss Terry")
 **Client deadline:** Two-week window; POC due to Terence for client testing (TODAY)
@@ -20,7 +20,7 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 **Why it exists:** Banks and VASPs struggle to navigate sprawling regulatory rulebooks. An uncited answer is worthless in compliance. This tool answers *only* from the document, cites every claim, and refuses when the answer isn't in the source.
 
 **Current Corpus:** VARA Compliance and Risk Management Rulebook (19 May 2025). 
-*(Note: The Company, Technology, and Market Conduct rulebooks were removed to ensure absolute stability for the demo. The architecture remains fully capable of scaling to all rulebooks post-demo).*
+*(Note: The Company, Technology, and Market Conduct rulebooks were removed to ensure absolute stability for the demo. The ingestion script is fully capable of scaling to all rulebooks post-demo).*
 
 ---
 
@@ -117,7 +117,7 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 10. **Render Deployment Out of Memory (512MB)** → `sentence-transformers` loaded PyTorch at startup. **Resolution:** Migrated to cloud embeddings. ✅
 11. **Gemini Embedding Rate Limits (429)** → Migrated to Cohere. ✅
 12. **Cohere API Key Header Error** → Trailing newline in Render env var caused `Illegal header value`. **Resolution:** Added `.strip()` to `config.py` and fixed Render dashboard. ✅
-13. **Corrupted Text Encoding** → Notepad++ saved `.txt` files in ANSI/UTF-16. **Resolution:** Reverted to the stable 202-chunk Risk Management PDF. ✅
+13. **Corrupted Text Encoding** → Notepad++ saved `.txt` files in ANSI/UTF-16. **Resolution:** Reverted to the stable 202-chunk Risk Management PDF. The fix for this is documented for post-demo. ✅
 14. **Shared Chat History** → `guest-user-001` hardcoded, exposing your chats to anyone with the link. **Resolution:** Implemented unique `vara_browser_id` in `localStorage` for every new browser. ✅
 
 ### ⚠️ Security — RESOLVED

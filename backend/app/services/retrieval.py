@@ -3,11 +3,12 @@ from typing import List, Dict, Any
 
 import faiss
 import numpy as np
-import google.generativeai as genai
+import cohere
 
 from app import config
 
-genai.configure(api_key=config.GEMINI_API_KEY)
+# Initialize Cohere client
+co = cohere.Client(api_key=config.COHERE_API_KEY)
 
 def _load_index_and_metadata() -> tuple:
     try:
@@ -29,12 +30,13 @@ def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List
     if index.ntotal == 0:
         return []
 
-    result = genai.embed_content(
-        model="models/gemini-embedding-001",
-        content=question,
-        task_type="retrieval_query"
+    # Use Cohere to embed the question
+    response = co.embed(
+        texts=[question],
+        model="embed-english-v3.0",
+        input_type="search_query"
     )
-    query_vec = np.array([result['embedding']], dtype="float32")
+    query_vec = np.array(response.embeddings, dtype="float32")
 
     if query_vec.shape[1] != index.d:
         raise ValueError(f"Embedding dimension mismatch: index={index.d}, query={query_vec.shape[1]}")
