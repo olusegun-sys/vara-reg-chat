@@ -66,9 +66,6 @@ export default function ChatInput({ value, onChange, onSend, disabled }) {
             </svg>
           </button>
         </form>
-        <p className="text-center text-[11px] text-slate-500 mt-2">
-          VARA Intelligence can make mistakes. Verify important information.
-        </p>
       </div>
     </div>
   );

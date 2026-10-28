@@ -19,6 +19,9 @@ export default function App() {
   const [sessions, setSessions] = useState([]);
   const [currentSessionId, setCurrentSessionId] = useState(null);
   const [messages, setMessages] = useState([]);
+  
+  // Mobile sidebar state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     getJurisdictions().then(data => {
@@ -173,21 +176,34 @@ export default function App() {
         onRename={handleRename} 
         onDelete={handleDelete} 
         onTogglePin={handleTogglePin} 
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
       <div className="flex-1 flex flex-col min-w-0 bg-luxury-light">
-        {/* Cleaned up Header */}
         <header className="bg-luxury border-b border-slate-800 px-4 sm:px-6 py-3 shrink-0 z-10 shadow-sm">
           <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
             
-            {/* Left: Title */}
-            <div className="min-w-0 flex-1">
-              <h1 className="text-base sm:text-lg font-semibold text-white truncate">
-                {sessions.find(s => s.id === currentSessionId)?.title || "New Conversation"}
-              </h1>
-              <p className="text-[11px] text-slate-400 hidden sm:block">
-                VARA Intelligence
-              </p>
+            {/* Hamburger Menu (Mobile Only) & Title */}
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <button 
+                onClick={() => setIsSidebarOpen(true)}
+                className="md:hidden p-2 -ml-2 text-slate-400 hover:text-white transition-colors"
+                aria-label="Open menu"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+              </button>
+
+              <div className="min-w-0 flex-1">
+                <h1 className="text-base sm:text-lg font-semibold text-white truncate">
+                  {sessions.find(s => s.id === currentSessionId)?.title || "New Conversation"}
+                </h1>
+                <p className="text-[11px] text-slate-400 hidden sm:block">
+                  VARA Intelligence
+                </p>
+              </div>
             </div>
             
             {/* Right: Jurisdiction */}
