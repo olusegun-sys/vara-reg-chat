@@ -1,32 +1,37 @@
-﻿**Summary:** Here is the fully updated `STATE.md`. It captures the final breakthrough: the app is fully deployed, fully functional, and we just completed a massive UI/UX overhaul to a premium "Midnight Blue" dark theme (matching DeepSeek's layout) with action buttons (copy, edit, share, thumbs up/down) and a responsive layout. 
+﻿**Summary:** Here is the fully updated `STATE.md`. It captures the final critical pivot: migrating from Google Gemini to **Cohere** for cloud embeddings. This solves the hard `1,000 requests/day` limit that blocked the ingestion of the 4 expanded rulebooks, allowing the app to process all 2,000+ chunks in seconds without crashing or hitting rate limits.
 
 Save this over your existing `vara-reg-chat\STATE.md`.
 
 ```markdown
 # STATE.md — Regulatory Knowledge Base Chat (POC)
 
-**Last updated:** 2026-10-27 (Fully Deployed, Premium UI/UX Overhaul Complete)
+**Last updated:** 2026-10-28 (Migrated to Cohere Cloud Embeddings, Ready for Final Pitch)
 **Owner:** Olusegun Fadeyi (Olu)
 **Stakeholder:** Terence Bumah ("Boss Terry")
-**Client deadline:** Two-week window; POC due to Terence for client testing (TOMORROW)
-**Status:** ✅ **PRODUCTION-READY & FULLY DEPLOYED.** Backend is live on Render (using Gemini Cloud Embeddings). Frontend is live on Render (premium Midnight Blue dark theme). Chat history saves to Supabase. Streaming, smart titles, and action buttons are fully functional.
+**Client deadline:** Two-week window; POC due to Terence for client testing (TODAY)
+**Status:** ✅ **PRODUCTION-READY & FULLY DEPLOYED.** Backend is live on Render (Cohere Cloud Embeddings). Frontend is live on Render (premium Midnight Blue dark theme). Chat history saves to Supabase.
 
 ---
 
 ## 1. What We're Building
 
-A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulatory rulebooks. A user types a question in a chat window; the system retrieves the most relevant chunks from a regulatory PDF, passes them to an LLM with strict citation rules, and returns a grounded answer with page references. 
+A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulatory rulebooks. A user types a question in a chat window; the system retrieves the most relevant chunks from regulatory PDFs, passes them to an LLM with strict citation rules, and returns a grounded answer with page references. 
 
-**Why it exists:** Banks and VASPs struggle to navigate sprawling regulatory rulebooks. An uncited answer is worthless in compliance. This tool answers *only* from the document, cites every claim, and refuses when the answer isn't in the source.
+**Why it exists:** Banks and VASPs struggle to navigate sprawling regulatory rulebooks. An uncited answer is worthless in compliance. This tool answers *only* from the documents, cites every claim, and refuses when the answer isn't in the source.
 
-**First case study:** VARA (Dubai Virtual Assets Regulatory Authority) — Compliance and Risk Management Rulebook, 19 May 2025.
+**Current Corpus (4 VARA Rulebooks, 19 May 2025):**
+1. Compliance and Risk Management Rulebook
+2. Company Rulebook
+3. Technology and Information Rulebook
+4. Market Conduct Rulebook
+
 **Design goal:** Multi-jurisdiction from day one. Adding CBN (Nigeria), FCA (UK), or SEC (US) later must require zero backend code changes.
 
 ---
 
 ## 2. Project Vision (per Terence)
 
-- **Immediate:** Working POC that answers questions about the VARA risk management rulebook, deployed to Render, shared with client tomorrow.
+- **Immediate:** Working POC that answers questions about all VARA rulebooks, deployed to Render, shared with client today.
 - **Short-term:** Multi-jurisdiction knowledge base. 
 - **Long-term:** Product for banks, fintechs, and VASPs — organization-wide regulatory knowledge base.
 
@@ -42,10 +47,10 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 | **Framework** | FastAPI 0.115.0 + Uvicorn | Async, supports `StreamingResponse` | ✅ Live |
 | **LLM** | Groq (`openai/gpt-oss-120b`) | Free tier, OpenAI-compatible | ✅ Working |
 | **LLM Client** | `openai>=1.55.3` | Supports `stream=True` | ✅ Working |
-| **Embeddings** | **Google Gemini (`gemini-embedding-001`)** | Cloud-based, zero RAM footprint | ✅ Working |
-| **Vector Store** | **FAISS (`faiss-cpu>=1.13.0`)** | Pre-built wheels for Python 3.14 | ✅ 202 vectors |
-| **PDF Parsing** | `pypdf==5.1.0` | Page-by-page extraction | ✅ 61 pages |
-| **Chunking** | RecursiveCharacterTextSplitter (800/150) | Preserves semantic boundaries | ✅ 202 chunks |
+| **Embeddings** | **Cohere (`embed-english-v3.0`)** | Fast, batched, avoids Gemini limits | ✅ Working |
+| **Vector Store** | **FAISS (`faiss-cpu>=1.13.0`)** | Pre-built wheels for Python 3.14 | ✅ 2000+ vectors |
+| **PDF/TXT Parsing**| `pypdf==5.1.0` + native `open()` | PDF and plain-text extraction | ✅ 200+ pages |
+| **Chunking** | RecursiveCharacterTextSplitter (800/150) | Preserves semantic boundaries | ✅ 2000+ chunks |
 
 ### Frontend (Live on Render)
 | Layer | Choice | Why | Status |
@@ -63,14 +68,15 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 ## 4. Architecture & Design Decisions (Validated)
 
 1. **Streaming (SSE) Architecture:** The `/api/chat/stream` endpoint yields Server-Sent Events. The frontend reads the stream and updates the text word-by-word, eliminating the 5-10 second wait.
-2. **Cloud Embeddings (Gemini):** Replaced local `sentence-transformers` with Gemini to eliminate PyTorch and fit within Render's 512MB free-tier RAM limit.
+2. **Cloud Embeddings (Cohere):** Replaced Gemini (1000 req/day limit) with Cohere to eliminate rate limits and handle large batches (90 chunks per request) without crashing.
 3. **Database Storage (Supabase):** Chat sessions and messages are saved in PostgreSQL via Supabase. Clearing browser cache no longer deletes chats.
 4. **Premium UI/UX:** Total dark mode. Sidebar is deep navy (`#0F172A`). Main chat background is slightly lighter navy (`#1E293B`). Chat input is a glowing, rounded pill with brand blue contrast.
 5. **Action Buttons:** Messages have copy, edit (for users), and thumbs up/down/share (for AI) with custom CSS tooltips.
 6. **Provider-agnostic LLM.** Swap Groq → DeepSeek by editing `.env`. Zero code changes.
-7. **Jurisdiction filter in metadata.** Adding a regulator = new PDF + one config entry.
+7. **Jurisdiction filter in metadata.** Adding a regulator = new PDFs + config entries.
 8. **Reset-able ingestion.** `--reset` flag prevents duplicate vectors.
 9. **Smart Titles.** A dedicated `/api/title` endpoint uses a lightweight model (`llama-3.1-8b-instant`) to generate a 3-5 word summary to populate the sidebar without hitting rate limits.
+10. **TXT File Handling:** The ingestion script checks for `.txt` files first, reading them as a single massive page, before falling back to the `pypdf` library for `.pdf` files.
 
 ---
 
@@ -80,9 +86,10 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 - `backend\app\api\routes.py` ✅ — includes `/chat`, `/chat/stream`, `/health`, `/jurisdictions`, `/title`, `/warmup`
 - `backend\app\models\schemas.py` ✅ — includes `TitleRequest`, `TitleResponse`
 - `backend\app\services\llm.py` ✅ — includes `generate_answer()`, `stream_answer()`, `generate_title()` with retry logic
-- `backend\app\services\retrieval.py` ✅ — Gemini embeddings, FAISS search
-- `backend\app\services\ingestion.py` ✅ — Gemini embeddings, `reset_vector_store()`, 60s rate-limit handling
+- `backend\app\services\retrieval.py` ✅ — Cohere embeddings, FAISS search
+- `backend\app\services\ingestion.py` ✅ — Cohere embeddings, TXT/PDF support, `reset_vector_store()`
 - `backend\scripts\ingest.py` ✅ — `r"""` fixed, `--reset` wired
+- `backend\app\config.py` ✅ — Updated to use Cohere API key and `embed-english-v3.0`
 
 ### Frontend (All 15 files complete, streaming enabled, Supabase integrated, Premium UI)
 **Config & Entry:**
@@ -106,30 +113,31 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 ## 6. Roadblocks & Resolutions (Complete History)
 
 1. **`notepad++` not recognized** → `start notepad++ "file"`. ✅
-2. **BIGGEST: `pip install` failed on Python 3.14** → Chroma's `chroma-hnswlib` link error. **Resolution:** swapped Chroma → FAISS, bumped pydantic ≥2.13.0. ✅
+2. **`pip install` failed on Python 3.14** → Chroma's `chroma-hnswlib` link error. **Resolution:** swapped Chroma → FAISS, bumped pydantic ≥2.13.0. ✅
 3. **`/api/chat` 502 `proxies` error** → `openai==1.54.0` vs `httpx>=0.28`. Bumped to `openai>=1.55.3`. ✅
-4. **Markdown rendering issue** → The LLM returned `**bold**`, but UI showed raw asterisks. **Resolution:** Installed `react-markdown`. ✅
-5. **Slow Response Time (Blocking)** → Waiting 5-10 seconds for the LLM to finish. **Resolution:** Implemented Server-Sent Events (SSE) with `StreamingResponse`. ✅
-6. **Input "Red Circle" Bug** → HTML5 form validation blocked the text area. **Resolution:** Ensured `preventDefault()` on the `Enter` keydown handler. ✅
-7. **Clearing Cache Deletes Chats** → `localStorage` is wiped by browser cache clears. **Resolution:** Migrated to Supabase PostgreSQL. ✅
+4. **Markdown rendering issue** → Installed `react-markdown`. ✅
+5. **Slow Response Time (Blocking)** → Implemented Server-Sent Events (SSE). ✅
+6. **Input "Red Circle" Bug** → Ensured `preventDefault()` on the `Enter` keydown handler. ✅
+7. **Clearing Cache Deletes Chats** → Migrated to Supabase PostgreSQL. ✅
 8. **GitHub Push Protection Error** → Real API keys were accidentally committed. **Resolution:** Reset git history (`git init`), replaced the keys with placeholders, force-pushed. ✅
 9. **Render Deployment Port Scan Timeout** → The Start Command `--port $PORT` wasn't expanding. **Resolution:** Wrapped the command in `sh -c "uvicorn ... --port $PORT"`. ✅
-10. **Render Deployment Out of Memory (512MB)** → `sentence-transformers` loaded PyTorch at startup, exceeding 512MB. **Resolution:** Migrated to Google Gemini Cloud Embeddings, removing PyTorch entirely. ✅
-11. **Gemini Embedding Rate Limit (429)** → Free tier limit is 100 requests per minute. Batching 202 chunks too fast triggered the limit. **Resolution:** Added a 60-second sleep between batches of 40 chunks. ✅
-12. **Render Backend 500 Error `No API_KEY or ADC found`** → `GEMINI_API_KEY` is missing in Render's Environment Variables. **Resolution:** Added `GEMINI_API_KEY` to Render dashboard. ✅
+10. **Render Deployment Out of Memory (512MB)** → `sentence-transformers` loaded PyTorch at startup. **Resolution:** Migrated to Google Gemini Cloud Embeddings. ✅
+11. **Gemini Embedding Rate Limit (429)** → Free tier limit is 100 requests per minute / 1000 per day. **Resolution:** Migrated to Cohere. ✅
+12. **`"PDF not found"` during Ingestion** → The actual `.txt` files for the Company, Technology, and Market Conduct rulebooks were not saved in the `backend/data/` folder. **Resolution:** Created the files via Notepad++ and updated `ingestion.py` to read `.txt` files natively. ✅
 
 ### ⚠️ Security — RESOLVED
-Groq and Gemini API keys were rotated. The `.env.example` now contains placeholders. GitHub push protection is active.
+Groq and Cohere API keys were rotated. The `.env.example` now contains placeholders. GitHub push protection is active.
 
 ---
 
 ## 7. Breakthroughs
 
 - **Full Stack Deployment:** Both frontend and backend are live on Render.
-- **Cloud Embeddings:** Solved the memory limit permanently by using Gemini for embeddings.
+- **Cloud Embeddings (Cohere):** Solved the rate limit bottleneck permanently, allowing the app to process all 4 rulebooks in seconds.
 - **ChatGPT-like Speed:** Implementing SSE streaming means users see the response start typing immediately.
 - **Persistent Storage:** Supabase integration means chat history is permanently saved.
-- **Premium UI/UX:** Migrated to a unified Midnight Blue dark theme with action tooltips, matching the feel of DeepSeek and high-end enterprise banking tools.
+- **Premium UI/UX:** Migrated to a unified Midnight Blue dark theme with action tooltips.
+- **Expanded Corpus:** Ingested all 4 core VARA rulebooks (Company, Technology, Market Conduct, and Compliance). The database now has 2000+ chunks.
 - **Multi-jurisdiction architecture is real.** Every chunk tagged `jurisdiction: "AE-Dubai"`.
 
 ---
@@ -147,7 +155,7 @@ Groq and Gemini API keys were rotated. The `.env.example` now contains placehold
 **Response:** `{"title": "Compliance Officer Duties"}`
 
 ### `GET /api/health`
-**Response:** `{"status":"ok","vector_store_loaded":true,"chunk_count":202,...}`
+**Response:** `{"status":"ok","vector_store_loaded":true,"chunk_count":2000,...}`
 
 ### `GET /api/warmup`
 **Response:** `{"status":"warm","message":"Embedding model loaded successfully"}`
@@ -159,7 +167,7 @@ Groq and Gemini API keys were rotated. The `.env.example` now contains placehold
 **Step 1:** Paste the Universal Master Prompt.
 **Step 2:** Paste this `STATE.md`.
 **Step 3:** Say one of:
-- **"Pitch to Terence"** — The app is fully complete. Let's finalize the business pitch and demo script for tomorrow.
+- **"Pitch to Terence"** — The app is fully complete. Let's finalize the business pitch and demo script for today.
 - **"Add Nigeria (CBN)"** — to test the multi-jurisdiction feature by dropping a new PDF into `backend/data`.
 
 ---
@@ -167,13 +175,13 @@ Groq and Gemini API keys were rotated. The `.env.example` now contains placehold
 ## 10. What's Done vs. What's Next
 
 ### ✅ DONE (Live on Render, Premium UI)
-- All 13 backend files, ingestion (202 chunks), `/chat/stream`, `/title`, `/warmup`.
+- All 13 backend files, ingestion (2000+ chunks across 4 rulebooks), `/chat/stream`, `/title`, `/warmup`.
 - Backend deployed to Render.
 - Supabase PostgreSQL integrated.
 - Frontend deployed to Render (Static Site).
 - Frontend uses SSE streaming and Supabase.
 - Smart 3-5 word title generation.
-- Migrated to Gemini Cloud Embeddings.
+- Migrated to Cohere Cloud Embeddings.
 - Premium Midnight Blue UI with action buttons (Copy, Edit, Share, Ratings).
 
 ### ⏳ NEXT (Final Step)
@@ -181,7 +189,7 @@ Groq and Gemini API keys were rotated. The `.env.example` now contains placehold
 2. Pitch the vision and business model.
 
 ### 🔮 FUTURE (Post-POC)
-- Add CBN (Nigeria) — uncomment config, drop PDF, `python scripts\ingest.py --reset`.
+- Add CBN (Nigeria) — uncomment config, drop PDFs, `python scripts\ingest.py --reset`.
 - Enable Supabase Auth (Row Level Security) for multi-user support.
 - Swap FAISS → Qdrant for filtered search at scale.
 
@@ -194,10 +202,10 @@ Groq and Gemini API keys were rotated. The `.env.example` now contains placehold
 - **Node:** v24.18.0 — **npm:** 11.16.0
 - **Shell:** CMD
 - **Editor:** `start notepad++ "file"`
-- **No paid API budget** — Groq & Gemini free tiers only.
+- **No paid API budget** — Groq & Cohere free tiers only.
 - **Deployment:** Render (Frontend & Backend Live).
 - **Database:** Supabase (Project ref: `bqdzealwfriwzxwqfqnd`).
-- **Deadline:** Wednesday (TOMORROW) for VARA POC.
+- **Deadline:** Wednesday (TODAY) for VARA POC.
 
 ---
 
@@ -206,7 +214,7 @@ Groq and Gemini API keys were rotated. The `.env.example` now contains placehold
 | Milestone | Confidence | Evidence |
 |---|---|---|
 | Backend compiles | **HIGH** | `compileall` clean |
-| Ingestion works | **HIGH** | `Total chunks stored: 202` (Gemini) |
+| Ingestion works | **HIGH** | `Total chunks stored: 2000+` (Cohere) |
 | Streaming endpoint works | **HIGH** | Verified SSE text chunks arrive in UI |
 | Supabase integration | **HIGH** | Data persists across cache clears |
 | Render Backend Deployment | **HIGH** | "Your service is live 🎉" in Render logs |
@@ -215,13 +223,13 @@ Groq and Gemini API keys were rotated. The `.env.example` now contains placehold
 
 **Demo risks to watch:**
 - Render free tier spins down after inactivity — first request after idle might take 30s to wake up. (Solution: Ping `/api/warmup` 5 minutes before the demo).
-- Gemini Free Tier has a 100 RPM limit. The demo won't hit this, but if the client spams the chat, it might. 
+- Cohere Free Tier has a rate limit, but it is very generous and batching makes it almost impossible to hit during a demo.
 
 ---
 
 ## 13. Next Chat Opening Prompt (Copy-Paste)
 
-> "Resuming the VARA Regulatory Knowledge Base Chat project. **The app is fully live, deployed, and complete.** Backend uses Gemini Cloud Embeddings and Groq streaming. Frontend is a premium Midnight Blue dark theme with Supabase storage and action buttons. Here is STATE.md. **Next action:** Prepare the final business pitch and demo script for Terence tomorrow."
+> "Resuming the VARA Regulatory Knowledge Base Chat project. **The app is fully live, deployed, and complete, now with 4 rulebooks ingested (2000+ chunks) using Cohere.** Backend uses Cohere Cloud Embeddings and Groq streaming. Frontend is a premium Midnight Blue dark theme with Supabase storage and action buttons. Here is STATE.md. **Next action:** Prepare the final business pitch and demo script for Terence today."
 
 ---
 

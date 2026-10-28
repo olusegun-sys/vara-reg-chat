@@ -6,21 +6,37 @@ import re
 
 import faiss
 import numpy as np
-import google.generativeai as genai
+import cohere
 from pypdf import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from app import config
 
-genai.configure(api_key=config.GEMINI_API_KEY)
+co = cohere.Client(api_key=config.COHERE_API_KEY)
 
 
 def load_pdf_pages(pdf_path: Path) -> List[Dict[str, Any]]:
-    reader = PdfReader(str(pdf_path))
+    """
+    Extract text from each page of a PDF, OR read a .txt file directly.
+    """
     pages = []
+    
+    if pdf_path.suffix.lower() == ".txt":
+        try:
+            with open(pdf_path, "r", encoding="utf-8") as f:
+                text = f.read()
+            if text.strip():
+                # Treat the whole txt file as one massive page
+                pages.append({"page": 1, "text": text})
+        except Exception as e:
+            print(f"[ingest] Warning: could not read {pdf_path.name} as text: {e}")
+        return pages
+
+    # Original PDF logic
+    reader = PdfReader(str(pdf_path))
     for idx, page in enumerate(reader.pages, start=1):
         text = page.extract_text() or ""
-        if text.strip():
+        if text.strip(): 
             pages.append({"page": idx, "text": text})
     return pages
 
@@ -51,11 +67,13 @@ def chunk_pages(pages: List[Dict[str, Any]], chunk_size: int, chunk_overlap: int
 
 def embed_chunks(chunks: List[Dict[str, Any]], model_name: str = None) -> List[List[float]]:
     """
-    Embed chunks using Gemini with rate limits and retry logic.
+    Embed chunks using Cohere. 
+    Cohere Trial allows 100,000 tokens per minute. 
+    We use a batch size of 40 (roughly ~50k tokens) and sleep 60s to stay safe.
     """
     texts = [c["text"] for c in chunks]
     embeddings = []
-    batch_size = 40
+    batch_size = 40  # Reduced from 90 to avoid token limits
     total_batches = (len(texts) + batch_size - 1) // batch_size
 
     for i in range(0, len(texts), batch_size):
@@ -67,22 +85,22 @@ def embed_chunks(chunks: List[Dict[str, Any]], model_name: str = None) -> List[L
         max_retries = 3
         for attempt in range(max_retries):
             try:
-                result = genai.embed_content(
-                    model="models/gemini-embedding-001",
-                    content=batch,
-                    task_type="retrieval_document"
+                response = co.embed(
+                    texts=batch,
+                    model="embed-english-v3.0",
+                    input_type="search_document"
                 )
-                embeddings.extend(result['embedding'])
-                break  # Success, exit retry loop
+                embeddings.extend(response.embeddings)
+                break  # Success
             except Exception as e:
                 if attempt < max_retries - 1:
-                    print(f"  [embed] Batch {current_batch} failed ({type(e).__name__}). Retrying in 10s...")
-                    time.sleep(10)
+                    print(f"  [embed] Batch {current_batch} failed ({type(e).__name__}). Retrying in 20s...")
+                    time.sleep(20)
                 else:
                     print(f"  [embed] Batch {current_batch} failed after {max_retries} attempts: {e}")
                     raise e
 
-        # Sleep 60 seconds between batches to respect the 100 RPM limit
+        # Sleep 60 seconds between batches to respect the 100k TPM limit
         if current_batch < total_batches:
             print("  [embed] Sleeping 60 seconds to respect API rate limits...")
             time.sleep(60)
@@ -174,7 +192,7 @@ def ingest_document(jurisdiction: str, doc_config: Dict[str, str]) -> int:
     chunks = chunk_pages(pages, config.CHUNK_SIZE, config.CHUNK_OVERLAP)
     print(f"[ingest] Created {len(chunks)} chunks.")
 
-    print("[ingest] Embedding with Gemini (cloud, no local model)...")
+    print("[ingest] Embedding with Cohere (cloud, no local model)...")
     embeddings = embed_chunks(chunks)
     print(f"[ingest] Generated {len(embeddings)} embeddings.")
 
