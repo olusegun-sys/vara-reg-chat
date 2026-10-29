@@ -56,85 +56,151 @@ JURISDICTIONS = {
         "regulator": "VARA",
         "name": "Dubai Virtual Assets Regulatory Authority",
         "documents": [
-            # --- Existing 4 core rulebooks (originally built the 487 chunks) ---
-            # Why .txt: pre-converted to clean UTF-8 by fix_text.py (STATE.md roadblock #13).
-            # Do not convert these back to .pdf — the .txt versions are the canonical,
-            # already-clean sources. pypdf PDF extraction would re-introduce footers.
+            # ================================================================
+            # STATE AS OF 2026-10-29 EVENING: 17 documents configured.
+            # FAISS index on disk: 1,081 vectors (11 docs) + ~500 new (6 docs
+            # being ingested in this run) = expected ~1,500-1,800 total.
+            #
+            # This list is the SOURCE OF TRUTH for a --reset rebuild.
+            # New ingestions use scripts/ingest.py which skips titles already
+            # present in metadata.json, so re-running is safe (no duplicates).
+            # ================================================================
+
+            # --- Compulsory Rulebooks (4/4) ---
             {
                 "file": "vara_compliance_risk_rulebook.txt",
                 "title": "Compliance and Risk Management Rulebook",
                 "effective_date": "2025-05-19",
-                # Why source_url: lets the frontend render the citation chip as a
-                # clickable link to the official VARA page for this rulebook.
                 "source_url": "https://rulebooks.vara.ae/index.php/rulebook/compliance-and-risk-management-rulebook",
+                "document_type": "rulebook",
             },
             {
                 "file": "vara_company_rulebook.txt",
                 "title": "Company Rulebook",
                 "effective_date": "2025-05-19",
                 "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_36_VER20250519.pdf",
+                "document_type": "rulebook",
             },
             {
                 "file": "vara_technology_rulebook.txt",
                 "title": "Technology and Information Rulebook",
                 "effective_date": "2025-05-19",
                 "source_url": "https://rulebooks.vara.ae/index.php/rulebook/technology-and-information-rulebook",
+                "document_type": "rulebook",
             },
             {
                 "file": "vara_market_conduct_rulebook.txt",
                 "title": "Market Conduct Rulebook",
                 "effective_date": "2025-05-19",
                 "source_url": "https://rulebooks.vara.ae/index.php/rulebook/market-conduct-rulebook",
+                "document_type": "rulebook",
             },
 
-            # --- NEW: 7 VA Activity Rulebooks + Guidance (PDFs, added 2026-10-29) ---
-            # Why .pdf: original source PDFs. pypdf reads them natively — no .txt
-            # conversion needed. ingestion.py's clean_vara_pdf_text() strips VARA
-            # page footers (Arabic + "varaconnect@vara.ae" + page number) before
-            # chunking, and drops pages that were just "1 1 1 1 ..." table garbage.
-            # Why per-doc effective_date: each document has its own issuance date
-            # encoded in the filename (VER20250519, VER20260331, VER1).
+            # --- VA Activity Rulebooks (7/9, already ingested) ---
             {
                 "file": "VARA_EN_258_VER20260331.pdf",
                 "title": "Exchange Services Rulebook",
                 "effective_date": "2026-03-31",
                 "source_url": "https://rulebooks.vara.ae/index.php/rulebook/exchange-services-rulebook",
+                "document_type": "rulebook",
             },
             {
                 "file": "VARA_EN_279_VER20250519.pdf",
                 "title": "Lending and Borrowing Services Rulebook",
                 "effective_date": "2025-05-19",
                 "source_url": "https://rulebooks.vara.ae/index.php/rulebook/lending-and-borrowing-services-rulebook",
-            },
-            {
-                "file": "VARA_EN_388_VER1.pdf",
-                "title": "Guidance on Marketing of Virtual Assets",
-                "effective_date": "2024-08-31",
-                "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_388_VER1.pdf",
-            },
-            {
-                "file": "VARA_EN_516_VER1.pdf",
-                "title": "Guidance on Virtual Asset Issuance",
-                "effective_date": "2026-04-09",
-                "source_url": "https://rulebooks.vara.ae/index.php/rulebook/virtual-asset-issuance-rulebook",
+                "document_type": "rulebook",
             },
             {
                 "file": "VARA_EN_215_VER20250519.pdf",
                 "title": "Advisory Services Rulebook",
                 "effective_date": "2025-05-19",
                 "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_215_VER20250519.pdf",
+                "document_type": "rulebook",
             },
             {
                 "file": "VARA_EN_226_VER20250519.pdf",
                 "title": "Broker-Dealer Services Rulebook",
                 "effective_date": "2025-05-19",
                 "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_226_VER20250519.pdf",
+                "document_type": "rulebook",
             },
             {
                 "file": "VARA_EN_243_VER20250519.pdf",
                 "title": "Custody Services Rulebook",
                 "effective_date": "2025-05-19",
                 "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_243_VER20250519.pdf",
+                "document_type": "rulebook",
+            },
+
+            # --- Guidance Documents (2/2, already ingested) ---
+            {
+                "file": "VARA_EN_388_VER1.pdf",
+                "title": "Guidance on Marketing of Virtual Assets",
+                "effective_date": "2024-08-31",
+                "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_388_VER1.pdf",
+                "document_type": "guidance",
+            },
+            {
+                "file": "VARA_EN_516_VER1.pdf",
+                "title": "Guidance on Virtual Asset Issuance",
+                "effective_date": "2026-04-09",
+                "source_url": "https://rulebooks.vara.ae/index.php/rulebook/virtual-asset-issuance-rulebook",
+                "document_type": "guidance",
+            },
+
+            # ================================================================
+            # NEW (2026-10-29 EVENING): 6 VARA framework documents
+            # These complete the framework layer: Laws, Cabinet Decisions,
+            # master Regulations, plus the last 2 VA Activity rulebooks.
+            # ================================================================
+
+            # --- VA Activity Rulebooks (2 more, completing 9/9) ---
+            {
+                "file": "VARA_EN_317_VER20250519.pdf",
+                "title": "VA Management and Investment Services Rulebook",
+                "effective_date": "2025-05-19",
+                "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_317_VER20250519.pdf",
+                "document_type": "rulebook",
+            },
+            {
+                "file": "VARA_EN_347_VER20250519.pdf",
+                "title": "VA Transfer and Settlement Services Rulebook",
+                "effective_date": "2025-05-19",
+                "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_347_VER20250519.pdf",
+                "document_type": "rulebook",
+            },
+
+            # --- Master Regulation (foundation of the whole framework) ---
+            {
+                "file": "VARA_EN_18_VER992_2.pdf",
+                "title": "Virtual Assets and Related Activities Regulations 2023",
+                "effective_date": "2023-02-07",
+                "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_18_VER992_2.pdf",
+                "document_type": "regulation",
+            },
+
+            # --- Laws & Cabinet Decisions (the legal framework above VARA) ---
+            {
+                "file": "VARA_EN_338_VER1.pdf",
+                "title": "Law No. (4) of 2022 Regulating Virtual Assets in the Emirate of Dubai",
+                "effective_date": "2022-03-11",
+                "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_338_VER1.pdf",
+                "document_type": "law",
+            },
+            {
+                "file": "VARA_EN_339_VER1.pdf",
+                "title": "Cabinet Decision No. 111/2022 on the Regulation of Virtual Assets and Their Service Providers",
+                "effective_date": "2022-12-12",
+                "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_339_VER1.pdf",
+                "document_type": "cabinet_decision",
+            },
+            {
+                "file": "VARA_EN_340_VER1.pdf",
+                "title": "Cabinet Decision No. 112/2022 on Delegating Certain Competencies related to the Regulation of Virtual Assets",
+                "effective_date": "2022-12-12",
+                "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_340_VER1.pdf",
+                "document_type": "cabinet_decision",
             },
         ],
     },

@@ -36,3 +36,6 @@ Thumbs.db
 # Local FAISS ingest safety backups — never commit these
 *.bak
 *.faiss.bak
+
+# Local FAISS pre-reset safety backups — never commit
+*.pre-reset
