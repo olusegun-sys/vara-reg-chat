@@ -32,3 +32,7 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Local FAISS ingest safety backups — never commit these
+*.bak
+*.faiss.bak

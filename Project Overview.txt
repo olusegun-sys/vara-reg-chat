@@ -1,15 +1,15 @@
-﻿**Summary:** Here is the fully updated `STATE.md`. It captures the final pre-demo state: the database is fully loaded with all 4 rulebooks (487 chunks), the UI is fully polished, chat privacy is isolated, and the backend now includes a **Query Rewriter** to handle vague user questions.
+﻿**Summary:** Here is the fully updated `STATE.md`. It captures the critical new feature we just built: **Conversational Memory**. The AI can now remember the last 4 messages of a chat, allowing it to handle follow-up questions naturally without breaking the 487-chunk database we built.
 
 Save this over your existing `vara-reg-chat\STATE.md`.
 
 ```markdown
 # STATE.md — Regulatory Knowledge Base Chat (POC)
 
-**Last updated:** 2026-10-28 (Final Pre-Demo State: Query Rewriter Added, Clean UI, 487 Chunks)
+**Last updated:** 2026-10-29 (Conversational Memory Implemented, 487 Chunks, Pre-Demo Ready)
 **Owner:** Olusegun Fadeyi (Olu)
 **Stakeholder:** Terence Bumah ("Boss Terry")
 **Client deadline:** Two-week window; POC due to Terence for client testing (TODAY)
-**Status:** ✅ **STABLE, PRIVATE, & DEPLOYED.** Backend live on Render (Cohere embeddings, 487 chunks covering 4 VARA rulebooks). Frontend live on Render (Midnight Blue theme, mobile hamburger menu). Supabase integrated with anonymous browser session isolation. Ready for Terry demo.
+**Status:** ✅ **STABLE, SMART, & DEPLOYED.** Backend live on Render (Cohere embeddings, 487 chunks). Frontend live on Render (Midnight Blue theme). The AI now has **conversational memory**, meaning it can answer follow-up questions contextually. Ready for Terry demo.
 
 ---
 
@@ -69,22 +69,23 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 
 1. **Streaming (SSE) Architecture:** The `/api/chat/stream` endpoint yields Server-Sent Events. The frontend reads the stream and updates the text word-by-word.
 2. **Cloud Embeddings (Cohere):** Replaced Gemini to bypass hard rate limits.
-3. **Database Storage & Privacy (Supabase):** Chat history is saved via Supabase. A unique `vara_browser_id` is generated in `localStorage` for every new browser. When Terry opens the link, he gets a fresh, private session, completely isolated from your history.
-4. **Query Rewriter:** Before retrieving chunks, a fast LLM call (`llama-3.1-8b-instant`) rewrites vague user questions into regulatory keywords. This ensures high accuracy even if the user asks a poorly phrased question.
-5. **Premium UI/UX:** Total dark mode. Sidebar is deep navy. Chat input is a glowing, rounded pill.
-6. **Mobile Responsiveness:** Added a hamburger menu to toggle the sidebar on mobile devices. Cleaned up the header alignment.
-7. **Clean Source Citations:** Because the demo uses `.txt` files (where page numbers aren't accurate), the UI groups sources by Document Name instead of spamming `p.1`.
-8. **Action Buttons:** Messages have copy, edit (for users), and thumbs up/down/share (for AI).
-9. **Encoding Fix:** Generated `.txt` files via Python (`fix_text.py`) to guarantee UTF-8 encoding before ingestion.
+3. **Database Storage & Privacy (Supabase):** Chat history is saved via Supabase. A unique `vara_browser_id` is generated in `localStorage` for every new browser. When Terry opens the link, he gets a fresh, private session.
+4. **Conversational Memory:** The frontend sends the last 4 messages to the backend, which injects them into the LLM prompt. This allows the AI to answer follow-up questions naturally (e.g., "What are the duties of the CO?" -> "Who does he report to?").
+5. **Query Rewriter:** Before retrieving chunks, a fast LLM call (`llama-3.1-8b-instant`) rewrites vague user questions into regulatory keywords.
+6. **Blank Slate Home:** The app starts with a clean, welcoming home screen ("What would you like to know?") instead of auto-loading the last chat.
+7. **Premium UI/UX:** Total dark mode. Sidebar is deep navy. Chat input is a glowing, rounded pill.
+8. **Mobile Responsiveness:** Added a hamburger menu to toggle the sidebar on mobile devices.
+9. **Clean Source Citations:** The UI groups sources by Document Name instead of spamming `p.1`.
+10. **Action Buttons:** Messages have copy, edit (for users), and thumbs up/down/share (for AI).
 
 ---
 
 ## 5. File Inventory (Current State)
 
 ### Backend (All working, hardened, streaming, deployed)
-- `backend\app\api\routes.py` ✅ — `/chat/stream`, `/health`, `/jurisdictions`, `/title`, `/warmup`, `/debug-search` (now uses query rewriting)
-- `backend\app\models\schemas.py` ✅ — `TitleRequest`, `TitleResponse`
-- `backend\app\services\llm.py` ✅ — `generate_answer()`, `stream_answer()`, `generate_title()`, `rewrite_query()` with retry logic
+- `backend\app\api\routes.py` ✅ — `/chat/stream`, `/health`, `/jurisdictions`, `/title`, `/warmup`, `/debug-search` (accepts memory history)
+- `backend\app\models\schemas.py` ✅ — `ChatRequest` now includes `history: List[Dict[str, str]]`
+- `backend\app\services\llm.py` ✅ — `stream_answer()` and `generate_answer()` inject history into the prompt. Includes `rewrite_query()`.
 - `backend\app\services\retrieval.py` ✅ — Cohere embeddings, FAISS search
 - `backend\app\services\ingestion.py` ✅ — Cohere embeddings, TXT/PDF support, `reset_vector_store()`
 - `backend\scripts\ingest.py` ✅ — `r"""` fixed, `--reset` wired
@@ -96,16 +97,16 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 - `index.html`, `src/main.jsx`, `src/index.css`
 
 **API:**
-- `src/api/client.js` — `getJurisdictions()`, `streamChat()`, `generateChatTitle()`
+- `src/api/client.js` — `streamChat()` now accepts a `history` array.
 - `src/api/supabase.js` — Generates unique `vara_browser_id` in `localStorage` for privacy. Full CRUD for sessions/messages.
 
 **Components:**
 - `src/components/Sidebar.jsx` — Mobile slide-out (hamburger menu), Pin/Rename/Delete actions, no "Powered by AI" footer.
 - `src/components/MessageBubble.jsx` — ReactMarkdown, clean unique document citations, action tooltips.
 - `src/components/ChatInput.jsx` — Glowing rounded pill, auto-growing textarea, removed bottom disclaimer text.
-- `src/components/ChatWindow.jsx` — Dark background, luxurious empty state.
+- `src/components/ChatWindow.jsx` — Blank slate home state ("What would you like to know?"), dark background.
 - `src/components/JurisdictionSelector.jsx` — Compact, rounded dropdown for AE-Dubai.
-- `src/App.jsx` — Orchestrates Supabase sessions, mobile sidebar state, SSE streaming handler.
+- `src/App.jsx` — Slices the last 4 messages and sends them as history.
 
 ---
 
@@ -135,19 +136,21 @@ Groq and Cohere API keys were rotated. `.strip()` applied to config to prevent w
 
 - **Full Stack Deployment:** Both frontend and backend are live on Render.
 - **Chat Privacy:** Every browser gets a unique anonymous ID, ensuring Terry sees a clean slate.
+- **Conversational Memory:** The AI can now handle follow-up questions contextually.
 - **Cloud Embeddings (Cohere):** Solved the rate limit bottleneck permanently.
 - **ChatGPT-like Speed:** Implementing SSE streaming means users see the response start typing immediately.
 - **Persistent Storage:** Supabase integration means chat history is permanently saved.
 - **Premium UI/UX:** Unified Midnight Blue dark theme, mobile hamburger menu, and clean source pills.
 - **Expanded Corpus:** Ingested all 4 core VARA rulebooks. The database now has 487 clean chunks.
 - **Robust Queries:** Added the Query Rewriter to fix vague questions before searching the database.
+- **Blank Slate Startup:** App opens to a clean, welcoming home screen rather than auto-loading an old chat.
 
 ---
 
 ## 8. API Contract (Live on Render)
 
 ### `POST /api/chat/stream`
-**Request:** `{"question":"...","jurisdiction":"AE-Dubai"}`
+**Request:** `{"question":"...","jurisdiction":"AE-Dubai","history":[{"role":"user","content":"..."},{"role":"assistant","content":"..."}]}`
 **Response (SSE stream):** 
 - First chunk: `{"type": "sources", "sources": [...]}`
 - Subsequent chunks: `{"type": "text", "text": "word "}`
@@ -171,12 +174,13 @@ Groq and Cohere API keys were rotated. `.strip()` applied to config to prevent w
 **Step 3:** Say one of:
 - **"Pitch to Terence"** — The app is fully complete. Let's finalize the business pitch and demo script for today.
 - **"Add Nigeria (CBN)"** — to test the multi-jurisdiction feature by dropping a new PDF into `backend/data`.
+- **"Fix page numbers"** — to add a `page` metadata property to the `.txt` ingestion so sources say `p.8` instead of `p.1`.
 
 ---
 
 ## 10. What's Done vs. What's Next
 
-### ✅ DONE (Live on Render, Premium UI, Privacy Fixed)
+### ✅ DONE (Live on Render, Premium UI, Privacy Fixed, Memory Added)
 - All 13 backend files, ingestion (487 stable chunks across 4 rulebooks), `/chat/stream`, `/title`, `/warmup`.
 - Backend deployed to Render.
 - Supabase PostgreSQL integrated with unique browser ID isolation.
@@ -186,6 +190,8 @@ Groq and Cohere API keys were rotated. `.strip()` applied to config to prevent w
 - Migrated to Cohere Cloud Embeddings.
 - Premium Midnight Blue UI with mobile hamburger menu, action buttons, and clean unique document citations.
 - Added Query Rewriter to fix vague user questions before searching.
+- Blank Slate home screen.
+- **Conversational memory** for follow-up questions.
 
 ### ⏳ NEXT (Final Step)
 1. Demo to Terence. (App is live and ready).
@@ -224,6 +230,7 @@ Groq and Cohere API keys were rotated. `.strip()` applied to config to prevent w
 | Render Frontend Deployment | **HIGH** | Live URL provided by Render |
 | Premium UI | **HIGH** | Dark theme, tooltips, mobile menu applied |
 | Query Rewriter | **HIGH** | Tested locally, improves vague questions |
+| Conversational Memory | **HIGH** | Sent history in payload, LLM handles follow-ups |
 
 **Demo risks to watch:**
 - Render free tier spins down after inactivity — first request after idle might take 30s to wake up. (Solution: Ping `/api/warmup` 5 minutes before the demo).
@@ -232,7 +239,7 @@ Groq and Cohere API keys were rotated. `.strip()` applied to config to prevent w
 
 ## 13. Next Chat Opening Prompt (Copy-Paste)
 
-> "Resuming the VARA Regulatory Knowledge Base Chat project. **The app is fully live, deployed, stable, and private.** Backend uses Cohere Cloud Embeddings and Groq streaming. It now has 4 rulebooks ingested (487 chunks) and uses an LLM query rewriter for vague questions. Frontend is a premium Midnight Blue dark theme with Supabase storage, mobile menu, and action buttons. Chat history is now isolated per browser. Here is STATE.md. **Next action:** Prepare the final business pitch and demo script for Terence today."
+> "Resuming the VARA Regulatory Knowledge Base Chat project. **The app is fully live, deployed, stable, and private.** Backend uses Cohere Cloud Embeddings and Groq streaming. It now has 4 rulebooks ingested (487 chunks), an LLM query rewriter, and conversational memory for follow-up questions. Frontend is a premium Midnight Blue dark theme with Supabase storage, mobile menu, and action buttons. Chat history is now isolated per browser. Here is STATE.md. **Next action:** Prepare the final business pitch and demo script for Terence today."
 
 ---
 

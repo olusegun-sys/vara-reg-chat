@@ -17,10 +17,9 @@ export default function App() {
   const [loadError, setLoadError] = useState(null);
 
   const [sessions, setSessions] = useState([]);
-  const [currentSessionId, setCurrentSessionId] = useState(null); // Start as null (Home state)
+  const [currentSessionId, setCurrentSessionId] = useState(null); 
   const [messages, setMessages] = useState([]);
   
-  // Mobile sidebar state
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -33,14 +32,12 @@ export default function App() {
   useEffect(() => {
     getSessions().then(data => {
       setSessions(data);
-      // REMOVED: The automatic selection of the first session. 
-      // We want the user to start on a blank home page.
     }).catch(err => console.error("Error loading sessions:", err));
   }, []);
 
   useEffect(() => {
     if (!currentSessionId) {
-      setMessages([]); // Clear messages if no session is selected
+      setMessages([]); 
       return;
     }
     getMessages(currentSessionId).then(data => {
@@ -54,7 +51,6 @@ export default function App() {
   }, [currentSessionId]);
 
   const handleNewChat = () => {
-    // Just clear the current session, don't create in DB until first message
     setCurrentSessionId(null);
     setMessages([]);
     setInputValue("");
@@ -73,7 +69,7 @@ export default function App() {
   const handleDelete = async (id) => {
     setSessions(prev => prev.filter(s => s.id !== id));
     if (currentSessionId === id) {
-      setCurrentSessionId(null); // Go back to home state
+      setCurrentSessionId(null); 
     }
     await deleteSession(id);
   };
@@ -104,7 +100,6 @@ export default function App() {
 
     let activeSessionId = currentSessionId;
     
-    // If we are on the home state (no session), create one now in Supabase
     if (!activeSessionId) {
       try {
         const newSession = await createSession("New Conversation");
@@ -130,6 +125,12 @@ export default function App() {
       });
     }
 
+    // Grab the last 4 messages for memory
+    const chatHistory = messages.slice(-4).map(m => ({
+      role: m.role,
+      content: m.content
+    }));
+
     try {
       let fullText = "";
       let receivedSources = [];
@@ -137,6 +138,7 @@ export default function App() {
       await streamChat(
         question, 
         selectedJurisdiction,
+        chatHistory, // Pass memory
         (textChunk) => {
           fullText += textChunk;
           setMessages(prev => {
@@ -190,7 +192,6 @@ export default function App() {
       <div className="flex-1 flex flex-col min-w-0 bg-luxury-light">
         <header className="bg-luxury border-b border-slate-800 px-4 sm:px-6 py-3 shrink-0 z-10 shadow-sm">
           <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
-            
             <div className="flex items-center gap-3 min-w-0 flex-1">
               <button 
                 onClick={() => setIsSidebarOpen(true)}

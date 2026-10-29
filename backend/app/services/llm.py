@@ -1,6 +1,3 @@
-"""
-LLM interaction: build prompt from retrieved chunks, call the configured provider.
-"""
 import json
 import time
 from typing import List, Dict, Any
@@ -41,17 +38,7 @@ def _get_client() -> OpenAI:
 
 
 def rewrite_query(question: str) -> str:
-    """
-    Rewrite a user's question into a clear, search-optimized query.
-    
-    Why this exists:
-    - Users often ask vague questions (e.g., "what are the rules for brokers?").
-    - The vector search needs specific terms to find the right chunks.
-    - We use the fast, cheap llama-3.1-8b-instant model to expand the query
-      with regulatory synonyms before we embed it.
-    """
     client = _get_client()
-    
     try:
         response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
@@ -60,39 +47,42 @@ def rewrite_query(question: str) -> str:
             messages=[
                 {
                     "role": "system", 
-                    "content": "You are a search query optimizer for a VARA (Virtual Assets Regulatory Authority) compliance database. "
+                    "content": "You are a search query optimizer for a VARA compliance database. "
                                "Take the user's question and rewrite it into a short, keyword-rich search query. "
-                               "Expand vague terms into regulatory synonyms. For example, 'capital' -> 'Paid-Up Capital and Prudential Requirements', "
-                               "'complaints' -> 'client complaints handling and resolution times'. "
-                               "Output ONLY the rewritten query, nothing else."
+                               "Expand vague terms into regulatory synonyms (e.g., 'capital' -> 'Paid-Up Capital'). "
+                               "Output ONLY the rewritten query."
                 },
                 {"role": "user", "content": question}
             ],
         )
         rewritten = response.choices[0].message.content.strip()
-        print(f"[query_rewrite] Original: '{question}' -> Rewritten: '{rewritten}'")
+        print(f"[query_rewrite] '{question}' -> '{rewritten}'")
         return rewritten
     except Exception as e:
-        # If the LLM fails, just use the original question
-        print(f"[query_rewrite] Failed to rewrite query: {e}")
+        print(f"[query_rewrite] Failed: {e}")
         return question
 
 
-def generate_answer(question: str, chunks: List[Dict[str, Any]]) -> str:
+def generate_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dict[str, str]] = None) -> str:
     if not chunks:
         return "I don't have that information in the provided document."
 
     client = _get_client()
+    
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    
+    if history:
+        for msg in history:
+            messages.append({"role": msg["role"], "content": msg["content"]})
+            
+    messages.append({"role": "user", "content": _build_user_message(question, chunks)})
 
     try:
         response = client.chat.completions.create(
             model=config.LLM_MODEL,
             temperature=config.LLM_TEMPERATURE,
             max_tokens=config.LLM_MAX_TOKENS,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": _build_user_message(question, chunks)},
-            ],
+            messages=messages,
         )
     except Exception as exc:
         print(f"[llm] Generate failed, retrying: {exc}")
@@ -101,17 +91,14 @@ def generate_answer(question: str, chunks: List[Dict[str, Any]]) -> str:
             model=config.LLM_MODEL,
             temperature=config.LLM_TEMPERATURE,
             max_tokens=config.LLM_MAX_TOKENS,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": _build_user_message(question, chunks)},
-            ],
+            messages=messages,
         )
 
     content = response.choices[0].message.content
     return (content or "").strip()
 
 
-def stream_answer(question: str, chunks: List[Dict[str, Any]]):
+def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dict[str, str]] = None):
     if not chunks:
         yield f"data: {json.dumps({'type': 'text', 'text': 'I don\'t have that information in the provided document.'})}\n\n"
         return
@@ -124,16 +111,21 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]]):
 
     client = _get_client()
     
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    
+    if history:
+        for msg in history:
+            messages.append({"role": msg["role"], "content": msg["content"]})
+            
+    messages.append({"role": "user", "content": _build_user_message(question, chunks)})
+    
     try:
         response = client.chat.completions.create(
             model=config.LLM_MODEL,
             temperature=config.LLM_TEMPERATURE,
             max_tokens=config.LLM_MAX_TOKENS,
             stream=True,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": _build_user_message(question, chunks)},
-            ],
+            messages=messages,
         )
         
         for chunk in response:
@@ -154,7 +146,7 @@ def generate_title(question: str) -> str:
             temperature=0.3, 
             max_tokens=20,   
             messages=[
-                {"role": "system", "content": "You generate short 3-5 word titles for chat conversations. Output ONLY the title, no quotes, no punctuation, no markdown. Just the words."},
+                {"role": "system", "content": "Generate a short 3-5 word title. Output ONLY the title."},
                 {"role": "user", "content": f"Question: {question}"}
             ],
         )
@@ -162,5 +154,5 @@ def generate_title(question: str) -> str:
         title = title.replace('"', '').replace("'", "").replace("*", "")
         return title if title else question[:30]
     except Exception as e:
-        print(f"[title] LLM generation failed: {e}")
+        print(f"[title] Failed: {e}")
         return question[:30].strip() + "..." if len(question) > 30 else question

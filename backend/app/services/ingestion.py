@@ -15,6 +15,57 @@ from app import config
 co = cohere.Client(api_key=config.COHERE_API_KEY)
 
 
+# --- VARA PDF text cleaning ------------------------------------------------
+# Why this exists: every VARA PDF page repeats the same Arabic+English footer
+# ("varaconnect@vara.ae - PO Box 9292...") and a standalone page number. Without
+# stripping it, those lines get chunked and embedded hundreds of times, polluting
+# the index with near-duplicate noise that steals top_k slots from real rule text.
+# Also drops pages whose only content was a table rendered as "1 1 1 1 1 ...".
+VARA_FOOTER_MARKERS = (
+    "varaconnect@vara.ae",
+    "araconnect@vara.ae",
+    "PO Box 9292",
+    "Virtual Assets Regulatory Authority",
+    "سُلطة تنظيم",          # Arabic: "Authority for Regulating"
+    "صندوق بريد",           # Arabic: "PO Box"
+)
+
+
+def _is_arabic_only(line: str) -> bool:
+    """
+    Return True if the line contains Arabic script and no Latin letters.
+    Why: the Arabic footer half never matches an English query, so it's pure noise.
+    Lines that mix Arabic+Latin (fused by pypdf) are handled by VARA_FOOTER_MARKERS above.
+    """
+    has_arabic = any('\u0600' <= ch <= '\u06FF' for ch in line)
+    has_latin = any('a' <= ch.lower() <= 'z' for ch in line)
+    return has_arabic and not has_latin
+
+
+def clean_vara_pdf_text(text: str) -> str:
+    """
+    Strip VARA page footers and Arabic-only lines from extracted PDF text.
+    Called only on the PDF branch — the .txt branch of load_pdf_pages() is untouched.
+    """
+    kept_lines = []
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        # Drop empty lines that survive after other filters
+        if not line:
+            continue
+        # Drop any line containing a known footer marker (substring match)
+        if any(marker in line for marker in VARA_FOOTER_MARKERS):
+            continue
+        # Drop lines that are Arabic-only (no Latin letters at all)
+        if _is_arabic_only(line):
+            continue
+        # Drop standalone page numbers (e.g. "5" or "36" left over after footer strip)
+        if re.fullmatch(r"\d{1,3}", line):
+            continue
+        kept_lines.append(line)
+    return "\n".join(kept_lines)
+
+
 def load_pdf_pages(pdf_path: Path) -> List[Dict[str, Any]]:
     pages = []
     if pdf_path.suffix.lower() == ".txt":
@@ -32,9 +83,15 @@ def load_pdf_pages(pdf_path: Path) -> List[Dict[str, Any]]:
 
     reader = PdfReader(str(pdf_path))
     for idx, page in enumerate(reader.pages, start=1):
-        text = page.extract_text() or ""
-        if text.strip(): 
-            pages.append({"page": idx, "text": text})
+        raw = page.extract_text() or ""
+        # Clean footers BEFORE checking emptiness — otherwise a page whose only
+        # text was the footer would slip through and become a useless chunk.
+        text = clean_vara_pdf_text(raw)
+        # Drop pages whose remaining content is too short to be a real rule
+        # (typically pypdf's mis-rendered table pages: "1 1 1 1 1 ...").
+        if len(text) < 40:
+            continue
+        pages.append({"page": idx, "text": text})
     return pages
 
 

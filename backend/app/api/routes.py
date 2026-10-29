@@ -1,6 +1,3 @@
-"""
-HTTP routes — the API surface the frontend calls.
-"""
 import uuid
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
@@ -59,17 +56,13 @@ def chat(req: ChatRequest):
     if req.jurisdiction not in config.JURISDICTIONS:
         raise HTTPException(status_code=400, detail=f"Unknown jurisdiction: {req.jurisdiction}")
 
-    # 1. Rewrite the query for better search results
     search_query = llm.rewrite_query(req.question)
-
-    # 2. Retrieve the context using the REWRITTEN query
     chunks = retrieval.retrieve_chunks(search_query, req.jurisdiction)
     if not chunks:
         raise HTTPException(status_code=404, detail="No relevant content found in the document.")
 
     try:
-        # 3. Generate the answer using the ORIGINAL question
-        answer = llm.generate_answer(req.question, chunks)
+        answer = llm.generate_answer(req.question, chunks, req.history)
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"LLM provider error: {str(e)}")
 
@@ -95,15 +88,11 @@ def chat_stream(req: ChatRequest):
     if req.jurisdiction not in config.JURISDICTIONS:
         raise HTTPException(status_code=400, detail=f"Unknown jurisdiction: {req.jurisdiction}")
 
-    # 1. Rewrite the query for better search results
     search_query = llm.rewrite_query(req.question)
-
-    # 2. Retrieve the context using the REWRITTEN query
     chunks = retrieval.retrieve_chunks(search_query, req.jurisdiction)
     
-    # 3. Stream the answer using the ORIGINAL question
     return StreamingResponse(
-        llm.stream_answer(req.question, chunks),
+        llm.stream_answer(req.question, chunks, req.history),
         media_type="text/event-stream"
     )
 
@@ -117,7 +106,6 @@ def title(req: TitleRequest):
 @router.get("/debug-search")
 def debug_search(q: str, jurisdiction: str = "AE-Dubai"):
     try:
-        # Also apply the rewrite to the debug endpoint so you can see the difference
         search_query = llm.rewrite_query(q)
         chunks = retrieval.retrieve_chunks(search_query, jurisdiction)
         return {

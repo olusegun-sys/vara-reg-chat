@@ -56,6 +56,24 @@ JURISDICTIONS = {
         "regulator": "VARA",
         "name": "Dubai Virtual Assets Regulatory Authority",
         "documents": [
+            # ================================================================
+            # STATE AS OF 2026-10-29: 11 documents active.
+            # FAISS index on disk contains 1,081 vectors — 487 from the original
+            # 4 .txt rulebooks + 594 from the 7 new .pdf rulebooks/guidance.
+            #
+            # Why all 11 stay active here:
+            # - This list is the SOURCE OF TRUTH for a --reset rebuild.
+            # - If we ever need to rebuild from scratch, running
+            #   `python scripts/ingest.py --reset` must reproduce the full
+            #   1,081-chunk corpus, not a partial one.
+            # - The list has no effect at query time. The running app reads
+            #   faiss_index/index.faiss + metadata.json, not this list.
+            # ================================================================
+
+            # --- Existing 4 core rulebooks (originally built the 487 chunks) ---
+            # Why .txt: pre-converted to clean UTF-8 by fix_text.py (STATE.md roadblock #13).
+            # Do not convert these back to .pdf — the .txt versions are the canonical,
+            # already-clean sources. pypdf PDF extraction would re-introduce footers.
             {
                 "file": "vara_compliance_risk_rulebook.txt",
                 "title": "Compliance and Risk Management Rulebook",
@@ -74,6 +92,50 @@ JURISDICTIONS = {
             {
                 "file": "vara_market_conduct_rulebook.txt",
                 "title": "Market Conduct Rulebook",
+                "effective_date": "2025-05-19",
+            },
+
+            # --- NEW: 7 VA Activity Rulebooks + Guidance (PDFs, added 2026-10-29) ---
+            # Why .pdf: original source PDFs. pypdf reads them natively — no .txt
+            # conversion needed. ingestion.py's clean_vara_pdf_text() strips VARA
+            # page footers (Arabic + "varaconnect@vara.ae" + page number) before
+            # chunking, and drops pages that were just "1 1 1 1 ..." table garbage.
+            # Why per-doc effective_date: each document has its own issuance date
+            # encoded in the filename (VER20250519, VER20260331, VER1). Hardcoding
+            # 2025-05-19 for all seven would produce false citations in the demo.
+            {
+                "file": "VARA_EN_258_VER20260331.pdf",
+                "title": "Exchange Services Rulebook",
+                "effective_date": "2026-03-31",
+            },
+            {
+                "file": "VARA_EN_279_VER20250519.pdf",
+                "title": "Lending and Borrowing Services Rulebook",
+                "effective_date": "2025-05-19",
+            },
+            {
+                "file": "VARA_EN_388_VER1.pdf",
+                "title": "Guidance on Marketing of Virtual Assets",
+                "effective_date": "2024-08-31",
+            },
+            {
+                "file": "VARA_EN_516_VER1.pdf",
+                "title": "Guidance on Virtual Asset Issuance",
+                "effective_date": "2026-04-09",
+            },
+            {
+                "file": "VARA_EN_215_VER20250519.pdf",
+                "title": "Advisory Services Rulebook",
+                "effective_date": "2025-05-19",
+            },
+            {
+                "file": "VARA_EN_226_VER20250519.pdf",
+                "title": "Broker-Dealer Services Rulebook",
+                "effective_date": "2025-05-19",
+            },
+            {
+                "file": "VARA_EN_243_VER20250519.pdf",
+                "title": "Custody Services Rulebook",
                 "effective_date": "2025-05-19",
             },
         ],

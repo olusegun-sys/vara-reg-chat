@@ -1,15 +1,12 @@
-"""
-Pydantic schemas define the API contract.
-Why: changing a schema is a deliberate act, not an accident.
-"""
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 
 class ChatRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=2000)
     jurisdiction: str = Field(default="AE-Dubai")
     session_id: Optional[str] = None
+    history: Optional[List[Dict[str, str]]] = Field(default_factory=list)
 
 
 class SourceReference(BaseModel):

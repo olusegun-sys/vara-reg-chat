@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const BASE_URL = import.meta.env.VITE_API_URL || "";
 
 export async function getJurisdictions() {
   const response = await fetch(`${BASE_URL}/api/jurisdictions`);
@@ -6,7 +6,6 @@ export async function getJurisdictions() {
   return response.json();
 }
 
-// Generate title (keep as is)
 export async function generateChatTitle(question) {
   try {
     const response = await fetch(`${BASE_URL}/api/title`, {
@@ -22,13 +21,15 @@ export async function generateChatTitle(question) {
   }
 }
 
-// STREAMING CHAT FUNCTION
-// Why streaming: Waits 0 seconds. Renders the text as it arrives from the LLM.
-export async function streamChat(question, jurisdiction, onChunk, onSources) {
+export async function streamChat(question, jurisdiction, history, onChunk, onSources) {
   const response = await fetch(`${BASE_URL}/api/chat/stream`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question, jurisdiction }),
+    body: JSON.stringify({ 
+      question, 
+      jurisdiction,
+      history: history || [] // Send the conversation history
+    }),
   });
 
   if (!response.ok) {
