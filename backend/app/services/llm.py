@@ -114,8 +114,14 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
         yield f"data: {json.dumps({'type': 'text', 'text': 'I don\'t have that information in the provided document.'})}\n\n"
         return
 
+    # NEW: Include source_url in the stream so the frontend can make clickable links
     sources_data = [
-        {"page": c["page"], "section": c["section"], "document": c["document"]} 
+        {
+            "page": c["page"],
+            "section": c["section"],
+            "document": c["document"],
+            "source_url": c.get("source_url", ""),
+        } 
         for c in chunks
     ]
     yield f"data: {json.dumps({'type': 'sources', 'sources': sources_data})}\n\n"

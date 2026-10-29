@@ -2,31 +2,20 @@ import ReactMarkdown from 'react-markdown';
 import { useState } from "react";
 
 // Convert the LLM's markdown string into clean plain text for the clipboard.
-// Why: users copy answers into emails, Word docs, or back into the chat input.
-// Raw markdown like **bold** and ### headings looks unprofessional outside the UI.
 function markdownToPlainText(md) {
   if (!md) return "";
   return md
-    // Code fences first (before inline code, or we'd mangle triple backticks)
     .replace(/```[\s\S]*?```/g, (block) =>
       block.replace(/^```[a-zA-Z]*\n?/, "").replace(/\n?```$/, "").trim()
     )
-    // Headings: "### Title" -> "Title"
     .replace(/^#{1,6}\s+/gm, "")
-    // Bold before italic so "**x**" doesn't get half-stripped
     .replace(/(\*\*|__)(.*?)\1/g, "$2")
     .replace(/(\*|_)(.*?)\1/g, "$2")
-    // Inline code: "`x`" -> "x"
     .replace(/`([^`]+)`/g, "$1")
-    // Links: "[text](url)" -> "text (url)"
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, "$1 ($2)")
-    // Horizontal rules: "---" or "***" on their own line -> remove
     .replace(/^[-*_]{3,}\s*$/gm, "")
-    // Blockquote markers: "> text" -> "text"
     .replace(/^>\s?/gm, "")
-    // Normalize "* " and "+ " list markers to "- "
     .replace(/^(\s*)[*+]\s+/gm, "$1- ")
-    // Collapse runs of 3+ blank lines into 2
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
@@ -36,7 +25,6 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    // Strip markdown so pasted text is clean everywhere (chat input, email, Word doc)
     navigator.clipboard.writeText(markdownToPlainText(content));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -50,7 +38,6 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
       </span>
     </div>
   );
-  
   
   return (
     <div className={`flex flex-col ${isUser ? "items-end" : "items-start"} w-full`}>
@@ -90,21 +77,50 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
               </div>
             )}
 			
-			
             {sources && sources.length > 0 && (
               <div className="mt-4 pt-3 border-t border-slate-700/60">
                 <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
                   Documents Referenced
                 </p>
                 <div className="flex flex-wrap gap-1.5">
-                  {[...new Set(sources.map(s => s.document))].map((docName, i) => (
-                    <span key={i} className="inline-flex items-center text-[11px] bg-slate-800/80 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700/50">
-                      <svg className="w-3 h-3 mr-1.5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                      </svg>
-                      {docName}
-                    </span>
-                  ))}
+                  {[...new Set(sources.map(s => s.document))].map((docName, i) => {
+                    // Find the URL for this document to make the chip clickable
+                    const sourceEntry = sources.find(s => s.document === docName);
+                    const url = sourceEntry?.source_url;
+                    
+                    const baseClasses = "inline-flex items-center text-[11px] bg-slate-800/80 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700/50 transition-colors";
+                    
+                    const innerContent = (
+                      <>
+                        <svg className="w-3 h-3 mr-1.5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        {docName}
+                        {url && (
+                          <svg className="w-3 h-3 ml-1.5 text-brand-400 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                          </svg>
+                        )}
+                      </>
+                    );
+
+                    return url ? (
+                      <a
+                        key={i}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`${baseClasses} hover:bg-slate-700/80 hover:border-brand-500/40 hover:text-white cursor-pointer`}
+                        title={`Open ${docName} on VARA's official site`}
+                      >
+                        {innerContent}
+                      </a>
+                    ) : (
+                      <span key={i} className={baseClasses}>
+                        {innerContent}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -131,8 +147,7 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
               </button>
             </Tooltip>
           )}
-		  
-		  
+
           {!isUser && (
             <>
               <Tooltip text="Good Response">

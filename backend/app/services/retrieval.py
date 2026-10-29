@@ -24,6 +24,20 @@ def _load_index_and_metadata() -> tuple:
 
     return index, metadata
 
+# NEW: Helper function to enrich retrieved chunks with the VARA source URL
+def _attach_source_urls(chunks: List[Dict[str, Any]], jurisdiction: str) -> List[Dict[str, Any]]:
+    """
+    Enrich each chunk dict with the source_url of its parent document.
+    Why: the FAISS metadata doesn't store URLs. Rather than re-ingest 1,081
+    chunks just to add one field, we look up the URL by matching the chunk's
+    `document` title against the document registry in config.
+    """
+    registry = config.JURISDICTIONS.get(jurisdiction, {}).get("documents", [])
+    url_by_title = {d["title"]: d.get("source_url", "") for d in registry}
+    for c in chunks:
+        c["source_url"] = url_by_title.get(c.get("document", ""), "")
+    return chunks
+
 def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List[Dict[str, Any]]:
     top_k = top_k or config.TOP_K_RESULTS
     index, metadata = _load_index_and_metadata()
@@ -60,7 +74,9 @@ def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List
         })
         if len(chunks) >= top_k:
             break
-    return chunks
+            
+    # NEW: Attach URLs before returning
+    return _attach_source_urls(chunks, jurisdiction)
 
 def get_chunk_count() -> int:
     try:
