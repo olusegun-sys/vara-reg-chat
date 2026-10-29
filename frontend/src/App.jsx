@@ -40,6 +40,15 @@ export default function App() {
       setMessages([]); 
       return;
     }
+    // RACE CONDITION FIX: When handleSend creates a new session, it calls
+    // setCurrentSessionId(), which would trigger this effect mid-stream. The DB
+    // fetch would come back with only the user message saved so far (the AI
+    // response isn't persisted until streaming finishes), overwriting the
+    // assistantPlaceholder in `messages`. The subsequent streaming updates
+    // then append text to the wrong array element (the user message), which
+    // renders the AI's answer inside the user's bubble.
+    if (isSending) return;
+
     getMessages(currentSessionId).then(data => {
       setMessages(data.map(m => ({
         id: m.id,
@@ -48,7 +57,7 @@ export default function App() {
         sources: m.sources
       })));
     }).catch(err => console.error("Error loading messages:", err));
-  }, [currentSessionId]);
+  }, [currentSessionId, isSending]);
 
   const handleNewChat = () => {
     setCurrentSessionId(null);
@@ -173,7 +182,7 @@ export default function App() {
     } finally {
       setIsSending(false);
     }
-  }, [inputValue, isSending, selectedJurisdiction, currentSessionId, messages.length]);
+  }, [inputValue, isSending, selectedJurisdiction, currentSessionId, messages]);
 
   return (
     <div className="h-full flex bg-luxury font-sans">
