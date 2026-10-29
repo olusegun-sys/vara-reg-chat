@@ -9,6 +9,12 @@ import {
   updateSessionTitle, deleteSession, togglePin 
 } from "./api/supabase.js";
 
+// STRATEGY A (SMART WINDOW) CONFIG
+// We keep the first 2 messages (User's opening question + AI's first answer) to anchor the topic.
+// We keep the last 8 messages to maintain the active thread.
+const SESSION_OPENING = 2;
+const RECENT_WINDOW = 8;
+
 export default function App() {
   const [jurisdictions, setJurisdictions] = useState([]);
   const [selectedJurisdiction, setSelectedJurisdiction] = useState("");
@@ -44,9 +50,7 @@ export default function App() {
     // setCurrentSessionId(), which would trigger this effect mid-stream. The DB
     // fetch would come back with only the user message saved so far (the AI
     // response isn't persisted until streaming finishes), overwriting the
-    // assistantPlaceholder in `messages`. The subsequent streaming updates
-    // then append text to the wrong array element (the user message), which
-    // renders the AI's answer inside the user's bubble.
+    // assistantPlaceholder in `messages`. 
     if (isSending) return;
 
     getMessages(currentSessionId).then(data => {
@@ -134,8 +138,21 @@ export default function App() {
       });
     }
 
-    // Grab the last 4 messages for memory
-    const chatHistory = messages.slice(-4).map(m => ({
+    // --- STRATEGY A: SMART WINDOW MEMORY SLICING ---
+    // If the chat is short, send everything. If it's long, keep the opening
+    // (to remember the core topic) and the most recent messages (to remember
+    // the active thread). This prevents the model from forgetting the rulebook
+    // while keeping token costs flat and preventing context windows from breaking.
+    let historyPayload = [];
+    if (messages.length <= (SESSION_OPENING + RECENT_WINDOW)) {
+      historyPayload = messages;
+    } else {
+      const opening = messages.slice(0, SESSION_OPENING);
+      const recent = messages.slice(-RECENT_WINDOW);
+      historyPayload = [...opening, ...recent];
+    }
+
+    const chatHistory = historyPayload.map(m => ({
       role: m.role,
       content: m.content
     }));
@@ -147,7 +164,7 @@ export default function App() {
       await streamChat(
         question, 
         selectedJurisdiction,
-        chatHistory, // Pass memory
+        chatHistory, // Pass smart memory
         (textChunk) => {
           fullText += textChunk;
           setMessages(prev => {
