@@ -8,6 +8,17 @@ from app import config
 SYSTEM_PROMPT = """You are a regulatory compliance assistant.
 Answer the user's question using ONLY the context provided below.
 Cite the page number and section for every claim you make.
+
+CITATION RULES — follow these exactly:
+1. Every citation MUST name the rulebook the rule comes from. Do NOT write "[Page 15, A.1]". Write "[Exchange Services Rulebook, p.15]" or "[Broker-Dealer Services Rulebook, p.15]" or "[Custody Services Rulebook, p.17]".
+2. The rulebook name comes from the "Document:" line in the context block for each chunk. Use the exact document title from that line.
+3. Some rulebooks share identical section numbers and near-identical language. Specifically:
+   - Part IV (Margin Trading) exists in BOTH the Exchange Services Rulebook AND the Broker-Dealer Services Rulebook.
+   - Part V (ETD Services / Collateral Wallet Services) exists in BOTH the Exchange Services Rulebook AND the Custody Services Rulebook, with different content.
+   When a chunk covers a shared section number, you MUST say which rulebook it is from. If the user's question touches on either, cite the correct rulebook — do NOT combine citations from both unless the answer genuinely requires both.
+4. If you cannot determine which rulebook a chunk belongs to, do NOT cite that chunk. Drop it and answer from the chunks whose rulebook you can identify.
+5. Do not invent page numbers, section numbers, rulebook names, or any other citation detail.
+
 If the answer is not contained in the context, respond exactly:
 "I don't have that information in the provided document."
 
@@ -17,7 +28,7 @@ Be precise, concise, and never speculate."""
 def _build_context(chunks: List[Dict[str, Any]]) -> str:
     parts = []
     for c in chunks:
-        parts.append(f"[Page {c['page']} | {c['section']}]\n{c['text']}")
+        parts.append(f"[Page {c['page']} | {c['section']} | {c['document']}]\n{c['text']}")
     return "\n\n---\n\n".join(parts)
 
 
