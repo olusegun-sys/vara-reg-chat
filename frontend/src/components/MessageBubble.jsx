@@ -59,7 +59,7 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
           max-w-[85%] sm:max-w-[85%] rounded-2xl px-5 py-4 shadow-sm text-[15px]
           ${isUser
             ? "bg-brand-600 text-white rounded-br-sm"
-            : "bg-[#1E293B] text-slate-200 border border-slate-700/50 rounded-bl-sm shadow-premium"}
+            : "bg-[#12141B] text-slate-200 border border-slate-800/60 rounded-bl-sm shadow-premium"}
         `}
       >
         {isLoading ? (

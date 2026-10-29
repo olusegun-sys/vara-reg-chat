@@ -11,30 +11,28 @@ export default {
         serif: ['Lora', 'serif'],
       },
       colors: {
-        // Brand = the accent blue used for user bubbles + send button.
-        // Darkened from electric blue (#2563eb) to deep cobalt (#1d4ed8) so the
-        // user bubble reads as "my message" without lighting up the whole screen.
+        // Brand = accent blue for user bubbles + buttons.
+        // Shifted from electric blue to deep midnight cobalt: both darker AND
+        // desaturated so the user bubble reads as "my message" in a dark theme,
+        // not as a bright highlight. Hue also shifted toward navy (cooler).
         brand: {
           50: '#eff6ff',
           100: '#dbeafe',
-          500: '#1e40af',   // hover state — deep cobalt
-          600: '#1d4ed8',   // user bubble + send button — deep navy cobalt
-          700: '#1e3a8a',   // pressed state
-          900: '#172554',   // darkest shade, unused but kept for future
+          500: '#1A2E5C',   // hover state — very dark navy
+          600: '#1E3A6E',   // user bubble + New Session button + send button
+          700: '#152849',   // pressed state — almost black-navy
+          900: '#0F1A30',   // unused, kept for future
         },
-        // Luxury = the near-black base surfaces.
-        // Tightened the gap between DEFAULT and light so the whole app reads as
-        // one dark surface (DeepSeek style). Previously #0F172A -> #1E293B was too
-        // big a jump and made the chat area feel "bright" inside a dark room.
+        // Luxury = base surfaces. Near-black navy throughout.
         luxury: {
-          DEFAULT: '#080B12', // near-black navy (sidebar)
-          light: '#0F1218',   // main chat background — only ~7% lighter than sidebar
-          accent: '#5EAAFF',  // muted blue highlight (was sky #38BDF8)
+          DEFAULT: '#080B12', // sidebar
+          light: '#0F1218',   // main chat background
+          accent: '#3B6DB8',  // muted steel blue (was #5EAAFF)
         },
       },
       boxShadow: {
         'premium': '0 4px 20px -2px rgba(0, 0, 0, 0.4)',
-        'glow': '0 0 15px -3px rgba(94, 170, 255, 0.25)',
+        'glow': '0 0 15px -3px rgba(59, 109, 184, 0.25)',  // matches new accent
       }
     },
   },
