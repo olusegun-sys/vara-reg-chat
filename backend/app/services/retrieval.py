@@ -10,25 +10,43 @@ from app import config
 # Initialize Cohere client
 co = cohere.Client(api_key=config.COHERE_API_KEY)
 
+# --- Module-level cache -----------------------------------------------------
+# Why: _load_index_and_metadata() reads a ~2MB FAISS index and ~3MB metadata
+# JSON on EVERY query. That's ~250-400ms of disk I/O per request with no
+# benefit — the files only change when you re-ingest. Cache them in module
+# memory (loaded once per process, shared across all requests) for a
+# one-time cost and near-instant lookups thereafter.
+#
+# IMPORTANT: after running `ingest.py --reset`, restart the backend process
+# so this cache is invalidated. Render does this automatically on redeploy.
+_INDEX = None
+_METADATA = None
+
+
 def _load_index_and_metadata() -> tuple:
+    global _INDEX, _METADATA
+    if _INDEX is not None and _METADATA is not None:
+        return _INDEX, _METADATA
+
     try:
-        index = faiss.read_index(config.FAISS_INDEX_PATH)
+        _INDEX = faiss.read_index(config.FAISS_INDEX_PATH)
     except Exception as exc:
         raise RuntimeError(f"Could not load FAISS index: {exc}") from exc
 
     try:
         with open(config.FAISS_METADATA_PATH, "r", encoding="utf-8") as f:
-            metadata = json.load(f)
+            _METADATA = json.load(f)
     except Exception as exc:
         raise RuntimeError(f"Could not load metadata: {exc}") from exc
 
-    return index, metadata
+    print(f"[retrieval] Loaded {_INDEX.ntotal} vectors + {len(_METADATA)} metadata entries into memory.")
+    return _INDEX, _METADATA
 
-# NEW: Helper function to enrich retrieved chunks with the VARA source URL
+
 def _attach_source_urls(chunks: List[Dict[str, Any]], jurisdiction: str) -> List[Dict[str, Any]]:
     """
     Enrich each chunk dict with the source_url of its parent document.
-    Why: the FAISS metadata doesn't store URLs. Rather than re-ingest 1,081
+    Why: the FAISS metadata doesn't store URLs. Rather than re-ingest 1,388
     chunks just to add one field, we look up the URL by matching the chunk's
     `document` title against the document registry in config.
     """
@@ -38,13 +56,16 @@ def _attach_source_urls(chunks: List[Dict[str, Any]], jurisdiction: str) -> List
         c["source_url"] = url_by_title.get(c.get("document", ""), "")
     return chunks
 
+
 def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List[Dict[str, Any]]:
     top_k = top_k or config.TOP_K_RESULTS
     index, metadata = _load_index_and_metadata()
     if index.ntotal == 0:
         return []
 
-    # Use Cohere to embed the question
+    # Cohere embed — unavoidable ~150-250ms. Could be parallelized with the
+    # query rewriter in llm.py for further speedup, but that's a bigger
+    # refactor. Caching index is the biggest single win.
     response = co.embed(
         texts=[question],
         model="embed-english-v3.0",
@@ -74,9 +95,9 @@ def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List
         })
         if len(chunks) >= top_k:
             break
-            
-    # NEW: Attach URLs before returning
+
     return _attach_source_urls(chunks, jurisdiction)
+
 
 def get_chunk_count() -> int:
     try:

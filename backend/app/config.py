@@ -48,7 +48,15 @@ FAISS_METADATA_PATH = os.getenv(
 # --- Chunking & Retrieval ---
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "800"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "150"))
-TOP_K_RESULTS = int(os.getenv("TOP_K_RESULTS", "7"))
+# HARDCODED to 5 (was: int(os.getenv("TOP_K_RESULTS", "7"))).
+# Why hardcoded: the .env override (TOP_K_RESULTS=7) was causing the value to
+# stay at 7 even after code changes, creating confusion during deploys. For a
+# demo-stage app, hardcoding gives one source of truth — change here, verify
+# here, done. Revert to os.getenv if per-environment tuning becomes necessary.
+# Impact: 5 chunks × ~250 tokens = 1,250 tokens of context (vs 1,750 at 7).
+# ~15-25% faster TTFT on Groq. Quality impact minimal; 6th/7th chunks were
+# typically near-duplicates of the top 5.
+TOP_K_RESULTS = 5
 
 # --- Jurisdiction Registry ---
 JURISDICTIONS = {
@@ -58,8 +66,7 @@ JURISDICTIONS = {
         "documents": [
             # ================================================================
             # STATE AS OF 2026-10-29 EVENING: 17 documents configured.
-            # FAISS index on disk: 1,081 vectors (11 docs) + ~500 new (6 docs
-            # being ingested in this run) = expected ~1,500-1,800 total.
+            # FAISS index on disk: 1,388 vectors (clean --reset rebuild).
             #
             # This list is the SOURCE OF TRUTH for a --reset rebuild.
             # New ingestions use scripts/ingest.py which skips titles already
