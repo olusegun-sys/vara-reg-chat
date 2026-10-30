@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 // Why a custom modal (not window.confirm): native browser confirm looks like
 // an alert, not a professional app. Terry's clients will see this. This modal
 // is styled, keyboard-accessible, and has an explicit destructive button.
-function DeleteConfirmModal({ isOpen, onCancel, onConfirm, sessionTitle }) {
+function DeleteConfirmModal({ isOpen, onCancel, onConfirm }) {
   // Close on Escape — the standard cancel gesture.
   useEffect(() => {
     if (!isOpen) return;
@@ -29,27 +29,12 @@ function DeleteConfirmModal({ isOpen, onCancel, onConfirm, sessionTitle }) {
         className="w-full max-w-md bg-[#12141B] border border-slate-800 rounded-2xl shadow-2xl p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Icon */}
-        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-500/10 border border-red-500/30 mb-4 mx-auto">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-red-400">
-            <path d="M3 6h18" />
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-          </svg>
-        </div>
-
         <h2
           id="delete-modal-title"
-          className="text-lg font-semibold text-white text-center mb-2"
+          className="text-lg font-semibold text-white text-center mb-4"
         >
           Delete chat?
         </h2>
-
-        {sessionTitle && (
-          <p className="text-xs text-slate-500 text-center mb-3 truncate px-4">
-            "{sessionTitle}"
-          </p>
-        )}
 
         <p className="text-sm text-slate-400 text-center leading-relaxed mb-6">
           This chat can't be recovered.
@@ -105,10 +90,6 @@ export default function Sidebar({
     }
     setEditingId(null);
   };
-
-  const sessionToDelete = deleteConfirmId
-    ? sessions.find(s => s.id === deleteConfirmId)
-    : null;
 
   const handleConfirmDelete = () => {
     if (deleteConfirmId) {
@@ -198,13 +179,10 @@ export default function Sidebar({
         </div>
       </div>
 
-      {/* Delete confirmation modal — rendered outside the sidebar div so its
-          overlay covers the full viewport, not just the sidebar column. */}
       <DeleteConfirmModal
         isOpen={deleteConfirmId !== null}
         onCancel={() => setDeleteConfirmId(null)}
         onConfirm={handleConfirmDelete}
-        sessionTitle={sessionToDelete?.title}
       />
     </>
   );
