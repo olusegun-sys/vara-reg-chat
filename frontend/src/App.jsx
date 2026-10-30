@@ -10,10 +10,14 @@ import {
 } from "./api/supabase.js";
 
 // STRATEGY A (SMART WINDOW) CONFIG
-// We keep the first 2 messages (User's opening question + AI's first answer) to anchor the topic.
-// We keep the last 8 messages to maintain the active thread.
 const SESSION_OPENING = 2;
 const RECENT_WINDOW = 8;
+
+// localStorage key for session persistence across page reloads.
+// Why: React state resets on refresh; without this, users lose their chat
+// context every time they hit F5 or the browser crashes. Storing the ID in
+// localStorage and reading it back on mount restores the session seamlessly.
+const SESSION_STORAGE_KEY = "vara_current_session_id";
 
 export default function App() {
   const [jurisdictions, setJurisdictions] = useState([]);
@@ -23,7 +27,15 @@ export default function App() {
   const [loadError, setLoadError] = useState(null);
 
   const [sessions, setSessions] = useState([]);
-  const [currentSessionId, setCurrentSessionId] = useState(null); 
+  // Initialize from localStorage so refresh stays on the same session.
+  // useState's lazy initializer runs once on mount — no race with useEffect.
+  const [currentSessionId, setCurrentSessionId] = useState(() => {
+    try {
+      return localStorage.getItem(SESSION_STORAGE_KEY) || null;
+    } catch {
+      return null;
+    }
+  });
   const [messages, setMessages] = useState([]);
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -38,19 +50,40 @@ export default function App() {
   useEffect(() => {
     getSessions().then(data => {
       setSessions(data);
+      // After sessions load, validate the stored session ID.
+      // Why: the stored ID could be from a deleted session (another tab,
+      // another device), or from a version of the app where the schema changed.
+      // If it doesn't exist in the loaded sessions, fall back to home screen.
+      const stored = localStorage.getItem(SESSION_STORAGE_KEY);
+      if (stored && !data.some(s => s.id === stored)) {
+        console.warn("[app] Stored session ID not found, clearing.");
+        localStorage.removeItem(SESSION_STORAGE_KEY);
+        setCurrentSessionId(null);
+      }
     }).catch(err => console.error("Error loading sessions:", err));
   }, []);
+
+  // Persist currentSessionId to localStorage whenever it changes.
+  // Why: single source of truth — every code path that changes the session
+  // (create new chat, select from sidebar, delete current) automatically
+  // writes through to storage without needing to remember to call it.
+  useEffect(() => {
+    try {
+      if (currentSessionId) {
+        localStorage.setItem(SESSION_STORAGE_KEY, currentSessionId);
+      } else {
+        localStorage.removeItem(SESSION_STORAGE_KEY);
+      }
+    } catch (e) {
+      console.warn("[app] Could not persist session ID:", e);
+    }
+  }, [currentSessionId]);
 
   useEffect(() => {
     if (!currentSessionId) {
       setMessages([]); 
       return;
     }
-    // RACE CONDITION FIX: When handleSend creates a new session, it calls
-    // setCurrentSessionId(), which would trigger this effect mid-stream. The DB
-    // fetch would come back with only the user message saved so far (the AI
-    // response isn't persisted until streaming finishes), overwriting the
-    // assistantPlaceholder in `messages`. 
     if (isSending) return;
 
     getMessages(currentSessionId).then(data => {
@@ -138,11 +171,6 @@ export default function App() {
       });
     }
 
-    // --- STRATEGY A: SMART WINDOW MEMORY SLICING ---
-    // If the chat is short, send everything. If it's long, keep the opening
-    // (to remember the core topic) and the most recent messages (to remember
-    // the active thread). This prevents the model from forgetting the rulebook
-    // while keeping token costs flat and preventing context windows from breaking.
     let historyPayload = [];
     if (messages.length <= (SESSION_OPENING + RECENT_WINDOW)) {
       historyPayload = messages;
@@ -164,7 +192,7 @@ export default function App() {
       await streamChat(
         question, 
         selectedJurisdiction,
-        chatHistory, // Pass smart memory
+        chatHistory,
         (textChunk) => {
           fullText += textChunk;
           setMessages(prev => {
