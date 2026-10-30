@@ -14,9 +14,6 @@ const SESSION_OPENING = 2;
 const RECENT_WINDOW = 8;
 
 // localStorage key for session persistence across page reloads.
-// Why: React state resets on refresh; without this, users lose their chat
-// context every time they hit F5 or the browser crashes. Storing the ID in
-// localStorage and reading it back on mount restores the session seamlessly.
 const SESSION_STORAGE_KEY = "vara_current_session_id";
 
 export default function App() {
@@ -27,8 +24,8 @@ export default function App() {
   const [loadError, setLoadError] = useState(null);
 
   const [sessions, setSessions] = useState([]);
+  
   // Initialize from localStorage so refresh stays on the same session.
-  // useState's lazy initializer runs once on mount — no race with useEffect.
   const [currentSessionId, setCurrentSessionId] = useState(() => {
     try {
       return localStorage.getItem(SESSION_STORAGE_KEY) || null;
@@ -36,7 +33,13 @@ export default function App() {
       return null;
     }
   });
+  
   const [messages, setMessages] = useState([]);
+  
+  // NEW: True while a session's messages are being fetched. Triggers the
+  // loading spinner in ChatWindow and prevents the "jump-to-bottom" scroll
+  // race that happens when an old session's messages appear all at once.
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -50,10 +53,7 @@ export default function App() {
   useEffect(() => {
     getSessions().then(data => {
       setSessions(data);
-      // After sessions load, validate the stored session ID.
-      // Why: the stored ID could be from a deleted session (another tab,
-      // another device), or from a version of the app where the schema changed.
-      // If it doesn't exist in the loaded sessions, fall back to home screen.
+      // Validate the stored session ID after sessions load.
       const stored = localStorage.getItem(SESSION_STORAGE_KEY);
       if (stored && !data.some(s => s.id === stored)) {
         console.warn("[app] Stored session ID not found, clearing.");
@@ -64,9 +64,6 @@ export default function App() {
   }, []);
 
   // Persist currentSessionId to localStorage whenever it changes.
-  // Why: single source of truth — every code path that changes the session
-  // (create new chat, select from sidebar, delete current) automatically
-  // writes through to storage without needing to remember to call it.
   useEffect(() => {
     try {
       if (currentSessionId) {
@@ -82,18 +79,24 @@ export default function App() {
   useEffect(() => {
     if (!currentSessionId) {
       setMessages([]); 
+      setIsLoadingMessages(false);
       return;
     }
     if (isSending) return;
 
-    getMessages(currentSessionId).then(data => {
-      setMessages(data.map(m => ({
-        id: m.id,
-        role: m.role,
-        content: m.content,
-        sources: m.sources
-      })));
-    }).catch(err => console.error("Error loading messages:", err));
+    // Show spinner while fetching. Cleared in .finally() regardless of outcome.
+    setIsLoadingMessages(true);
+    getMessages(currentSessionId)
+      .then(data => {
+        setMessages(data.map(m => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+          sources: m.sources
+        })));
+      })
+      .catch(err => console.error("Error loading messages:", err))
+      .finally(() => setIsLoadingMessages(false));
   }, [currentSessionId, isSending]);
 
   const handleNewChat = () => {
@@ -171,6 +174,7 @@ export default function App() {
       });
     }
 
+    // --- STRATEGY A: SMART WINDOW MEMORY SLICING ---
     let historyPayload = [];
     if (messages.length <= (SESSION_OPENING + RECENT_WINDOW)) {
       historyPayload = messages;
@@ -287,7 +291,11 @@ export default function App() {
         )}
 
         <main className="flex-1 flex flex-col min-h-0 max-w-4xl mx-auto w-full">
-          <ChatWindow messages={messages} onEdit={handleEditMessage} />
+          <ChatWindow 
+            messages={messages} 
+            onEdit={handleEditMessage} 
+            isLoading={isLoadingMessages} 
+          />
           <div className="w-full shrink-0">
             <ChatInput 
               value={inputValue} 
