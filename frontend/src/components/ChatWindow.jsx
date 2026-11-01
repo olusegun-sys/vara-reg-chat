@@ -1,10 +1,6 @@
 import { useEffect, useRef } from "react";
 import MessageBubble from "./MessageBubble.jsx";
 
-// Single rotating ring spinner — minimal, matches DeepSeek/ChatGPT style.
-// Why a ring instead of dots: cleaner, more professional, no text label.
-// The ring uses border-t-brand-500 for the accent color and border on the
-// other three sides for the track. Tailwind's animate-spin does the rotation.
 function LoadingSpinner() {
   return (
     <div className="h-full flex items-center justify-center">
@@ -15,9 +11,6 @@ function LoadingSpinner() {
 
 export default function ChatWindow({ messages, onEdit, isLoading }) {
   const bottomRef = useRef(null);
-  // Track the previous message count so we can decide scroll behavior:
-  // - When message count increases by 1 during a session → smooth scroll.
-  // - When the message count jumps by more than 1 (session load) → instant scroll.
   const prevCountRef = useRef(0);
 
   useEffect(() => {
@@ -35,6 +28,20 @@ export default function ChatWindow({ messages, onEdit, isLoading }) {
     }
 
     prevCountRef.current = curr;
+  }, [messages, isLoading]);
+
+  // NEW: During streaming, the `messages` array doesn't change length, but the
+  // content of the last message grows. This effect ensures we keep scrolling 
+  // to the bottom as the text streams in, preventing the page from jumping up.
+  useEffect(() => {
+    if (!bottomRef.current) return;
+    if (isLoading) return;
+    
+    // Only auto-scroll if we are streaming the AI's response (isLoading on message)
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg && lastMsg.isLoading) {
+      bottomRef.current.scrollIntoView({ behavior: "auto", block: "end" });
+    }
   }, [messages, isLoading]);
 
   return (

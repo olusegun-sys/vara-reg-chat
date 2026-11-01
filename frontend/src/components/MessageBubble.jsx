@@ -1,7 +1,6 @@
 import ReactMarkdown from 'react-markdown';
 import { useState } from "react";
 
-// Convert the LLM's markdown string into clean plain text for the clipboard.
 function markdownToPlainText(md) {
   if (!md) return "";
   return md
@@ -66,8 +65,9 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
                 <ReactMarkdown
                   components={{
                     p: ({ node, ...props }) => <p className="mb-3 last:mb-0" {...props} />,
-                    ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-3 space-y-1 marker:text-brand-500" {...props} />,
-                    ol: ({ node, ...props }) => <ol className="list-decimal pl-5 mb-3 space-y-1 marker:text-brand-500" {...props} />,
+                    ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-3 space-y-1" {...props} />,
+                    ol: ({ node, ...props }) => <ol className="list-decimal pl-5 mb-3 space-y-1" {...props} />,
+                    li: ({ node, ...props }) => <li className="text-slate-200" {...props} />,
                     strong: ({ node, ...props }) => <strong className="font-semibold text-white" {...props} />,
                     a: ({ node, ...props }) => <a className="text-brand-400 hover:underline" {...props} />
                   }}
@@ -76,7 +76,7 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
                 </ReactMarkdown>
               </div>
             )}
-			
+
             {sources && sources.length > 0 && (
               <div className="mt-4 pt-3 border-t border-slate-700/60">
                 <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
@@ -84,12 +84,9 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {[...new Set(sources.map(s => s.document))].map((docName, i) => {
-                    // Find the URL for this document to make the chip clickable
                     const sourceEntry = sources.find(s => s.document === docName);
                     const url = sourceEntry?.source_url;
-                    
                     const baseClasses = "inline-flex items-center text-[11px] bg-slate-800/80 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700/50 transition-colors";
-                    
                     const innerContent = (
                       <>
                         <svg className="w-3 h-3 mr-1.5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,20 +102,11 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
                     );
 
                     return url ? (
-                      <a
-                        key={i}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`${baseClasses} hover:bg-slate-700/80 hover:border-brand-500/40 hover:text-white cursor-pointer`}
-                        title={`Open ${docName} on VARA's official site`}
-                      >
+                      <a key={i} href={url} target="_blank" rel="noopener noreferrer" className={`${baseClasses} hover:bg-slate-700/80 hover:border-brand-500/40 hover:text-white cursor-pointer`} title={`Open ${docName} on VARA's official site`}>
                         {innerContent}
                       </a>
                     ) : (
-                      <span key={i} className={baseClasses}>
-                        {innerContent}
-                      </span>
+                      <span key={i} className={baseClasses}>{innerContent}</span>
                     );
                   })}
                 </div>
