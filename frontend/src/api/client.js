@@ -46,15 +46,8 @@ export async function streamChat(question, jurisdiction, history, onChunk, onSou
   
   // SSE BUFFERING FIX
   // Network reads don't respect event boundaries. A single read can
-  // contain half an event (`data: {"type":"te`) or multiple events merged.
-  // The old code did `chunk.split("\n")` on each read, which threw a
-  // "Unterminated string in JSON" on partial chunks. This bug silently
-  // dropped some text chunks (caught by try/catch), causing the console
-  // errors you saw on long responses like Q3.
-  //
-  // The correct pattern: maintain a buffer across reads, split on the
-  // true SSE event terminator "\n\n", and keep the incomplete tail in
-  // the buffer for the next read. Complete events are never split.
+  // contain half an event or multiple events merged. Buffer across reads,
+  // split on "\n\n", keep the incomplete tail for next read.
   let buffer = "";
   
   while (true) {
@@ -62,15 +55,10 @@ export async function streamChat(question, jurisdiction, history, onChunk, onSou
     if (done) break;
     
     buffer += decoder.decode(value, { stream: true });
-    
-    // SSE events are separated by a blank line ("\n\n").
     const events = buffer.split("\n\n");
-    // The last element is the incomplete tail; keep it for next read.
     buffer = events.pop() || "";
     
     for (const event of events) {
-      // Within a single event, there can be multiple "data: " lines
-      // (rare in our backend, but standard SSE allows it).
       for (const line of event.split("\n")) {
         if (!line.startsWith("data: ")) continue;
         const dataStr = line.slice(6).trim();
@@ -84,16 +72,13 @@ export async function streamChat(question, jurisdiction, history, onChunk, onSou
             onChunk(data.text);
           }
         } catch (e) {
-          // warn (not error): a malformed heartbeat or keepalive is benign.
-          // A real bug here would be caught by the fact that text is missing.
           console.warn("Skipping malformed SSE event:", dataStr.slice(0, 80));
         }
       }
     }
   }
   
-  // Edge case: if the stream ends without a trailing "\n\n", the last
-  // event may still be in the buffer. Try to flush it.
+  // Flush any trailing event if the stream ended without "\n\n".
   if (buffer.trim()) {
     for (const line of buffer.split("\n")) {
       if (!line.startsWith("data: ")) continue;
@@ -110,22 +95,6 @@ export async function streamChat(question, jurisdiction, history, onChunk, onSou
 
 // Extract durable facts from a user message via the backend.
 // Returns [] on any failure — never blocks the chat flow.
-export async function extractFacts(sessionId, userMessage) {
-  try {
-    const response = await fetch(`${BASE_URL}/api/memory/facts`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ session_id: sessionId, user_message: userMessage }),
-    });
-    if (!response.ok) return [];
-    const data = await response.json();
-    return data.facts || [];
-  } catch {
-    return [];
-  }
-}
-
-// Extract durable facts from a user message via the backend.
 export async function extractFacts(sessionId, userMessage) {
   try {
     const response = await fetch(`${BASE_URL}/api/memory/facts`, {
