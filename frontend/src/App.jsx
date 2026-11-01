@@ -33,7 +33,10 @@ export default function App() {
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // Refs used to protect the message-loading effect from clobbering in-flight sends.
   const justSentRef = useRef(false);
+  const skipNextFetchRef = useRef(false);   // NEW: skip the fetch triggered by createSession
+  const sendingInProgressRef = useRef(false); // NEW: true for the entire duration of handleSend
 
   useEffect(() => {
     getJurisdictions().then(data => {
@@ -72,6 +75,24 @@ export default function App() {
       setIsLoadingMessages(false);
       return;
     }
+
+    // Guard 1: if a send is currently in progress (from handleSend), do not
+    // fetch. The send flow manages its own message state.
+    if (sendingInProgressRef.current) {
+      return;
+    }
+
+    // Guard 2: if handleSend just created this session and is about to add the
+    // first user message + assistant placeholder, do not fetch — otherwise
+    // getMessages can resolve AFTER the placeholder is set and overwrite it,
+    // causing the streaming text to land in the user message's content field
+    // (which renders as a blue bubble with raw markdown).
+    if (skipNextFetchRef.current) {
+      skipNextFetchRef.current = false;
+      return;
+    }
+
+    // Guard 3: the classic post-send guard.
     if (isSending) return;
     if (justSentRef.current) {
       justSentRef.current = false;
@@ -139,16 +160,24 @@ export default function App() {
     const question = inputValue.trim();
     if (!question || isSending || !selectedJurisdiction) return;
 
+    // Set the in-progress flag BEFORE any await. The message-loading effect
+    // checks this and bails — preventing the getMessages overwrite that
+    // produces the "AI answer in user bubble with asterisks" bug.
+    sendingInProgressRef.current = true;
+
     let activeSessionId = currentSessionId;
     
     if (!activeSessionId) {
       try {
         const newSession = await createSession("New Conversation");
         setSessions(prev => [newSession, ...prev]);
+        // Skip the fetch that would otherwise trigger on this change.
+        skipNextFetchRef.current = true;
         setCurrentSessionId(newSession.id);
         activeSessionId = newSession.id;
       } catch (err) {
         console.error("Failed to create chat:", err);
+        sendingInProgressRef.current = false;
         return;
       }
     }
@@ -166,11 +195,7 @@ export default function App() {
       });
     }
 
-    // --- HYBRID MEMORY: fetch durable facts for this session ----------------
-    // Why: the recency window below (first 2 + last 8) keeps coherent follow-ups,
-    // but drops facts the user stated more than ~8 turns ago. Facts are the
-    // "what does this mean for MY firm" layer that persists across the whole
-    // conversation. Fetch them now, prepend them to the LLM context.
+    // --- HYBRID MEMORY: fetch facts for this session -----------------------
     let sessionFacts = [];
     try {
       sessionFacts = await getSessionFacts(activeSessionId);
@@ -178,7 +203,7 @@ export default function App() {
       console.warn("[app] Could not fetch session facts:", err);
     }
 
-    // --- STRATEGY A: RECENCY WINDOW ----------------------------------------
+    // --- RECENCY WINDOW ----------------------------------------------------
     let historyPayload = [];
     if (messages.length <= (SESSION_OPENING + RECENT_WINDOW)) {
       historyPayload = messages;
@@ -193,10 +218,6 @@ export default function App() {
       content: m.content
     }));
 
-    // Prepend a synthetic system-tagged message with the session facts.
-    // The backend's stream_answer already accepts `history` as a list of
-    // {role, content} dicts, so a "system" role here reaches the LLM with
-    // the right precedence — after the SYSTEM_PROMPT, before user history.
     if (sessionFacts.length > 0) {
       const factsText = sessionFacts.map(f => `- ${f.fact_text}`).join("\n");
       chatHistory.unshift({
@@ -238,10 +259,7 @@ export default function App() {
         return updated;
       });
 
-      // --- EXTRACT & SAVE FACTS from the user's message --------------------
-      // Fire-and-forget: this happens AFTER the answer completes, so it never
-      // delays the visible response. If extraction fails, only the next turn
-      // loses context — the current one is unaffected.
+      // Fire-and-forget fact extraction.
       extractFacts(activeSessionId, question)
         .then(newFacts => {
           if (newFacts && newFacts.length > 0) {
@@ -258,6 +276,7 @@ export default function App() {
       });
     } finally {
       justSentRef.current = true;
+      sendingInProgressRef.current = false;
       setIsSending(false);
     }
   }, [inputValue, isSending, selectedJurisdiction, currentSessionId, messages]);
