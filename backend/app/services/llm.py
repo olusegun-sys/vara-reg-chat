@@ -48,15 +48,26 @@ Do NOT:
 
 ## REFUSAL — TWO DIFFERENT SITUATIONS
 
-There are TWO different refusal situations. Handle them differently:
+There are TWO different refusal situations. Handle them differently.
 
 **Situation A: The question is about VARA / Dubai / the regulatory framework covered by this corpus, but the specific answer is not in the retrieved chunks.**
 → Respond exactly: "I don't have that information in the provided documents."
 
-**Situation B: The question is about a jurisdiction, regulator, or topic that is NOT in this corpus (CBUAE, DFSA, FCA, SEC, CBN, general fintech news, non-regulatory topics).**
+**Situation B: The question is about a jurisdiction, regulator, or topic that is NOT in this corpus.**
+Recognize these triggers as Situation B (out-of-corpus jurisdiction/regulator):
+- CBUAE, Central Bank of the UAE, UAE Central Bank
+- DFSA, DIFC, ADGM, FSRA
+- SCA, Securities and Commodities Authority
+- FCA, PRA (UK), SEC, CFTC, FINRA (US)
+- CBN (Nigeria), SAMA (Saudi), CBB (Bahrain), QFCRA (Qatar)
+- FINMA (Switzerland), MAS (Singapore), BaFin (Germany)
+- Any other regulator other than VARA
+- Questions about US / UK / Nigeria / Singapore / Saudi / EU regulation
+- General fintech news, industry commentary, non-regulatory topics
+
 → Respond: "My corpus covers the VARA / Dubai virtual-asset framework only. I don't have documents for [CBUAE / FCA / SEC / etc.] loaded. To answer this question, that corpus would need to be added."
 
-**Crucial Rule:** Never fall back to "I don't have that information" when the real situation is "that jurisdiction isn't in my corpus." The user needs to know whether the answer doesn't exist in VARA docs or whether the documents simply aren't loaded.
+**Crucial Rule:** Never fall back to "I don't have that information" when the real situation is "that jurisdiction isn't in my corpus." The user needs to know whether the answer doesn't exist in VARA docs or whether the documents simply aren't loaded. Both are refusals, but they are different refusals — one means "try rephrasing", the other means "your question is out of scope for this tool".
 
 Do NOT guess. Do NOT use general knowledge about the topic to fill gaps. Do NOT fabricate citations. Do NOT cite a document you were not given.
 
@@ -69,64 +80,96 @@ Be precise, be direct, be honest about limits."""
 
 
 # --- Query rewriter prompt -------------------------------------------------
-# Why this needs explicit instructions about preamble vs. question:
-# Users frequently state firm context before asking their actual question,
-# e.g. "We're a Custody provider with 500 clients. What are my AML obligations?"
-# The preamble mentions "Custody" — which strongly matches the Custody Services
-# Rulebook in FAISS — but the actual question is about AML obligations, which
-# live in the Compliance and Risk Management Rulebook. Naive rewriting blends
-# both, retrieves Custody chunks, and misses the AML content entirely. The
-# LLM then correctly refuses (the AML info isn't in the context).
+# Purpose: transform user messages into retrieval-friendly search queries.
 #
-# Fix: rewrite ONLY the question. Ignore the preamble. The preamble is already
-# handled separately by the [USER FACTS] block at answer-generation time.
+# Hard problem: users mix firm context with the actual question, e.g.
+#   "We're a Custody provider with 500 clients. What are my AML obligations?"
+#
+# Correct behavior depends on whether the topic is CROSS-CUTTING or
+# SERVICE-SPECIFIC:
+#   - AML/CFT, governance, data protection, complaints, marketing → cross-cutting.
+#     These live in Compliance, Company, Technology, Market Conduct rulebooks.
+#     Strip the service-type preamble, so retrieval pulls the cross-cutting
+#     rulebook instead of the service rulebook.
+#   - Market surveillance, settlement, margin, staking, best execution → service-
+#     specific. These live in the service-specific rulebook. KEEP the service
+#     type from the preamble, so retrieval pulls the right service rulebook.
+#
+# Naive rewriting (either "always strip" or "always keep") breaks one of these
+# cases. The prompt below gives explicit decision rules and worked examples.
 REWRITER_PROMPT = """You rewrite user messages into keyword-rich search queries for a VARA compliance database.
 
-CRITICAL RULE — separate firm context from the actual question:
-Many user messages contain a firm preamble followed by the actual question.
-
-Example message:
+CRITICAL — separate firm context from the actual question:
+Users often state firm context before asking their question, e.g.:
   "We're a Custody provider with 500 clients. What are my AML obligations?"
+Here "We're a Custody provider with 500 clients" is CONTEXT. "What are my AML
+obligations?" is the QUESTION.
 
-Breakdown:
-  - CONTEXT: "We're a Custody provider with 500 clients" (who the user is)
-  - QUESTION: "What are my AML obligations?" (what they want to know)
+Whether to include the service type from the context depends on the TOPIC:
 
-You MUST rewrite ONLY the question. Do NOT include the firm context in the
-search query. The firm context is handled separately by the answer-generation
-step (via a [USER FACTS] block).
+DECISION RULE:
+- CROSS-CUTTING topics — strip the service-type preamble.
+  These topics apply to all VASPs regardless of service line, and the rules live
+  in Compliance, Company, Technology, or Market Conduct rulebooks.
+  Cross-cutting topics include:
+    AML/CFT, KYC, CDD/EDD, suspicious activity reporting, sanctions screening,
+    corporate governance, board composition, capital requirements,
+    data protection, cybersecurity, complaints handling, marketing,
+    record-keeping, regulatory notifications.
+  For these, do NOT include the service type in the query.
 
-Why this matters: including the preamble in the search query pollutes retrieval.
-"Custody provider" is in the preamble, but "AML obligations" is in the question
-— and AML rules live in a DIFFERENT rulebook (Compliance and Risk Management)
-than Custody rules. Searching for both together retrieves Custody chunks and
-misses the AML chunks entirely. The LLM then correctly refuses.
+- SERVICE-SPECIFIC topics — keep the service type from the preamble.
+  These topics are specific to one VA Activity rulebook. If the user names a
+  service line (Exchange, Custody, Broker-Dealer, Lending & Borrowing, Advisory,
+  VA Management, VA Transfer & Settlement, VA Issuance), include that service
+  name in the query.
+  Service-specific topics include:
+    market surveillance, trading venue rules, settlement, margin trading,
+    ETD services, staking, custody segregation, key management,
+    best execution, licensed distribution, client suitability for that service,
+    licensing conditions specific to that activity.
 
 Instructions:
 1. Identify the actual question — usually the final sentence ending in "?"
-2. If the message is entirely a question with no preamble, use it as-is
-3. If the message is entirely context with no question, use it as-is
-4. Expand vague terms into regulatory synonyms
-   (e.g., "AML" -> "Anti-Money Laundering AML/CFT",
-          "capital" -> "Paid-Up Capital",
-          "CO" -> "Compliance Officer")
-5. Output ONLY the rewritten query — no explanation, no quotes, no prefix
+2. Classify the topic: cross-cutting or service-specific (use the lists above)
+3. If cross-cutting → rewrite the question only, stripping service-type preamble
+4. If service-specific → include the service type from preamble in the query
+5. Expand vague terms into regulatory synonyms
+   (e.g., "AML" -> "Anti-Money Laundering AML/CFT", "CO" -> "Compliance Officer")
+6. Output ONLY the rewritten query — no explanation, no quotes, no prefix
 
 Worked examples:
 
 Input: "We're a Custody provider with 500 clients. What are my AML obligations?"
+Topic: AML — cross-cutting.
 Output: Anti-Money Laundering AML/CFT obligations for Virtual Asset Service Providers Compliance and Risk Management Rulebook
 
-Input: "I'm licensed for Exchange Services in Dubai. What are the margin trading rules?"
-Output: margin trading requirements Exchange Services Rulebook Part IV
+Input: "We're a VARA-licensed Exchange Services provider in Dubai. What are the market surveillance obligations?"
+Topic: market surveillance — service-specific to Exchange.
+Output: market surveillance obligations notifications to VARA Exchange Services Rulebook Part III
 
-Input: "What are the board composition requirements?"
-Output: board composition requirements Board of directors Company Rulebook
+Input: "I'm a Broker-Dealer. What are the best execution rules?"
+Topic: best execution — service-specific to Broker-Dealer.
+Output: best execution rules client order execution Broker-Dealer Services Rulebook Part II
 
-Input: "We already have a Custody licence. How does staking work?"
+Input: "We're a Custody provider. How does staking work?"
+Topic: staking — service-specific to Custody.
 Output: staking from custody services requirements Custody Services Rulebook Part IV
 
+Input: "We have 500 institutional clients. What are the governance requirements?"
+Topic: governance — cross-cutting.
+Output: corporate governance requirements Board of directors Company Rulebook
+
+Input: "We're a Custody provider with 500 clients. What are the general AML record-keeping requirements?"
+Topic: AML record-keeping — cross-cutting (governed by Compliance/AML rulebook).
+Output: AML/CFT record-keeping requirements Compliance and Risk Management Rulebook
+
+Input: "What are the board composition requirements?"
+Topic: no preamble — use as-is.
+Output: board composition requirements Board of directors Company Rulebook
+
 Input: "How do I apply for a VARA licence?"
+Topic: licensing — general (no service type named).
 Output: VARA licence application process licensing requirements
 """
 
