@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import JurisdictionSelector from "./components/JurisdictionSelector.jsx";
 import ChatWindow from "./components/ChatWindow.jsx";
 import ChatInput from "./components/ChatInput.jsx";
@@ -9,11 +9,8 @@ import {
   updateSessionTitle, deleteSession, togglePin 
 } from "./api/supabase.js";
 
-// STRATEGY A (SMART WINDOW) CONFIG
 const SESSION_OPENING = 2;
 const RECENT_WINDOW = 8;
-
-// localStorage key for session persistence across page reloads.
 const SESSION_STORAGE_KEY = "vara_current_session_id";
 
 export default function App() {
@@ -25,7 +22,6 @@ export default function App() {
 
   const [sessions, setSessions] = useState([]);
   
-  // Initialize from localStorage so refresh stays on the same session.
   const [currentSessionId, setCurrentSessionId] = useState(() => {
     try {
       return localStorage.getItem(SESSION_STORAGE_KEY) || null;
@@ -35,13 +31,15 @@ export default function App() {
   });
   
   const [messages, setMessages] = useState([]);
-  
-  // NEW: True while a session's messages are being fetched. Triggers the
-  // loading spinner in ChatWindow and prevents the "jump-to-bottom" scroll
-  // race that happens when an old session's messages appear all at once.
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // NEW: Tracks whether the upcoming isSending→false transition is from a
+  // completed send (we already have correct state) or from a session switch
+  // (we need to fetch). Prevents an unnecessary DB reload that would remount
+  // the ChatWindow container and reset scroll to top.
+  const justSentRef = useRef(false);
 
   useEffect(() => {
     getJurisdictions().then(data => {
@@ -53,7 +51,6 @@ export default function App() {
   useEffect(() => {
     getSessions().then(data => {
       setSessions(data);
-      // Validate the stored session ID after sessions load.
       const stored = localStorage.getItem(SESSION_STORAGE_KEY);
       if (stored && !data.some(s => s.id === stored)) {
         console.warn("[app] Stored session ID not found, clearing.");
@@ -63,7 +60,6 @@ export default function App() {
     }).catch(err => console.error("Error loading sessions:", err));
   }, []);
 
-  // Persist currentSessionId to localStorage whenever it changes.
   useEffect(() => {
     try {
       if (currentSessionId) {
@@ -84,7 +80,14 @@ export default function App() {
     }
     if (isSending) return;
 
-    // Show spinner while fetching. Cleared in .finally() regardless of outcome.
+    // NEW: Skip the reload when isSending just flipped false after a completed
+    // send. We already have the correct messages in state — no need to fetch,
+    // and fetching would remount the message list (resetting scroll to top).
+    if (justSentRef.current) {
+      justSentRef.current = false;
+      return;
+    }
+
     setIsLoadingMessages(true);
     getMessages(currentSessionId)
       .then(data => {
@@ -174,7 +177,6 @@ export default function App() {
       });
     }
 
-    // --- STRATEGY A: SMART WINDOW MEMORY SLICING ---
     let historyPayload = [];
     if (messages.length <= (SESSION_OPENING + RECENT_WINDOW)) {
       historyPayload = messages;
@@ -229,6 +231,10 @@ export default function App() {
         return updated;
       });
     } finally {
+      // NEW: Mark that the upcoming isSending→false transition is from a
+      // completed send. The fetch effect will see this flag and skip the
+      // reload, keeping the message list mounted (no scroll reset).
+      justSentRef.current = true;
       setIsSending(false);
     }
   }, [inputValue, isSending, selectedJurisdiction, currentSessionId, messages]);
