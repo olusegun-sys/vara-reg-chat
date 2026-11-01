@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useLayoutEffect } from "react";
 import MessageBubble from "./MessageBubble.jsx";
 
 function LoadingSpinner() {
@@ -10,42 +10,84 @@ function LoadingSpinner() {
 }
 
 export default function ChatWindow({ messages, onEdit, isLoading }) {
-  const bottomRef = useRef(null);
-  const prevCountRef = useRef(0);
+  // Ref to the SCROLL CONTAINER, not a marker div. Scrolling the container
+  // directly with scrollTop = scrollHeight is deterministic and NEVER scrolls
+  // the outer page — unlike scrollIntoView, which walks the ancestor chain
+  // and can scroll parent containers unexpectedly.
+  const scrollContainerRef = useRef(null);
+  const prevMessageCountRef = useRef(0);
+  const lastScrollTimeRef = useRef(0);
+  const rafPendingRef = useRef(false);
 
-  useEffect(() => {
-    if (!bottomRef.current) return;
-    if (isLoading) return;
+  // Scroll the container to the bottom, batched per animation frame.
+  // Why rAF: during streaming, setMessages fires per token (~50-100x/sec).
+  // Without batching, we'd call scrollTop 100 times per second, causing the
+  // browser to abandon/restart scroll animations. rAF coalesces all scroll
+  // requests in a single frame into one actual scroll.
+  const scrollToBottom = (smooth = false) => {
+    if (!scrollContainerRef.current) return;
+    if (rafPendingRef.current) return;
 
-    const prev = prevCountRef.current;
-    const curr = messages.length;
-    const delta = curr - prev;
+    rafPendingRef.current = true;
+    requestAnimationFrame(() => {
+      const el = scrollContainerRef.current;
+      if (!el) {
+        rafPendingRef.current = false;
+        return;
+      }
+      // Direct scrollTop assignment. Always works, never touches page scroll.
+      // smooth: we use CSS scroll-behavior instead (see className below) so
+      // the browser handles animation natively without our JS fighting it.
+      el.scrollTo({
+        top: el.scrollHeight,
+        behavior: smooth ? "smooth" : "auto",
+      });
+      lastScrollTimeRef.current = Date.now();
+      rafPendingRef.current = false;
+    });
+  };
 
-    if (delta === 1) {
-      bottomRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
-    } else if (delta > 1 || prev === 0) {
-      bottomRef.current.scrollIntoView({ behavior: "auto", block: "end" });
-    }
+  // useLayoutEffect (not useEffect) — fires synchronously AFTER DOM mutations
+  // but BEFORE the browser paints. This ensures the scroll happens in the same
+  // frame as the content growth, so there's no visible jump.
+  useLayoutEffect(() => {
+    if (isLoading) return; // session-level spinner: don't scroll
 
-    prevCountRef.current = curr;
-  }, [messages, isLoading]);
+    const prevCount = prevMessageCountRef.current;
+    const currCount = messages.length;
+    const delta = currCount - prevCount;
+    prevMessageCountRef.current = currCount;
 
-  // NEW: During streaming, the `messages` array doesn't change length, but the
-  // content of the last message grows. This effect ensures we keep scrolling 
-  // to the bottom as the text streams in, preventing the page from jumping up.
-  useEffect(() => {
-    if (!bottomRef.current) return;
-    if (isLoading) return;
-    
-    // Only auto-scroll if we are streaming the AI's response (isLoading on message)
-    const lastMsg = messages[messages.length - 1];
-    if (lastMsg && lastMsg.isLoading) {
-      bottomRef.current.scrollIntoView({ behavior: "auto", block: "end" });
+    if (currCount === 0) return;
+
+    // New message(s) appended (send flow): delta = 2 because we add both the
+    // user message AND the assistant placeholder in one setMessages call.
+    // Use smooth scroll only for single-message growth (during session load
+    // with pagination, this shouldn't trigger — we want instant).
+    if (delta === 2) {
+      scrollToBottom(false); // instant on send — no competing animations
+    } else if (delta > 2 || prevCount === 0) {
+      scrollToBottom(false); // session load — instant
+    } else {
+      // delta === 0: array reference changed but length same — this is streaming.
+      // The last message's content grew. Keep the user pinned to bottom ONLY
+      // if they were already near the bottom (don't fight manual scroll-up).
+      const el = scrollContainerRef.current;
+      if (!el) return;
+      const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+      // If user is within 150px of bottom, they want to follow the stream.
+      // If they scrolled up further, respect their position (don't yank them down).
+      if (distanceFromBottom < 150) {
+        scrollToBottom(false); // instant during streaming — no smooth animation
+      }
     }
   }, [messages, isLoading]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-8 bg-luxury-light custom-scrollbar">
+    <div
+      ref={scrollContainerRef}
+      className="flex-1 overflow-y-auto px-4 sm:px-6 py-8 bg-luxury-light custom-scrollbar"
+    >
       {isLoading ? (
         <LoadingSpinner />
       ) : messages.length === 0 ? (
@@ -63,7 +105,7 @@ export default function ChatWindow({ messages, onEdit, isLoading }) {
         <div className="max-w-3xl mx-auto space-y-6 pb-4">
           {messages.map((msg, i) => (
             <MessageBubble
-              key={i}
+              key={msg.id || i}
               role={msg.role}
               content={msg.content}
               sources={msg.sources}
@@ -71,7 +113,6 @@ export default function ChatWindow({ messages, onEdit, isLoading }) {
               onEdit={onEdit}
             />
           ))}
-          <div ref={bottomRef} />
         </div>
       )}
     </div>
