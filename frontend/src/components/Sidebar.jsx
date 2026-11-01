@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react"; // useRef added for click-outside detection
 
 // Delete confirmation modal — matches the app's near-black palette.
 // Why a custom modal (not window.confirm): native browser confirm looks like
@@ -73,10 +73,14 @@ export default function Sidebar({
   isOpen,
   onClose
 }) {
-  const [editingId, setEditingId] = useState(null);
-  const [editTitle, setEditTitle] = useState("");
+  const [editingId, setEditingId] = useState(null); // which session is being renamed (null = none)
+  const [editTitle, setEditTitle] = useState(""); // the in-progress rename text
+  // Which session's action menu is open (null = none). Single menu at a time.
+  const [menuOpenId, setMenuOpenId] = useState(null);
   // Which session is pending deletion confirmation (null = none).
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  // Ref to the scrollable list container — used to detect clicks outside any menu.
+  const menuContainerRef = useRef(null);
 
   const sortedSessions = [...sessions].sort((a, b) => {
     if (a.is_pinned && !b.is_pinned) return -1;
@@ -84,18 +88,42 @@ export default function Sidebar({
     return 0; 
   });
 
+  // Close the popover on any outside click or Escape press.
+  // Why: on mobile there's no "hover off" — the user needs an explicit dismiss.
+  // We listen at the document level so tapping anywhere closes the menu.
+  useEffect(() => {
+    if (menuOpenId === null) return; // nothing open — no listeners needed
+    const onDocClick = (e) => {
+      // If the click is inside the menu container, let the button handle it.
+      // We use a data-attribute check so we don't have to track per-row refs.
+      if (e.target.closest('[data-session-menu]')) return;
+      setMenuOpenId(null);
+    };
+    const onEsc = (e) => {
+      if (e.key === "Escape") setMenuOpenId(null);
+    };
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("touchstart", onDocClick);
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("touchstart", onDocClick);
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, [menuOpenId]);
+
   const handleEditSubmit = (id) => {
     if (editTitle.trim()) {
-      onRename(id, editTitle.trim());
+      onRename(id, editTitle.trim()); // persist the new title via parent callback
     }
-    setEditingId(null);
+    setEditingId(null); // exit edit mode regardless of save/cancel
   };
 
   const handleConfirmDelete = () => {
     if (deleteConfirmId) {
-      onDelete(deleteConfirmId);
+      onDelete(deleteConfirmId); // fire the delete via parent callback
     }
-    setDeleteConfirmId(null);
+    setDeleteConfirmId(null); // close the modal after action
   };
 
   return (
@@ -126,9 +154,12 @@ export default function Sidebar({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1 custom-scrollbar">
+        <div
+          ref={menuContainerRef}
+          className="flex-1 overflow-y-auto px-3 py-2 space-y-1 custom-scrollbar"
+        >
           {sortedSessions.map((session) => (
-            <div key={session.id} className="relative group">
+            <div key={session.id} className="relative">
               {editingId === session.id ? (
                 <input
                   type="text" autoFocus value={editTitle}
@@ -140,7 +171,7 @@ export default function Sidebar({
               ) : (
                 <button
                   onClick={() => { onSelectSession(session.id); onClose(); }}
-                  className={`w-full text-left pl-3 pr-8 py-2.5 rounded-lg text-sm truncate transition-all flex items-center gap-2 ${currentSessionId === session.id ? "bg-luxury-light text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"}`}
+                  className={`w-full text-left pl-3 pr-10 py-2.5 rounded-lg text-sm truncate transition-all flex items-center gap-2 ${currentSessionId === session.id ? "bg-luxury-light text-white shadow-sm" : "hover:bg-slate-800/50 text-slate-400 hover:text-slate-200"}`}
                 >
                   {session.is_pinned && (
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-luxury-accent shrink-0 rotate-45">
@@ -151,22 +182,67 @@ export default function Sidebar({
                 </button>
               )}
 
+              {/* Three-dot trigger — always visible, works on touch.
+                  Why always visible: hover doesn't exist on mobile. Discoverability > tidiness. */}
               {!editingId && (
-                <div className="absolute right-1 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center gap-1 bg-slate-800 rounded px-1 py-0.5 shadow-sm">
-                  <button onClick={(e) => { e.stopPropagation(); onTogglePin(session.id); }} className="p-1 text-slate-400 hover:text-white" title={session.is_pinned ? "Unpin" : "Pin"}>
+                <button
+                  data-session-menu
+                  onClick={(e) => {
+                    e.stopPropagation(); // don't select the session when opening the menu
+                    setMenuOpenId(menuOpenId === session.id ? null : session.id); // toggle; opening another closes this one
+                  }}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-slate-500 hover:text-white hover:bg-slate-800 transition-colors"
+                  aria-label="Session actions"
+                  aria-haspopup="menu"
+                  aria-expanded={menuOpenId === session.id}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                    <circle cx="5" cy="12" r="1.6" />
+                    <circle cx="12" cy="12" r="1.6" />
+                    <circle cx="19" cy="12" r="1.6" />
+                  </svg>
+                </button>
+              )}
+
+              {/* Popover menu — rendered only for the open session, right-aligned under the trigger. */}
+              {menuOpenId === session.id && (
+                <div
+                  data-session-menu
+                  role="menu"
+                  className="absolute right-1 top-[calc(100%-6px)] z-30 w-36 bg-[#12141B] border border-slate-700 rounded-lg shadow-xl py-1 animate-fade-in"
+                  onClick={(e) => e.stopPropagation()} // clicks inside the menu must not bubble to the row
+                >
+                  <button
+                    role="menuitem"
+                    onClick={() => { onTogglePin(session.id); setMenuOpenId(null); }} // pin/unpin then close
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                  >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
                       <line x1="12" y1="17" x2="12" y2="22" /><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.55V6a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4.55a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z" />
                     </svg>
+                    {session.is_pinned ? "Unpin" : "Pin"}
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); setEditingId(session.id); setEditTitle(session.title); }} className="p-1 text-slate-400 hover:text-white" title="Rename">
+
+                  <button
+                    role="menuitem"
+                    onClick={() => { setEditingId(session.id); setEditTitle(session.title); setMenuOpenId(null); }} // enter rename mode, close menu
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                  >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
                       <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
                     </svg>
+                    Rename
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); setDeleteConfirmId(session.id); }} className="p-1 text-slate-400 hover:text-red-400" title="Delete">
+
+                  <button
+                    role="menuitem"
+                    onClick={() => { setDeleteConfirmId(session.id); setMenuOpenId(null); }} // open delete modal, close menu
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
+                  >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
                       <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                     </svg>
+                    Delete
                   </button>
                 </div>
               )}
