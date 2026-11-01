@@ -15,8 +15,8 @@ SYSTEM_PROMPT = """You are a regulatory compliance research assistant for the VA
 
 ## CONVERSATIONAL CONTEXT
 - You will receive prior messages in this conversation. Use them.
-- You may also receive a [SESSION FACTS] block containing durable details about the user's firm extracted from earlier turns. **These facts are authoritative** — if the user said they are a Custody provider, treat that as true for the entire conversation. Reference them naturally: "Since you're a Custody Services provider..." Do NOT repeat them back verbatim unless they're directly relevant.
-- If the user has told you their firm type, licence class, or business activity earlier in the conversation, reference it.
+- You may also receive a [USER FACTS] block containing durable details about the user's firm, accumulated across all of this user's sessions. **These facts are authoritative** — if the user said they are a Custody provider, treat that as true for the entire conversation. Reference them naturally: "Since you're a Custody Services provider..." Do NOT repeat them back verbatim unless they're directly relevant.
+- When the user asks about "my clients", "my obligations", "my firm", or "my situation", FILTER the answer using these facts. Do NOT dump a survey of every client type or every service type in the rulebooks. Answer for THIS user's specific situation.
 - If the user's question is a follow-up ("and what about retail investors?"), infer the subject from the last 8 messages. Do NOT ask the user to repeat themselves.
 - Do NOT assume facts the user hasn't stated. If the answer depends on a fact not in the conversation, say so.
 
@@ -68,6 +68,69 @@ Do NOT guess. Do NOT use general knowledge about the topic to fill gaps. Do NOT 
 Be precise, be direct, be honest about limits."""
 
 
+# --- Query rewriter prompt -------------------------------------------------
+# Why this needs explicit instructions about preamble vs. question:
+# Users frequently state firm context before asking their actual question,
+# e.g. "We're a Custody provider with 500 clients. What are my AML obligations?"
+# The preamble mentions "Custody" — which strongly matches the Custody Services
+# Rulebook in FAISS — but the actual question is about AML obligations, which
+# live in the Compliance and Risk Management Rulebook. Naive rewriting blends
+# both, retrieves Custody chunks, and misses the AML content entirely. The
+# LLM then correctly refuses (the AML info isn't in the context).
+#
+# Fix: rewrite ONLY the question. Ignore the preamble. The preamble is already
+# handled separately by the [USER FACTS] block at answer-generation time.
+REWRITER_PROMPT = """You rewrite user messages into keyword-rich search queries for a VARA compliance database.
+
+CRITICAL RULE — separate firm context from the actual question:
+Many user messages contain a firm preamble followed by the actual question.
+
+Example message:
+  "We're a Custody provider with 500 clients. What are my AML obligations?"
+
+Breakdown:
+  - CONTEXT: "We're a Custody provider with 500 clients" (who the user is)
+  - QUESTION: "What are my AML obligations?" (what they want to know)
+
+You MUST rewrite ONLY the question. Do NOT include the firm context in the
+search query. The firm context is handled separately by the answer-generation
+step (via a [USER FACTS] block).
+
+Why this matters: including the preamble in the search query pollutes retrieval.
+"Custody provider" is in the preamble, but "AML obligations" is in the question
+— and AML rules live in a DIFFERENT rulebook (Compliance and Risk Management)
+than Custody rules. Searching for both together retrieves Custody chunks and
+misses the AML chunks entirely. The LLM then correctly refuses.
+
+Instructions:
+1. Identify the actual question — usually the final sentence ending in "?"
+2. If the message is entirely a question with no preamble, use it as-is
+3. If the message is entirely context with no question, use it as-is
+4. Expand vague terms into regulatory synonyms
+   (e.g., "AML" -> "Anti-Money Laundering AML/CFT",
+          "capital" -> "Paid-Up Capital",
+          "CO" -> "Compliance Officer")
+5. Output ONLY the rewritten query — no explanation, no quotes, no prefix
+
+Worked examples:
+
+Input: "We're a Custody provider with 500 clients. What are my AML obligations?"
+Output: Anti-Money Laundering AML/CFT obligations for Virtual Asset Service Providers Compliance and Risk Management Rulebook
+
+Input: "I'm licensed for Exchange Services in Dubai. What are the margin trading rules?"
+Output: margin trading requirements Exchange Services Rulebook Part IV
+
+Input: "What are the board composition requirements?"
+Output: board composition requirements Board of directors Company Rulebook
+
+Input: "We already have a Custody licence. How does staking work?"
+Output: staking from custody services requirements Custody Services Rulebook Part IV
+
+Input: "How do I apply for a VARA licence?"
+Output: VARA licence application process licensing requirements
+"""
+
+
 def _build_context(chunks: List[Dict[str, Any]]) -> str:
     parts = []
     for c in chunks:
@@ -99,13 +162,7 @@ def rewrite_query(question: str) -> str:
             temperature=0.0,
             max_tokens=300,
             messages=[
-                {
-                    "role": "system", 
-                    "content": "You are a search query optimizer for a VARA compliance database. "
-                               "Take the user's question and rewrite it into a short, keyword-rich search query. "
-                               "Expand vague terms into regulatory synonyms (e.g., 'capital' -> 'Paid-Up Capital'). "
-                               "Output ONLY the rewritten query."
-                },
+                {"role": "system", "content": REWRITER_PROMPT},
                 {"role": "user", "content": question}
             ],
         )
