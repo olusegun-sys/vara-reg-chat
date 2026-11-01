@@ -7,7 +7,7 @@ import { getJurisdictions, streamChat, generateChatTitle, extractFacts } from ".
 import { 
   getSessions, createSession, getMessages, addMessage, 
   updateSessionTitle, deleteSession, togglePin,
-  getSessionFacts, saveSessionFacts
+  getUserFacts, saveUserFacts
 } from "./api/supabase.js";
 
 const SESSION_OPENING = 2;
@@ -33,10 +33,10 @@ export default function App() {
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Refs used to protect the message-loading effect from clobbering in-flight sends.
+  // Refs protecting the message-loading effect from clobbering in-flight sends.
   const justSentRef = useRef(false);
-  const skipNextFetchRef = useRef(false);   // NEW: skip the fetch triggered by createSession
-  const sendingInProgressRef = useRef(false); // NEW: true for the entire duration of handleSend
+  const skipNextFetchRef = useRef(false);
+  const sendingInProgressRef = useRef(false);
 
   useEffect(() => {
     getJurisdictions().then(data => {
@@ -76,17 +76,10 @@ export default function App() {
       return;
     }
 
-    // Guard 1: if a send is currently in progress (from handleSend), do not
-    // fetch. The send flow manages its own message state.
-    if (sendingInProgressRef.current) {
-      return;
-    }
+    // Guard 1: an in-flight send manages its own message state.
+    if (sendingInProgressRef.current) return;
 
-    // Guard 2: if handleSend just created this session and is about to add the
-    // first user message + assistant placeholder, do not fetch — otherwise
-    // getMessages can resolve AFTER the placeholder is set and overwrite it,
-    // causing the streaming text to land in the user message's content field
-    // (which renders as a blue bubble with raw markdown).
+    // Guard 2: skip the fetch triggered by handleSend creating a new session.
     if (skipNextFetchRef.current) {
       skipNextFetchRef.current = false;
       return;
@@ -160,9 +153,7 @@ export default function App() {
     const question = inputValue.trim();
     if (!question || isSending || !selectedJurisdiction) return;
 
-    // Set the in-progress flag BEFORE any await. The message-loading effect
-    // checks this and bails — preventing the getMessages overwrite that
-    // produces the "AI answer in user bubble with asterisks" bug.
+    // Set before any await so the message-loading effect bails on this render.
     sendingInProgressRef.current = true;
 
     let activeSessionId = currentSessionId;
@@ -171,7 +162,6 @@ export default function App() {
       try {
         const newSession = await createSession("New Conversation");
         setSessions(prev => [newSession, ...prev]);
-        // Skip the fetch that would otherwise trigger on this change.
         skipNextFetchRef.current = true;
         setCurrentSessionId(newSession.id);
         activeSessionId = newSession.id;
@@ -195,15 +185,17 @@ export default function App() {
       });
     }
 
-    // --- HYBRID MEMORY: fetch facts for this session -----------------------
-    let sessionFacts = [];
+    // --- HYBRID MEMORY: fetch USER facts (not session facts) --------------
+    // Per-user, not per-session. A Custody provider is a Custody provider
+    // across every conversation. Clicking "New Session" does not lose facts.
+    let userFacts = [];
     try {
-      sessionFacts = await getSessionFacts(activeSessionId);
+      userFacts = await getUserFacts();
     } catch (err) {
-      console.warn("[app] Could not fetch session facts:", err);
+      console.warn("[app] Could not fetch user facts:", err);
     }
 
-    // --- RECENCY WINDOW ----------------------------------------------------
+    // --- RECENCY WINDOW ---------------------------------------------------
     let historyPayload = [];
     if (messages.length <= (SESSION_OPENING + RECENT_WINDOW)) {
       historyPayload = messages;
@@ -218,11 +210,12 @@ export default function App() {
       content: m.content
     }));
 
-    if (sessionFacts.length > 0) {
-      const factsText = sessionFacts.map(f => `- ${f.fact_text}`).join("\n");
+    // Prepend the facts block as a synthetic system message.
+    if (userFacts.length > 0) {
+      const factsText = userFacts.map(f => `- ${f.fact_text}`).join("\n");
       chatHistory.unshift({
         role: "system",
-        content: `[SESSION FACTS — durable details about the user's firm, extracted from earlier in this conversation. Use these to personalize answers, e.g. "since you're a Custody provider...". Do NOT repeat them back verbatim unless relevant.]\n${factsText}`
+        content: `[USER FACTS — durable details about the user's firm, accumulated across ALL of this user's sessions (not just this one). These facts are authoritative. Use them to personalize the answer — e.g., "since you're a Custody Services provider...". When the user asks about "my clients", "my obligations", or "my firm", filter your answer using these facts. Do NOT dump a survey of every client type in the rulebooks — answer for THIS user's specific situation.]\n${factsText}`
       });
     }
 
@@ -259,11 +252,11 @@ export default function App() {
         return updated;
       });
 
-      // Fire-and-forget fact extraction.
+      // Fire-and-forget fact extraction. Facts save at user scope.
       extractFacts(activeSessionId, question)
         .then(newFacts => {
           if (newFacts && newFacts.length > 0) {
-            saveSessionFacts(activeSessionId, newFacts);
+            saveUserFacts(activeSessionId, newFacts);
           }
         })
         .catch(err => console.warn("[app] Fact extraction failed:", err));

@@ -10,7 +10,7 @@ if (!supabaseUrl || !supabaseKey) {
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Generate or retrieve a unique browser ID.
-// This ensures every person who opens the link sees their own private chat history.
+// Every person who opens the link sees their own private chat history.
 function getBrowserId() {
   let id = localStorage.getItem("vara_browser_id");
   if (!id) {
@@ -21,6 +21,8 @@ function getBrowserId() {
 }
 
 const USER_ID = getBrowserId();
+
+// --- Sessions CRUD ---------------------------------------------------------
 
 export async function getSessions() {
   const { data, error } = await supabase
@@ -38,28 +40,6 @@ export async function createSession(title = "New Conversation") {
   const { data, error } = await supabase
     .from("chat_sessions")
     .insert([{ user_id: USER_ID, title }])
-    .select()
-    .single();
-    
-  if (error) throw error;
-  return data;
-}
-
-export async function getMessages(sessionId) {
-  const { data, error } = await supabase
-    .from("chat_messages")
-    .select("*")
-    .eq("session_id", sessionId)
-    .order("created_at", { ascending: true });
-    
-  if (error) throw error;
-  return data;
-}
-
-export async function addMessage(sessionId, role, content, sources = []) {
-  const { data, error } = await supabase
-    .from("chat_messages")
-    .insert([{ session_id: sessionId, role, content, sources }])
     .select()
     .single();
     
@@ -91,30 +71,63 @@ export async function togglePin(sessionId, isPinned) {
   if (error) throw error;
 }
 
-// --- Session facts CRUD (hybrid memory) ------------------------------------
-// Why: on each send, we fetch all facts for the session and prepend them to
-// the LLM prompt. After each send, we extract new facts from the user's
-// message and save them. Gives "remembers me" behavior for durable facts.
+// --- Messages CRUD ---------------------------------------------------------
 
-export async function getSessionFacts(sessionId) {
-  if (!sessionId) return [];
+export async function getMessages(sessionId) {
+  const { data, error } = await supabase
+    .from("chat_messages")
+    .select("*")
+    .eq("session_id", sessionId)
+    .order("created_at", { ascending: true });
+    
+  if (error) throw error;
+  return data;
+}
+
+export async function addMessage(sessionId, role, content, sources = []) {
+  const { data, error } = await supabase
+    .from("chat_messages")
+    .insert([{ session_id: sessionId, role, content, sources }])
+    .select()
+    .single();
+    
+  if (error) throw error;
+  return data;
+}
+
+// --- User facts (hybrid memory) --------------------------------------------
+// Facts are per-USER, not per-session. A Custody provider is a Custody provider
+// across every conversation they start. Session-scoped facts would vanish when
+// the user clicks "New Session" — which breaks the whole point of memory.
+//
+// Session_id is kept as an audit trail (which session the fact was extracted
+// from) but is not used for scoping or filtering.
+
+export async function getUserFacts() {
   const { data, error } = await supabase
     .from("session_facts")
     .select("fact_text, created_at")
-    .eq("session_id", sessionId)
+    .eq("user_id", USER_ID)
     .order("created_at", { ascending: true });
   if (error) {
-    console.error("[supabase] getSessionFacts failed:", error);
+    console.error("[supabase] getUserFacts failed:", error);
     return [];
   }
   return data || [];
 }
 
-export async function saveSessionFacts(sessionId, facts) {
-  if (!sessionId || !facts || facts.length === 0) return;
-  const rows = facts.map((fact_text) => ({ session_id: sessionId, fact_text }));
+export async function saveUserFacts(sessionId, facts) {
+  if (!facts || facts.length === 0) return;
+  // Dedupe within the batch — extraction occasionally produces the same
+  // fact twice from a single message.
+  const unique = Array.from(new Set(facts));
+  const rows = unique.map((fact_text) => ({
+    user_id: USER_ID,
+    session_id: sessionId || null,
+    fact_text,
+  }));
   const { error } = await supabase.from("session_facts").insert(rows);
   if (error) {
-    console.error("[supabase] saveSessionFacts failed:", error);
+    console.error("[supabase] saveUserFacts failed:", error);
   }
 }
