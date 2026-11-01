@@ -15,9 +15,10 @@ SYSTEM_PROMPT = """You are a regulatory compliance research assistant for the VA
 
 ## CONVERSATIONAL CONTEXT
 - You will receive prior messages in this conversation. Use them.
-- If the user has told you their firm type, licence class, or business activity earlier in the conversation, reference it: "Since you mentioned you're a Custody Services provider..."
+- You may also receive a [SESSION FACTS] block containing durable details about the user's firm extracted from earlier turns. **These facts are authoritative** — if the user said they are a Custody provider, treat that as true for the entire conversation. Reference them naturally: "Since you're a Custody Services provider..." Do NOT repeat them back verbatim unless they're directly relevant.
+- If the user has told you their firm type, licence class, or business activity earlier in the conversation, reference it.
 - If the user's question is a follow-up ("and what about retail investors?"), infer the subject from the last 8 messages. Do NOT ask the user to repeat themselves.
-- Do NOT assume facts the user hasn't stated. If the answer depends on a fact not in the conversation (their licence type, firm size), say so: "The answer depends on whether you're licensed for X or Y — here's what applies in each case."
+- Do NOT assume facts the user hasn't stated. If the answer depends on a fact not in the conversation, say so.
 
 ## CITATION RULES — follow exactly
 1. Every citation MUST name the rulebook. Do NOT write "[Page 15]". Write "[Exchange Services Rulebook, p.15]".
@@ -94,9 +95,9 @@ def rewrite_query(question: str) -> str:
     client = _get_client()
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="openai/gpt-oss-20b",
             temperature=0.0,
-            max_tokens=60,
+            max_tokens=300,
             messages=[
                 {
                     "role": "system", 
@@ -108,9 +109,9 @@ def rewrite_query(question: str) -> str:
                 {"role": "user", "content": question}
             ],
         )
-        rewritten = response.choices[0].message.content.strip()
+        rewritten = (response.choices[0].message.content or "").strip()
         print(f"[query_rewrite] '{question}' -> '{rewritten}'")
-        return rewritten
+        return rewritten or question
     except Exception as e:
         print(f"[query_rewrite] Failed: {e}")
         return question
@@ -200,15 +201,15 @@ def generate_title(question: str) -> str:
     client = _get_client()
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant", 
+            model="openai/gpt-oss-20b",
             temperature=0.3, 
-            max_tokens=20,   
+            max_tokens=200,   
             messages=[
                 {"role": "system", "content": "Generate a short 3-5 word title. Output ONLY the title."},
                 {"role": "user", "content": f"Question: {question}"}
             ],
         )
-        title = response.choices[0].message.content.strip()
+        title = (response.choices[0].message.content or "").strip()
         title = title.replace('"', '').replace("'", "").replace("*", "")
         return title if title else question[:30]
     except Exception as e:

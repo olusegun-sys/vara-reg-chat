@@ -91,3 +91,56 @@ export async function togglePin(sessionId, isPinned) {
     .eq("id", sessionId);
   if (error) throw error;
 }
+
+// --- Session facts CRUD (hybrid memory) ------------------------------------
+// Why: on each send, we fetch all facts for the session and prepend them to
+// the LLM prompt. After each send, we extract new facts from the user's
+// message and save them. This gives "remembers me" behavior for durable
+// facts without the cost/complexity of vector memory.
+
+export async function getSessionFacts(sessionId) {
+  if (!sessionId) return [];
+  const { data, error } = await supabase
+    .from("session_facts")
+    .select("fact_text, created_at")
+    .eq("session_id", sessionId)
+    .order("created_at", { ascending: true });
+  if (error) {
+    console.error("[supabase] getSessionFacts failed:", error);
+    return [];
+  }
+  return data || [];
+}
+
+export async function saveSessionFacts(sessionId, facts) {
+  if (!sessionId || !facts || facts.length === 0) return;
+  const rows = facts.map((fact_text) => ({ session_id: sessionId, fact_text }));
+  const { error } = await supabase.from("session_facts").insert(rows);
+  if (error) {
+    console.error("[supabase] saveSessionFacts failed:", error);
+  }
+}
+
+// --- Session facts CRUD (hybrid memory) ------------------------------------
+export async function getSessionFacts(sessionId) {
+  if (!sessionId) return [];
+  const { data, error } = await supabase
+    .from("session_facts")
+    .select("fact_text, created_at")
+    .eq("session_id", sessionId)
+    .order("created_at", { ascending: true });
+  if (error) {
+    console.error("[supabase] getSessionFacts failed:", error);
+    return [];
+  }
+  return data || [];
+}
+
+export async function saveSessionFacts(sessionId, facts) {
+  if (!sessionId || !facts || facts.length === 0) return;
+  const rows = facts.map((fact_text) => ({ session_id: sessionId, fact_text }));
+  const { error } = await supabase.from("session_facts").insert(rows);
+  if (error) {
+    console.error("[supabase] saveSessionFacts failed:", error);
+  }
+}

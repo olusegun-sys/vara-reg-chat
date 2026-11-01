@@ -3,10 +3,11 @@ import JurisdictionSelector from "./components/JurisdictionSelector.jsx";
 import ChatWindow from "./components/ChatWindow.jsx";
 import ChatInput from "./components/ChatInput.jsx";
 import Sidebar from "./components/Sidebar.jsx";
-import { getJurisdictions, streamChat, generateChatTitle } from "./api/client.js";
+import { getJurisdictions, streamChat, generateChatTitle, extractFacts } from "./api/client.js";
 import { 
   getSessions, createSession, getMessages, addMessage, 
-  updateSessionTitle, deleteSession, togglePin 
+  updateSessionTitle, deleteSession, togglePin,
+  getSessionFacts, saveSessionFacts
 } from "./api/supabase.js";
 
 const SESSION_OPENING = 2;
@@ -21,7 +22,6 @@ export default function App() {
   const [loadError, setLoadError] = useState(null);
 
   const [sessions, setSessions] = useState([]);
-  
   const [currentSessionId, setCurrentSessionId] = useState(() => {
     try {
       return localStorage.getItem(SESSION_STORAGE_KEY) || null;
@@ -29,16 +29,10 @@ export default function App() {
       return null;
     }
   });
-  
   const [messages, setMessages] = useState([]);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
-  
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // NEW: Tracks whether the upcoming isSending→false transition is from a
-  // completed send (we already have correct state) or from a session switch
-  // (we need to fetch). Prevents an unnecessary DB reload that would remount
-  // the ChatWindow container and reset scroll to top.
   const justSentRef = useRef(false);
 
   useEffect(() => {
@@ -79,10 +73,6 @@ export default function App() {
       return;
     }
     if (isSending) return;
-
-    // NEW: Skip the reload when isSending just flipped false after a completed
-    // send. We already have the correct messages in state — no need to fetch,
-    // and fetching would remount the message list (resetting scroll to top).
     if (justSentRef.current) {
       justSentRef.current = false;
       return;
@@ -130,7 +120,6 @@ export default function App() {
     const session = sessions.find(s => s.id === id);
     if (!session) return;
     const newPinnedState = !session.is_pinned;
-    
     setSessions(prev => {
       const updated = prev.map(s => s.id === id ? { ...s, is_pinned: newPinnedState } : s);
       return updated.sort((a, b) => {
@@ -177,6 +166,19 @@ export default function App() {
       });
     }
 
+    // --- HYBRID MEMORY: fetch durable facts for this session ----------------
+    // Why: the recency window below (first 2 + last 8) keeps coherent follow-ups,
+    // but drops facts the user stated more than ~8 turns ago. Facts are the
+    // "what does this mean for MY firm" layer that persists across the whole
+    // conversation. Fetch them now, prepend them to the LLM context.
+    let sessionFacts = [];
+    try {
+      sessionFacts = await getSessionFacts(activeSessionId);
+    } catch (err) {
+      console.warn("[app] Could not fetch session facts:", err);
+    }
+
+    // --- STRATEGY A: RECENCY WINDOW ----------------------------------------
     let historyPayload = [];
     if (messages.length <= (SESSION_OPENING + RECENT_WINDOW)) {
       historyPayload = messages;
@@ -190,6 +192,18 @@ export default function App() {
       role: m.role,
       content: m.content
     }));
+
+    // Prepend a synthetic system-tagged message with the session facts.
+    // The backend's stream_answer already accepts `history` as a list of
+    // {role, content} dicts, so a "system" role here reaches the LLM with
+    // the right precedence — after the SYSTEM_PROMPT, before user history.
+    if (sessionFacts.length > 0) {
+      const factsText = sessionFacts.map(f => `- ${f.fact_text}`).join("\n");
+      chatHistory.unshift({
+        role: "system",
+        content: `[SESSION FACTS — durable details about the user's firm, extracted from earlier in this conversation. Use these to personalize answers, e.g. "since you're a Custody provider...". Do NOT repeat them back verbatim unless relevant.]\n${factsText}`
+      });
+    }
 
     try {
       let fullText = "";
@@ -224,6 +238,18 @@ export default function App() {
         return updated;
       });
 
+      // --- EXTRACT & SAVE FACTS from the user's message --------------------
+      // Fire-and-forget: this happens AFTER the answer completes, so it never
+      // delays the visible response. If extraction fails, only the next turn
+      // loses context — the current one is unaffected.
+      extractFacts(activeSessionId, question)
+        .then(newFacts => {
+          if (newFacts && newFacts.length > 0) {
+            saveSessionFacts(activeSessionId, newFacts);
+          }
+        })
+        .catch(err => console.warn("[app] Fact extraction failed:", err));
+
     } catch (err) {
       setMessages(prev => {
         const updated = [...prev];
@@ -231,9 +257,6 @@ export default function App() {
         return updated;
       });
     } finally {
-      // NEW: Mark that the upcoming isSending→false transition is from a
-      // completed send. The fetch effect will see this flag and skip the
-      // reload, keeping the message list mounted (no scroll reset).
       justSentRef.current = true;
       setIsSending(false);
     }

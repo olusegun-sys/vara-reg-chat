@@ -107,3 +107,36 @@ export async function streamChat(question, jurisdiction, history, onChunk, onSou
     }
   }
 }
+
+// Extract durable facts from a user message via the backend.
+// Returns [] on any failure — never blocks the chat flow.
+export async function extractFacts(sessionId, userMessage) {
+  try {
+    const response = await fetch(`${BASE_URL}/api/memory/facts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_id: sessionId, user_message: userMessage }),
+    });
+    if (!response.ok) return [];
+    const data = await response.json();
+    return data.facts || [];
+  } catch {
+    return [];
+  }
+}
+
+// Extract durable facts from a user message via the backend.
+export async function extractFacts(sessionId, userMessage) {
+  try {
+    const response = await fetch(`${BASE_URL}/api/memory/facts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_id: sessionId, user_message: userMessage }),
+    });
+    if (!response.ok) return [];
+    const data = await response.json();
+    return data.facts || [];
+  } catch {
+    return [];
+  }
+}

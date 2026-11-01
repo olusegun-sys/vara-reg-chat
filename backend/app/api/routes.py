@@ -1,6 +1,7 @@
 import uuid
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 
 from app.models.schemas import (
     ChatRequest,
@@ -11,11 +12,33 @@ from app.models.schemas import (
     TitleRequest,
     TitleResponse,
 )
-from app.services import retrieval, llm
+from app.services import retrieval, llm, memory
 from app import config
 
 router = APIRouter()
 
+
+# --- Session facts memory endpoint -----------------------------------------
+# Why: the frontend extracts durable facts after each send. This endpoint runs
+# the extraction LLM call and returns the extracted facts. The frontend then
+# persists them to Supabase using its own client (which already handles
+# browser-id isolation). Fails gracefully — never blocks chat flow.
+class SaveFactsRequest(BaseModel):
+    session_id: str
+    user_message: str
+
+
+@router.post("/memory/facts")
+def extract_and_return_facts(req: SaveFactsRequest):
+    try:
+        facts = memory.extract_facts(req.user_message)
+        return {"facts_saved": len(facts), "facts": facts}
+    except Exception as e:
+        # Never raise on fact extraction — it's a best-effort enrichment.
+        return {"facts_saved": 0, "facts": [], "error": str(e)}
+
+
+# --- Existing endpoints (unchanged) ----------------------------------------
 
 @router.get("/health", response_model=HealthResponse)
 def health():
