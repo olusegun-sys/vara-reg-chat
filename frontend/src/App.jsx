@@ -186,8 +186,6 @@ export default function App() {
     }
 
     // --- HYBRID MEMORY: fetch USER facts (not session facts) --------------
-    // Per-user, not per-session. A Custody provider is a Custody provider
-    // across every conversation. Clicking "New Session" does not lose facts.
     let userFacts = [];
     try {
       userFacts = await getUserFacts();
@@ -320,6 +318,7 @@ export default function App() {
                 value={selectedJurisdiction} 
                 onChange={setSelectedJurisdiction} 
                 disabled={isSending || jurisdictions.length === 0} 
+                isSending={isSending} // Pass isSending to show the spinner natively in the selector
               />
             </div>
           </div>
