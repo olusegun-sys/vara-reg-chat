@@ -13,7 +13,7 @@
     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   }
 
-  /* DeepSeek-style dark scrollbar */
+  /* DeepSeek-style dark scrollbar for the main chat area */
   .custom-scrollbar::-webkit-scrollbar {
     width: 8px;
   }
@@ -27,6 +27,25 @@
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #2a3346;  /* darkened from #475569 */
   }
+}
+
+/* 
+ * Dark-themed scrollbar for wide Markdown tables.
+ * Why: tables from the EU AI Act are wide and cause horizontal overflow. 
+ * Windows shows an ugly light-gray scrollbar by default that breaks the theme.
+ */
+.overflow-x-auto::-webkit-scrollbar {
+  height: 6px;
+}
+.overflow-x-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb {
+  background: #334155; /* slate-700 */
+  border-radius: 3px;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: #475569; /* slate-600 */
 }
 
 @keyframes pulse-dot {

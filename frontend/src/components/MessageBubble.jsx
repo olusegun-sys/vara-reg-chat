@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useState } from "react";
 
 function markdownToPlainText(md) {
@@ -42,7 +43,7 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
     <div className={`flex flex-col ${isUser ? "items-end" : "items-start"} w-full`}>
       <div
         className={`
-          max-w-[85%] sm:max-w-[85%] rounded-2xl px-5 py-4 shadow-sm text-[15px]
+          max-w-[95%] sm:max-w-[85%] rounded-2xl px-4 sm:px-5 py-3 sm:py-4 shadow-sm text-[15px]
           ${isUser
             ? "bg-brand-600 text-white rounded-br-sm"
             : "bg-[#12141B] text-slate-200 border border-slate-800/60 rounded-bl-sm shadow-premium"}
@@ -63,13 +64,29 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
             ) : (
               <div className="leading-relaxed overflow-hidden prose prose-invert max-w-none text-slate-200">
                 <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
                   components={{
                     p: ({ node, ...props }) => <p className="mb-3 last:mb-0" {...props} />,
                     ul: ({ node, ...props }) => <ul className="list-disc pl-5 mb-3 space-y-1" {...props} />,
                     ol: ({ node, ...props }) => <ol className="list-decimal pl-5 mb-3 space-y-1" {...props} />,
                     li: ({ node, ...props }) => <li className="text-slate-200" {...props} />,
                     strong: ({ node, ...props }) => <strong className="font-semibold text-white" {...props} />,
-                    a: ({ node, ...props }) => <a className="text-brand-400 hover:underline" {...props} />
+                    a: ({ node, ...props }) => <a className="text-brand-400 hover:underline" {...props} />,
+                    
+                    // Premium OpenAI/Claude table styling.
+                    // w-full and min-w-0 force the container to respect the bubble width
+                    // on mobile, preventing the layout from breaking out of the screen.
+                    table: ({ node, ...props }) => (
+                      <div className="w-full min-w-0 overflow-x-auto my-4 border border-slate-700/60 rounded-lg shadow-sm">
+                        <table className="w-full text-[13.5px] text-left border-collapse" {...props} />
+                      </div>
+                    ),
+                    thead: ({ node, ...props }) => <thead className="bg-slate-800/80 border-b border-slate-700/60" {...props} />,
+                    tbody: ({ node, ...props }) => <tbody className="divide-y divide-slate-700/40 bg-slate-900/20" {...props} />,
+                    tr: ({ node, ...props }) => <tr className="hover:bg-slate-800/40 transition-colors" {...props} />,
+                    // The first column gets a slightly distinct background for readability on wide tables
+                    th: ({ node, ...props }) => <th className="px-3 sm:px-4 py-2 sm:py-2.5 font-medium text-slate-200 whitespace-nowrap" {...props} />,
+                    td: ({ node, ...props }) => <td className="px-3 sm:px-4 py-2 sm:py-2.5 text-slate-300 align-top" {...props} />,
                   }}
                 >
                   {content}
@@ -89,12 +106,12 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
                     const baseClasses = "inline-flex items-center text-[11px] bg-slate-800/80 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700/50 transition-colors";
                     const innerContent = (
                       <>
-                        <svg className="w-3 h-3 mr-1.5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 mr-1.5 text-brand-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
-                        {docName}
+                        <span className="truncate max-w-[200px] sm:max-w-full">{docName}</span>
                         {url && (
-                          <svg className="w-3 h-3 ml-1.5 text-brand-400 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3 h-3 ml-1.5 text-brand-400 opacity-70 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                           </svg>
                         )}
@@ -102,7 +119,7 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
                     );
 
                     return url ? (
-                      <a key={i} href={url} target="_blank" rel="noopener noreferrer" className={`${baseClasses} hover:bg-slate-700/80 hover:border-brand-500/40 hover:text-white cursor-pointer`} title={`Open ${docName} on VARA's official site`}>
+                      <a key={i} href={url} target="_blank" rel="noopener noreferrer" className={`${baseClasses} hover:bg-slate-700/80 hover:border-brand-500/40 hover:text-white cursor-pointer`} title={`Open ${docName} on the official source site`}>
                         {innerContent}
                       </a>
                     ) : (

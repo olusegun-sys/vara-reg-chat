@@ -211,6 +211,41 @@ JURISDICTIONS = {
             },
         ],
     },
+    "EU": {
+        "regulator": "European Union",
+        "name": "European Union — Artificial Intelligence",
+        "documents": [
+            # ================================================================
+            # EU AI Act — the primary AI regulation for the EU.
+            # Source: EUR-Lex, Official Journal, 12 July 2024.
+            # NOTE: pypdf extraction of this PDF was verified clean on
+            # Article 6 — no garbled text, no broken numbering. The VARA
+            # footer cleaner is SKIPPED for this jurisdiction (see ingestion.py
+            # _is_vara_document guard) so article/paragraph numbers survive.
+            # ================================================================
+            {
+                "file": "EU_AI_Act_Regulation_2024_1689.pdf",
+                "title": "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act",
+                "effective_date": "2026-08-02",  # Main application date (most obligations start here)
+                "source_url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+                "document_type": "regulation",
+            },
+            # ================================================================
+            # Digital Omnibus on AI — amends the 2024 Act, notably delaying
+            # high-risk obligations from 2026-08-02 to 2027-12-02 for Annex III
+            # systems, and to 2028-08-02 for Annex I product-embedded systems.
+            # Stored as a separate document so the model can explain BOTH the
+            # original date and the amendment when asked "when does this apply?"
+            # ================================================================
+            {
+                "file": "EU_AI_Act_Omnibus_2026_1744.pdf",
+                "title": "Regulation (EU) 2026/1744 — Digital Omnibus on AI (amending the EU AI Act)",
+                "effective_date": "2026-07-27",  # Date it entered into force (does NOT change the 2024 Act's effective_date field)
+                "source_url": "https://eur-lex.europa.eu/eli/reg/2026/1744/oj",
+                "document_type": "amendment",  # New type — no downstream code filters on document_type, safe to add
+            },
+        ],
+    },
 }
 
 

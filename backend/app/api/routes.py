@@ -79,13 +79,13 @@ def chat(req: ChatRequest):
     if req.jurisdiction not in config.JURISDICTIONS:
         raise HTTPException(status_code=400, detail=f"Unknown jurisdiction: {req.jurisdiction}")
 
-    search_query = llm.rewrite_query(req.question)
+    search_query = llm.rewrite_query(req.question, req.jurisdiction)
     chunks = retrieval.retrieve_chunks(search_query, req.jurisdiction)
     if not chunks:
-        raise HTTPException(status_code=404, detail="No relevant content found in the document.")
+        raise HTTPException(status_code=404, detail="No relevant content found for the selected jurisdiction.")
 
     try:
-        answer = llm.generate_answer(req.question, chunks, req.history)
+        answer = llm.generate_answer(req.question, chunks, req.history, req.jurisdiction)
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"LLM provider error: {str(e)}")
 
@@ -111,11 +111,11 @@ def chat_stream(req: ChatRequest):
     if req.jurisdiction not in config.JURISDICTIONS:
         raise HTTPException(status_code=400, detail=f"Unknown jurisdiction: {req.jurisdiction}")
 
-    search_query = llm.rewrite_query(req.question)
+    search_query = llm.rewrite_query(req.question, req.jurisdiction)
     chunks = retrieval.retrieve_chunks(search_query, req.jurisdiction)
     
     return StreamingResponse(
-        llm.stream_answer(req.question, chunks, req.history),
+        llm.stream_answer(req.question, chunks, req.history, req.jurisdiction),
         media_type="text/event-stream"
     )
 
@@ -129,7 +129,7 @@ def title(req: TitleRequest):
 @router.get("/debug-search")
 def debug_search(q: str, jurisdiction: str = "AE-Dubai"):
     try:
-        search_query = llm.rewrite_query(q)
+        search_query = llm.rewrite_query(q, jurisdiction)
         chunks = retrieval.retrieve_chunks(search_query, jurisdiction)
         return {
             "original_query": q,

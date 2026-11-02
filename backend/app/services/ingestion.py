@@ -42,10 +42,23 @@ def _is_arabic_only(line: str) -> bool:
     return has_arabic and not has_latin
 
 
+def _is_vara_document(pdf_path: Path) -> bool:
+    """Return True if this PDF is a VARA document (identified by filename prefix).
+
+    Why filename-based: VARA PDFs are all named VARA_EN_*.pdf; every other
+    jurisdiction's files use different naming. This avoids threading a
+    jurisdiction string through every ingestion call, and it's correct because
+    the filename is the one thing that's guaranteed to be VARA-specific here.
+    """
+    return pdf_path.name.startswith("VARA_EN_")
+
+
 def clean_vara_pdf_text(text: str) -> str:
     """
     Strip VARA page footers and Arabic-only lines from extracted PDF text.
-    Called only on the PDF branch — the .txt branch of load_pdf_pages() is untouched.
+    Called only on VARA PDFs — non-VARA jurisdictions bypass this cleaner
+    (see the guard in load_pdf_pages) so their article/paragraph numbering
+    survives intact. The .txt branch of load_pdf_pages() is untouched.
     """
     kept_lines = []
     for raw_line in text.splitlines():
@@ -84,9 +97,14 @@ def load_pdf_pages(pdf_path: Path) -> List[Dict[str, Any]]:
     reader = PdfReader(str(pdf_path))
     for idx, page in enumerate(reader.pages, start=1):
         raw = page.extract_text() or ""
-        # Clean footers BEFORE checking emptiness — otherwise a page whose only
-        # text was the footer would slip through and become a useless chunk.
-        text = clean_vara_pdf_text(raw)
+        # Only VARA PDFs carry the bilingual footer garbage this cleaner removes.
+        # Why the guard: clean_vara_pdf_text() also strips standalone 1–3 digit
+        # lines — which would delete EU AI Act article/paragraph numbers and
+        # break citations. Non-VARA jurisdictions skip the cleaner entirely.
+        if _is_vara_document(pdf_path):
+            text = clean_vara_pdf_text(raw)
+        else:
+            text = raw
         # Drop pages whose remaining content is too short to be a real rule
         # (typically pypdf's mis-rendered table pages: "1 1 1 1 1 ...").
         if len(text) < 40:
