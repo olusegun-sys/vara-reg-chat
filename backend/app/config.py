@@ -35,6 +35,11 @@ LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "2048"))
 COHERE_API_KEY = os.getenv("COHERE_API_KEY", "").strip()
 EMBEDDING_MODEL = "embed-english-v3.0"
 
+# --- Web Search Fallback (Tavily) ---
+# Why Tavily: Built specifically for LLMs, returns clean snippets and URLs.
+# Free tier: 1,000 credits/month (1 credit per basic search).
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "").strip()
+
 # --- Vector Store (FAISS) ---
 FAISS_INDEX_PATH = os.getenv(
     "FAISS_INDEX_PATH",

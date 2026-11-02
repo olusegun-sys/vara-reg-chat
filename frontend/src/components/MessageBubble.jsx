@@ -84,7 +84,6 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
                     thead: ({ node, ...props }) => <thead className="bg-slate-800/80 border-b border-slate-700/60" {...props} />,
                     tbody: ({ node, ...props }) => <tbody className="divide-y divide-slate-700/40 bg-slate-900/20" {...props} />,
                     tr: ({ node, ...props }) => <tr className="hover:bg-slate-800/40 transition-colors" {...props} />,
-                    // The first column gets a slightly distinct background for readability on wide tables
                     th: ({ node, ...props }) => <th className="px-3 sm:px-4 py-2 sm:py-2.5 font-medium text-slate-200 whitespace-nowrap" {...props} />,
                     td: ({ node, ...props }) => <td className="px-3 sm:px-4 py-2 sm:py-2.5 text-slate-300 align-top" {...props} />,
                   }}
@@ -95,23 +94,26 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
             )}
 
             {sources && sources.length > 0 && (
-              <div className="mt-4 pt-3 border-t border-slate-700/60">
+              <div className="mt-4 pt-3 border-t border-slate-700/60 w-full">
                 <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
                   Documents Referenced
                 </p>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-col gap-1.5 w-full">
                   {[...new Set(sources.map(s => s.document))].map((docName, i) => {
                     const sourceEntry = sources.find(s => s.document === docName);
                     const url = sourceEntry?.source_url;
-                    const baseClasses = "inline-flex items-center text-[11px] bg-slate-800/80 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700/50 transition-colors";
+                    
+                    // New premium card-like styling for source chips
+                    const baseClasses = "group flex items-start w-full text-[12px] bg-slate-800/60 hover:bg-slate-700/80 text-slate-300 hover:text-white px-3 py-2 rounded-lg border border-slate-700/50 transition-all text-left";
+                    
                     const innerContent = (
                       <>
-                        <svg className="w-3 h-3 mr-1.5 text-brand-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3.5 h-3.5 mr-2 mt-[2px] text-brand-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
-                        <span className="truncate max-w-[200px] sm:max-w-full">{docName}</span>
+                        <span className="break-words whitespace-normal leading-tight flex-1 pr-2">{docName}</span>
                         {url && (
-                          <svg className="w-3 h-3 ml-1.5 text-brand-400 opacity-70 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3.5 h-3.5 text-slate-500 group-hover:text-brand-400 transition-colors shrink-0 mt-[1px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                           </svg>
                         )}
@@ -119,11 +121,11 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
                     );
 
                     return url ? (
-                      <a key={i} href={url} target="_blank" rel="noopener noreferrer" className={`${baseClasses} hover:bg-slate-700/80 hover:border-brand-500/40 hover:text-white cursor-pointer`} title={`Open ${docName} on the official source site`}>
+                      <a key={i} href={url} target="_blank" rel="noopener noreferrer" className={baseClasses} title={`Open ${docName} on the official source site`}>
                         {innerContent}
                       </a>
                     ) : (
-                      <span key={i} className={baseClasses}>{innerContent}</span>
+                      <div key={i} className={baseClasses}>{innerContent}</div>
                     );
                   })}
                 </div>

@@ -12,7 +12,7 @@ from app.models.schemas import (
     TitleRequest,
     TitleResponse,
 )
-from app.services import retrieval, llm, memory
+from app.services import retrieval, llm, memory, web_search
 from app import config
 
 router = APIRouter()
@@ -80,9 +80,22 @@ def chat(req: ChatRequest):
         raise HTTPException(status_code=400, detail=f"Unknown jurisdiction: {req.jurisdiction}")
 
     search_query = llm.rewrite_query(req.question, req.jurisdiction)
-    chunks = retrieval.retrieve_chunks(search_query, req.jurisdiction)
+    
+    # Check if the user explicitly asked about an out-of-scope jurisdiction
+    out_of_scope_keywords = ["fca", "sec", "mas", "finma", "cbn", "uk", "us", "singapore", "nigeria"]
+    is_out_of_scope = any(keyword in req.question.lower() for keyword in out_of_scope_keywords)
+    
+    if is_out_of_scope:
+        print(f"[fallback] Out-of-scope jurisdiction detected. Triggering web search.")
+        chunks = web_search.search_web(req.question)
+    else:
+        chunks = retrieval.retrieve_chunks(search_query, req.jurisdiction)
+        if not chunks:
+            print(f"[fallback] No internal docs found. Triggering web search.")
+            chunks = web_search.search_web(req.question)
+        
     if not chunks:
-        raise HTTPException(status_code=404, detail="No relevant content found for the selected jurisdiction.")
+        raise HTTPException(status_code=404, detail="No relevant content found in the documents or the web.")
 
     try:
         answer = llm.generate_answer(req.question, chunks, req.history, req.jurisdiction)
@@ -112,8 +125,20 @@ def chat_stream(req: ChatRequest):
         raise HTTPException(status_code=400, detail=f"Unknown jurisdiction: {req.jurisdiction}")
 
     search_query = llm.rewrite_query(req.question, req.jurisdiction)
-    chunks = retrieval.retrieve_chunks(search_query, req.jurisdiction)
     
+    # Check if the user explicitly asked about an out-of-scope jurisdiction
+    out_of_scope_keywords = ["fca", "sec", "mas", "finma", "cbn", "uk", "us", "singapore", "nigeria"]
+    is_out_of_scope = any(keyword in req.question.lower() for keyword in out_of_scope_keywords)
+    
+    if is_out_of_scope:
+        print(f"[fallback] Out-of-scope jurisdiction detected. Triggering web search.")
+        chunks = web_search.search_web(req.question)
+    else:
+        chunks = retrieval.retrieve_chunks(search_query, req.jurisdiction)
+        if not chunks:
+            print(f"[fallback] No internal docs found. Triggering web search.")
+            chunks = web_search.search_web(req.question)
+
     return StreamingResponse(
         llm.stream_answer(req.question, chunks, req.history, req.jurisdiction),
         media_type="text/event-stream"
@@ -130,7 +155,17 @@ def title(req: TitleRequest):
 def debug_search(q: str, jurisdiction: str = "AE-Dubai"):
     try:
         search_query = llm.rewrite_query(q, jurisdiction)
-        chunks = retrieval.retrieve_chunks(search_query, jurisdiction)
+        
+        out_of_scope_keywords = ["fca", "sec", "mas", "finma", "cbn", "uk", "us", "singapore", "nigeria"]
+        is_out_of_scope = any(keyword in q.lower() for keyword in out_of_scope_keywords)
+        
+        if is_out_of_scope:
+            chunks = web_search.search_web(q)
+        else:
+            chunks = retrieval.retrieve_chunks(search_query, jurisdiction)
+            if not chunks:
+                chunks = web_search.search_web(q)
+
         return {
             "original_query": q,
             "rewritten_query": search_query,
