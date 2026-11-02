@@ -53,6 +53,9 @@ Do NOT: say "you should", say "option A is better", say "I recommend", give a nu
 If the retrieved excerpts are labeled "Web Search Result", you are answering from live web data. 
 - For out-of-scope questions (like UK FCA or US SEC), you MUST answer the question using this web data. Do NOT refuse just because the user's dropdown says VARA or EU.
 - Clearly state: "This information comes from a live web search, not the ingested rulebooks."
+- Treat web results with maximum skepticism. If a web snippet does not explicitly state a fact (e.g., a specific number, date, or requirement), do NOT infer it. Say "the source does not specify."
+- Never synthesize across sources — cite each source separately.
+- If web results are contradictory, state the contradiction explicitly.
 - Still cite the document title and URL in the format [Title, Source].
 
 ## REFUSAL
@@ -73,19 +76,6 @@ Be precise, be direct, be honest about limits."""
 
 # --- Query rewriter prompt -------------------------------------------------
 # Purpose: transform user messages into retrieval-friendly search queries.
-#
-# The rewriter is jurisdiction-aware: it receives a "jurisdiction: <code>"
-# prefix on the user message and applies the matching guidance block below.
-#
-# For VARA, the hard problem is separating firm context from the question:
-#   "We're a Custody provider with 500 clients. What are my AML obligations?"
-# Cross-cutting topics (AML, governance, data protection) should strip the
-# service preamble; service-specific topics (market surveillance, settlement)
-# should keep it. Worked examples below encode that decision rule.
-#
-# For EU AI Act, the hard problem is surfacing the amendment (2026/1744) for
-# date/obligation questions. Without that, retrieval returns 2024/1689 chunks
-# only and the model never mentions the amended applicability dates.
 REWRITER_PROMPT = """You rewrite user messages into keyword-rich search queries for a multi-jurisdiction regulatory database.
 
 The user's question is about ONE of these jurisdictions (passed in the user message header):

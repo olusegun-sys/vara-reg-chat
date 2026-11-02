@@ -24,6 +24,9 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
   const isUser = role === "user";
   const [copied, setCopied] = useState(false);
 
+  // Detect if this message used live web data.
+  const isWebSearch = sources && sources.some(s => s.section === "Web Search Result");
+
   const handleCopy = () => {
     navigator.clipboard.writeText(markdownToPlainText(content));
     setCopied(true);
@@ -74,8 +77,6 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
                     a: ({ node, ...props }) => <a className="text-brand-400 hover:underline" {...props} />,
                     
                     // Premium OpenAI/Claude table styling.
-                    // w-full and min-w-0 force the container to respect the bubble width
-                    // on mobile, preventing the layout from breaking out of the screen.
                     table: ({ node, ...props }) => (
                       <div className="w-full min-w-0 overflow-x-auto my-4 border border-slate-700/60 rounded-lg shadow-sm">
                         <table className="w-full text-[13.5px] text-left border-collapse" {...props} />
@@ -93,6 +94,18 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
               </div>
             )}
 
+            {/* Warning Badge for Web Search Results */}
+            {!isUser && isWebSearch && (
+              <div className="mt-3 flex items-start gap-2 bg-amber-900/20 border border-amber-700/40 rounded-lg p-2.5">
+                <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <p className="text-[11px] text-amber-200/90 leading-tight">
+                  <strong className="font-semibold text-amber-200">Web Search Fallback:</strong> This answer includes live web results because it falls outside the ingested rulebooks. Verify independently.
+                </p>
+              </div>
+            )}
+
             {sources && sources.length > 0 && (
               <div className="mt-4 pt-3 border-t border-slate-700/60 w-full">
                 <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
@@ -103,7 +116,7 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
                     const sourceEntry = sources.find(s => s.document === docName);
                     const url = sourceEntry?.source_url;
                     
-                    // New premium card-like styling for source chips
+                    // Premium card-like styling for source chips
                     const baseClasses = "group flex items-start w-full text-[12px] bg-slate-800/60 hover:bg-slate-700/80 text-slate-300 hover:text-white px-3 py-2 rounded-lg border border-slate-700/50 transition-all text-left";
                     
                     const innerContent = (
