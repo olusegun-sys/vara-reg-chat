@@ -1,4 +1,5 @@
 import uuid
+import re
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -81,9 +82,13 @@ def chat(req: ChatRequest):
 
     search_query = llm.rewrite_query(req.question, req.jurisdiction)
     
-    # Check if the user explicitly asked about an out-of-scope jurisdiction
-    out_of_scope_keywords = ["fca", "sec", "mas", "finma", "cbn", "uk", "us", "singapore", "nigeria"]
-    is_out_of_scope = any(keyword in req.question.lower() for keyword in out_of_scope_keywords)
+    # Fix 1: If the LLM fails and returns an empty string, fall back to the raw question
+    if not search_query.strip():
+        search_query = req.question
+        
+    # Fix 2: Use regex word boundaries (\b) so "us" doesn't match inside "custody"
+    out_of_scope_pattern = r"\b(fca|sec|mas|finma|cbn|uk|us|singapore|nigeria)\b"
+    is_out_of_scope = re.search(out_of_scope_pattern, req.question, re.IGNORECASE) is not None
     
     if is_out_of_scope:
         print(f"[fallback] Out-of-scope jurisdiction detected. Triggering web search.")
@@ -126,9 +131,13 @@ def chat_stream(req: ChatRequest):
 
     search_query = llm.rewrite_query(req.question, req.jurisdiction)
     
-    # Check if the user explicitly asked about an out-of-scope jurisdiction
-    out_of_scope_keywords = ["fca", "sec", "mas", "finma", "cbn", "uk", "us", "singapore", "nigeria"]
-    is_out_of_scope = any(keyword in req.question.lower() for keyword in out_of_scope_keywords)
+    # Fix 1: If the LLM fails and returns an empty string, fall back to the raw question
+    if not search_query.strip():
+        search_query = req.question
+        
+    # Fix 2: Use regex word boundaries (\b) so "us" doesn't match inside "custody"
+    out_of_scope_pattern = r"\b(fca|sec|mas|finma|cbn|uk|us|singapore|nigeria)\b"
+    is_out_of_scope = re.search(out_of_scope_pattern, req.question, re.IGNORECASE) is not None
     
     if is_out_of_scope:
         print(f"[fallback] Out-of-scope jurisdiction detected. Triggering web search.")
@@ -156,8 +165,11 @@ def debug_search(q: str, jurisdiction: str = "AE-Dubai"):
     try:
         search_query = llm.rewrite_query(q, jurisdiction)
         
-        out_of_scope_keywords = ["fca", "sec", "mas", "finma", "cbn", "uk", "us", "singapore", "nigeria"]
-        is_out_of_scope = any(keyword in q.lower() for keyword in out_of_scope_keywords)
+        if not search_query.strip():
+            search_query = q
+            
+        out_of_scope_pattern = r"\b(fca|sec|mas|finma|cbn|uk|us|singapore|nigeria)\b"
+        is_out_of_scope = re.search(out_of_scope_pattern, q, re.IGNORECASE) is not None
         
         if is_out_of_scope:
             chunks = web_search.search_web(q)
