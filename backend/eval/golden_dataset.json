@@ -1,0 +1,72 @@
+[
+  {
+    "id": "vara_custody_aml",
+    "jurisdiction": "AE-Dubai",
+    "question": "What are my AML obligations as a Custody provider?",
+    "expected_document": "Compliance and Risk Management Rulebook",
+    "expected_keyword": "anti-money laundering,aml,aml/cft"
+  },
+  {
+    "id": "vara_exchange_market_surveillance",
+    "jurisdiction": "AE-Dubai",
+    "question": "What are the market surveillance rules for an Exchange?",
+    "expected_document": "Exchange Services Rulebook",
+    "expected_keyword": "market surveillance,surveillance"
+  },
+  {
+    "id": "vara_broker_dealer_best_execution",
+    "jurisdiction": "AE-Dubai",
+    "question": "What are the best execution rules for a Broker-Dealer?",
+    "expected_document": "Broker-Dealer Services Rulebook",
+    "expected_keyword": "best execution,best-execution,execution"
+  },
+  {
+    "id": "vara_cabinet_decision",
+    "jurisdiction": "AE-Dubai",
+    "question": "What does Cabinet Decision No. 111/2022 say about virtual asset service providers?",
+    "expected_document": "Cabinet Decision No. 111/2022",
+    "expected_keyword": "virtual asset,vasp,cabinet decision"
+  },
+  {
+    "id": "eu_high_risk_classification",
+    "jurisdiction": "EU",
+    "question": "What are the classification rules for high-risk AI systems?",
+    "expected_document": "Regulation (EU) 2024/1689",
+    "expected_keyword": "high-risk,article 6,classification"
+  },
+  {
+    "id": "eu_omnibus_amendment_date",
+    "jurisdiction": "EU",
+    "question": "When do high-risk AI obligations apply?",
+    "expected_document": "Regulation (EU) 2026/1744",
+    "expected_keyword": "2027,2026,december"
+  },
+  {
+    "id": "eu_article_50_transparency",
+    "jurisdiction": "EU",
+    "question": "What are the transparency obligations for AI systems that interact with humans?",
+    "expected_document": "Regulation (EU) 2024/1689",
+    "expected_keyword": "transparen,article 50"
+  },
+  {
+    "id": "eu_gpai_obligations",
+    "jurisdiction": "EU",
+    "question": "What are the obligations for general-purpose AI model providers?",
+    "expected_document": "Regulation (EU) 2024/1689",
+    "expected_keyword": "general-purpose,gpai,general purpose"
+  },
+  {
+    "id": "web_uk_fca_staking",
+    "jurisdiction": "AE-Dubai",
+    "question": "What is the UK FCA's latest guidance on crypto staking?",
+    "expected_document": "Web Search Result",
+    "expected_keyword": "fca,staking"
+  },
+  {
+    "id": "web_us_sec_crypto",
+    "jurisdiction": "EU",
+    "question": "What is the SEC's position on crypto tokens as securities?",
+    "expected_document": "Web Search Result",
+    "expected_keyword": "sec,securities and exchange"
+  }
+]

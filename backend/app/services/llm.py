@@ -1,4 +1,5 @@
 import json
+import re
 import time
 from typing import List, Dict, Any
 from openai import OpenAI
@@ -132,6 +133,75 @@ Output: transparency obligations Article 50 AI systems interacting with natural 
 """
 
 
+# --- Cross-cutting topic service-stripping --------------------------------
+# Why: The rewriter LLM reliably fails to strip "Custody provider" context
+# when the topic is cross-cutting (AML, governance, etc.). The prompt asks it
+# to, but gpt-oss-20b doesn't always obey. A deterministic post-processor is
+# more reliable than prompt engineering for this narrow case.
+#
+# Topics that live in cross-cutting rulebooks (Compliance, Company, Technology,
+# Market Conduct) regardless of service line.
+_CROSS_CUTTING_TOPICS = [
+    "aml", "anti-money laundering", "kyc", "cdd", "edd",
+    "sanctions", "governance", "board", "capital",
+    "data protection", "cybersecurity", "complaints", "marketing",
+    "record-keeping", "record keeping", "notifications",
+]
+
+# Service-type words that should be stripped when the topic is cross-cutting.
+_SERVICE_TYPES = [
+    "custody", "exchange", "broker-dealer", "broker dealer",
+    "lending", "borrowing", "advisory", "management",
+    "transfer", "settlement", "issuance",
+]
+
+
+def _postprocess_rewrite(rewritten: str, original_question: str) -> str:
+    """
+    Deterministic cleanup of the rewriter output. Two jobs:
+    1. If the topic is cross-cutting, strip service-type words. This makes
+       "AML for Custody providers" search the Compliance Rulebook, not the
+       Custody Rulebook.
+    2. If the output was truncated (ends with '-' or ',' or ' and'), fall back
+       to a sanitized version of the original question.
+    """
+    text = rewritten.strip()
+    
+    # Detect truncation: rewriter sometimes gets cut off by rate limits.
+    if not text or text.endswith(("-", ",", " and", " or", " the", " a")):
+        # Fall back to the raw question, stripped of common preamble phrases.
+        fallback = original_question
+        for preamble in ["we're a ", "we are a ", "i'm a ", "i am a ",
+                         "our firm is a ", "my firm is a ",
+                         "we're an ", "we are an ", "i'm an ", "i am an "]:
+            if fallback.lower().startswith(preamble):
+                # Keep the sentence after the first comma or period
+                parts = re.split(r"[,.]", fallback, maxsplit=1)
+                if len(parts) > 1:
+                    fallback = parts[1].strip()
+                break
+        print(f"[rewrite] Truncated output detected, falling back to: '{fallback}'")
+        text = fallback
+    
+    # Check if topic is cross-cutting.
+    lower_text = text.lower()
+    is_cross_cutting = any(topic in lower_text for topic in _CROSS_CUTTING_TOPICS)
+    
+    if is_cross_cutting:
+        # Strip service-type words from the rewritten query.
+        stripped = text
+        for svc in _SERVICE_TYPES:
+            # Case-insensitive word-boundary replacement
+            stripped = re.sub(rf"\b{re.escape(svc)}\b", "", stripped, flags=re.IGNORECASE)
+        # Collapse multiple spaces.
+        stripped = re.sub(r"\s+", " ", stripped).strip()
+        if stripped and stripped != text:
+            print(f"[rewrite] Cross-cutting topic detected, stripped service context: '{stripped}'")
+            text = stripped
+    
+    return text
+
+
 def _build_context(chunks: List[Dict[str, Any]]) -> str:
     parts = []
     for c in chunks:
@@ -179,7 +249,13 @@ def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
         )
         rewritten = (response.choices[0].message.content or "").strip()
         print(f"[query_rewrite] ({jurisdiction}) '{question}' -> '{rewritten}'")
-        return rewritten or question
+        
+        # Apply deterministic post-processing: strips service context for
+        # cross-cutting topics, and recovers from truncated rewriter output.
+        processed = _postprocess_rewrite(rewritten, question)
+        if processed != rewritten:
+            print(f"[query_rewrite] Post-processed -> '{processed}'")
+        return processed or question
     except Exception as e:
         print(f"[query_rewrite] Failed: {e}")
         return question

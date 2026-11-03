@@ -1,41 +1,47 @@
-﻿**Summary:** Here is the fully updated `STATE.md`. It captures the critical new feature we just built: **Conversational Memory**. The AI can now remember the last 4 messages of a chat, allowing it to handle follow-up questions naturally without breaking the 487-chunk database we built.
+﻿**Plain-English summary:** Here is the fully updated `STATE.md`, incorporating the RAG Evaluation Harness (Phase 1 RSI), the deterministic rewriter post-processor, the non-streaming API `source_url` fix, and the Unicode normalization fix. This file now serves as a complete historical snapshot and resume guide.
 
-Save this over your existing `vara-reg-chat\STATE.md`.
+---
 
 ```markdown
-# STATE.md — Regulatory Knowledge Base Chat (POC)
+# STATE.md — Multi-Jurisdiction Regulatory Knowledge Base (POC)
 
-**Last updated:** 2026-10-29 (Conversational Memory Implemented, 487 Chunks, Pre-Demo Ready)
+**Last updated:** 2026-11-03 (RAG Eval Harness + Deterministic Query Rewriter)
 **Owner:** Olusegun Fadeyi (Olu)
 **Stakeholder:** Terence Bumah ("Boss Terry")
-**Client deadline:** Two-week window; POC due to Terence for client testing (TODAY)
-**Status:** ✅ **STABLE, SMART, & DEPLOYED.** Backend live on Render (Cohere embeddings, 487 chunks). Frontend live on Render (Midnight Blue theme). The AI now has **conversational memory**, meaning it can answer follow-up questions contextually. Ready for Terry demo.
+**Status:** ✅ **STABLE, SMART, AUDITABLE, FAST, POLISHED, HYBRID-SEARCH, SELF-EVALUATING.**
+Backend live on Render (Cohere embeddings, **2,678 chunks across 19 documents**). Frontend live on Render (DeepSeek-style near-black theme). The AI features **advisory-style synthesis**, **jurisdiction-aware query routing**, **strict citations**, **clickable source links**, **Markdown table rendering**, a **live web search fallback (Tavily)**, and an **automated RAG Evaluation Harness**.
+
+**⏸️ BLOCKED ON DECISION:** 9 CBUAE documents are staged in `backend/data/cbuae/`, but **ingestion is deliberately paused** pending Terry's confirmation on multi-jurisdiction scope.
 
 ---
 
 ## 1. What We're Building
 
-A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulatory rulebooks. A user types a question in a chat window; the system retrieves the most relevant chunks from a regulatory PDF, passes them to an LLM with strict citation rules, and returns a grounded answer with page references. 
+A **Retrieval-Augmented Generation (RAG) chat interface** for querying global regulatory rulebooks. A user selects a jurisdiction, types a question, and the system retrieves the most relevant chunks. It passes them to an LLM with strict citation rules and returns a grounded answer. **If the answer isn't in the internal docs (or the user asks about a jurisdiction not yet ingested), it automatically falls back to a live Tavily web search**, synthesizing an answer with clickable web references.
 
-**Why it exists:** Banks and VASPs struggle to navigate sprawling regulatory rulebooks. An uncited answer is worthless in compliance. This tool answers *only* from the document, cites every claim, and refuses when the answer isn't in the source.
+**Why it exists:** Banks, fintechs, and VASPs struggle to navigate sprawling regulations (e.g., Dubai VARA, EU AI Act, UK FCA). An uncited answer is worthless in compliance. This tool answers *only* from the documents or live web data, cites every claim, and refuses when the answer isn't found.
 
-**Current Corpus (4 VARA Rulebooks, 19 May 2025):**
-1. Compliance and Risk Management Rulebook
-2. Company Rulebook
-3. Technology and Information Rulebook
-4. Market Conduct Rulebook
+**Current Corpus — 19 documents, 2,678 chunks:**
 
-**Design goal:** Multi-jurisdiction from day one. Adding CBN (Nigeria), FCA (UK), or SEC (US) later must require zero backend code changes.
+*AE-Dubai (VARA) — 17 documents, 1,388 chunks:*
+- 4 Compulsory Rulebooks (Compliance, Company, Technology, Market Conduct)
+- 9 VA Activity Rulebooks (Exchange, Lending, Advisory, Broker-Dealer, Custody, Management, Transfer, etc.)
+- 2 Guidance Documents (Marketing, Issuance)
+- 4 Framework Documents (Law No. 4/2022, Cabinet Decisions 111 & 112/2022, 2023 Master Regulations)
+
+*EU (European Union) — 2 documents, 1,290 chunks:*
+- Regulation (EU) 2024/1689 — EU Artificial Intelligence Act (1,030 chunks)
+- Regulation (EU) 2026/1744 — Digital Omnibus on AI (260 chunks)
 
 ---
 
 ## 2. Project Vision (per Terence)
 
-- **Immediate:** Working POC that answers questions about all VARA rulebooks, deployed to Render, shared with client today.
-- **Short-term:** Multi-jurisdiction knowledge base. 
-- **Long-term:** Product for banks, fintechs, and VASPs — organization-wide regulatory knowledge base.
+- **Immediate:** Working POC that answers questions accurately with zero hallucinations, backed by an objective evaluation score.
+- **Short-term:** Multi-jurisdiction knowledge base. Terry explicitly requested adding the EU AI Act using a global tracker (VerifyWise) as a product vision guideline.
+- **Long-term:** Enterprise product with **Bounded Recursive Self-Improvement (RSI)** — the system automatically optimizes its own prompts and retrieval parameters against a Golden Dataset.
 
-**Current priority:** VARA POC. **All other tasks (Plaza, Marachi, Scholar) deprioritized per Terence's explicit instruction.**
+**Current priority:** VARA + EU POC with web fallback. All other tasks (Plaza, Marachi, Scholar) deprioritized.
 
 ---
 
@@ -47,201 +53,202 @@ A **Retrieval-Augmented Generation (RAG) chat interface** for querying regulator
 | **Framework** | FastAPI 0.115.0 + Uvicorn | Async, supports `StreamingResponse` | ✅ Live |
 | **LLM** | Groq (`openai/gpt-oss-120b`) | Free tier, OpenAI-compatible | ✅ Working |
 | **LLM Client** | `openai>=1.55.3` | Supports `stream=True` | ✅ Working |
-| **Embeddings** | **Cohere (`embed-english-v3.0`)** | Solves Gemini 1000 req/day limit, very fast | ✅ Working |
-| **Vector Store** | **FAISS (`faiss-cpu>=1.13.0`)** | Pre-built wheels for Python 3.14 | ✅ 487 vectors |
-| **PDF/TXT Parsing**| `pypdf==5.1.0` + native `open()` | PDF and plain-text extraction | ✅ 200+ pages |
-| **Chunking** | RecursiveCharacterTextSplitter (800/150) | Preserves semantic boundaries | ✅ 487 chunks |
+| **Embeddings** | **Cohere (`embed-english-v3.0`)** | Solves rate limits, very fast | ✅ Working |
+| **Vector Store** | **FAISS (`faiss-cpu>=1.13.0`)** | Pre-built wheels, in-memory cached | ✅ **2,678 vectors** |
+| **PDF/TXT Parsing**| `pypdf==5.1.0` + native `open()` | PDF and plain-text extraction | ✅ 19 docs |
+| **Chunking** | RecursiveCharacterTextSplitter (800/150) | Preserves semantic boundaries | ✅ **2,678 chunks** |
+| **Web Search** | **Tavily (`tavily-python>=0.5.0`)** | LLM-optimized web search, 1k free/mo | ✅ Working |
+| **Eval Client** | `requests>=2.32.0` | Hits `/api/chat` to run RAG evaluation | ✅ Working |
 
 ### Frontend (Live on Render)
 | Layer | Choice | Why | Status |
 |---|---|---|---|
 | **Framework** | React 18.3.1 | Stable, proven | ✅ Live |
-| **Build tool** | Vite 5.4.11 | Fast HMR, minimal config | ✅ Live |
-| **Styling** | Tailwind CSS 3.4.17 | Custom "Midnight Blue" theme | ✅ Live |
-| **Markdown** | `react-markdown` | Parses LLM output (**bold**, lists) | ✅ Working |
-| **State/Storage** | **Supabase** (`@supabase/supabase-js`) | Permanent database + browser ID isolation | ✅ Integrated |
-| **Streaming** | Native `fetch` + `ReadableStream` | Parses SSE chunks in real-time | ✅ Working |
-| **Fonts** | Inter (UI) + Lora (Headers) | DeepSeek-style readability + luxury | ✅ Working |
+| **Build tool** | Vite 5.4.11 | Fast HMR | ✅ Live |
+| **Styling** | Tailwind CSS 3.4.17 | Custom near-black DeepSeek-style theme | ✅ Live |
+| **Markdown** | `react-markdown` + `remark-gfm` | Parses LLM output, supports tables | ✅ Working |
+| **State/Storage** | **Supabase** | Permanent database + browser ID isolation | ✅ Integrated |
+| **Streaming** | Native `fetch` + `ReadableStream` | Parses SSE with buffer | ✅ Working |
+| **Fonts** | Inter (UI) + Lora (Headers) | DeepSeek-style readability | ✅ Working |
 
 ---
 
 ## 4. Architecture & Design Decisions (Validated)
 
-1. **Streaming (SSE) Architecture:** The `/api/chat/stream` endpoint yields Server-Sent Events. The frontend reads the stream and updates the text word-by-word.
-2. **Cloud Embeddings (Cohere):** Replaced Gemini to bypass hard rate limits.
-3. **Database Storage & Privacy (Supabase):** Chat history is saved via Supabase. A unique `vara_browser_id` is generated in `localStorage` for every new browser. When Terry opens the link, he gets a fresh, private session.
-4. **Conversational Memory:** The frontend sends the last 4 messages to the backend, which injects them into the LLM prompt. This allows the AI to answer follow-up questions naturally (e.g., "What are the duties of the CO?" -> "Who does he report to?").
-5. **Query Rewriter:** Before retrieving chunks, a fast LLM call (`llama-3.1-8b-instant`) rewrites vague user questions into regulatory keywords.
-6. **Blank Slate Home:** The app starts with a clean, welcoming home screen ("What would you like to know?") instead of auto-loading the last chat.
-7. **Premium UI/UX:** Total dark mode. Sidebar is deep navy. Chat input is a glowing, rounded pill.
-8. **Mobile Responsiveness:** Added a hamburger menu to toggle the sidebar on mobile devices.
-9. **Clean Source Citations:** The UI groups sources by Document Name instead of spamming `p.1`.
-10. **Action Buttons:** Messages have copy, edit (for users), and thumbs up/down/share (for AI).
+1. **Streaming (SSE) Architecture:** `/api/chat/stream` yields Server-Sent Events. SSE parser uses proper `\n\n` buffering to prevent JSON truncation errors.
+2. **Cloud Embeddings (Cohere):** Replaced local PyTorch embeddings to avoid Render 512MB OOM crashes.
+3. **Database Storage & Privacy (Supabase):** Unique `vara_browser_id` in `localStorage` isolates sessions per browser.
+4. **Conversational Memory:** Frontend sends history (smart-window: first 2 + last 8 messages) to backend.
+5. **Jurisdiction-Aware Query Rewriter:** Fast LLM call rewrites vague questions. **CRITICAL UPGRADE:** A deterministic Python post-processor (`_postprocess_rewrite`) now sanitizes the LLM's output. It detects truncated responses and strips service-type words (e.g., "custody") when the topic is cross-cutting (e.g., "AML"). This prevents the LLM from retrieving the wrong rulebook.
+6. **Multi-Jurisdiction System Prompt:** The LLM is explicitly told which jurisdiction it is answering for, to prevent cross-contamination. It is permitted to answer out-of-scope questions if the retrieved chunks are labeled "Web Search Result".
+7. **Tavily Web Search Fallback:** If the user asks about an out-of-scope jurisdiction (detected via regex `\b(fca|sec|...)\b`), or if FAISS returns zero chunks, the backend queries Tavily. Tavily chunks are formatted identically to FAISS chunks.
+8. **RAG Evaluation Harness (Phase 1 RSI):** `eval/run_eval.py` runs a "Golden Dataset" of 10 hardcoded questions against `/api/chat`. It validates Retrieval (did it get the right doc?) and Groundedness (did the answer contain the right keywords?). It includes Unicode normalization to handle smart hyphens (`U+2011`) emitted by LLMs.
+9. **Premium UI/UX:** Total dark mode, DeepSeek-style near-black palette. Tables render natively. **Source chips are full-width stacked cards** that wrap long web titles cleanly.
+10. **Custom UI Popover:** Replaced native browser `<select>` for jurisdictions with a custom React popover (checkmarks, hover states, two-line detail) that matches the premium desktop feel on mobile.
+11. **VARA Footer Sanitization:** `clean_vara_pdf_text()` strips bilingual footers. **CRITICAL:** The ingestion pipeline guards this (`_is_vara_document()`) so it does NOT strip article numbers from the EU AI Act.
+12. **FAISS In-Memory Cache:** `retrieval.py` caches `_INDEX` and `_METADATA` at module level, saving ~530ms per query.
+13. **Scroll-Jump Root-Cause Fix:** `App.jsx` uses `justSentRef` to prevent DB reloads. `ChatWindow.jsx` uses `scrollTo` on the container.
 
 ---
 
-## 5. File Inventory (Current State)
+## 5. Roadblocks & Resolutions (Complete History)
 
-### Backend (All working, hardened, streaming, deployed)
-- `backend\app\api\routes.py` ✅ — `/chat/stream`, `/health`, `/jurisdictions`, `/title`, `/warmup`, `/debug-search` (accepts memory history)
-- `backend\app\models\schemas.py` ✅ — `ChatRequest` now includes `history: List[Dict[str, str]]`
-- `backend\app\services\llm.py` ✅ — `stream_answer()` and `generate_answer()` inject history into the prompt. Includes `rewrite_query()`.
-- `backend\app\services\retrieval.py` ✅ — Cohere embeddings, FAISS search
-- `backend\app\services\ingestion.py` ✅ — Cohere embeddings, TXT/PDF support, `reset_vector_store()`
-- `backend\scripts\ingest.py` ✅ — `r"""` fixed, `--reset` wired
-- `backend\app\config.py` ✅ — `.strip()` applied to all API keys to prevent trailing newline errors
-
-### Frontend (All 15 files complete, streaming enabled, Supabase integrated, Premium UI)
-**Config & Entry:**
-- `package.json`, `vite.config.js`, `tailwind.config.js`, `postcss.config.js`
-- `index.html`, `src/main.jsx`, `src/index.css`
-
-**API:**
-- `src/api/client.js` — `streamChat()` now accepts a `history` array.
-- `src/api/supabase.js` — Generates unique `vara_browser_id` in `localStorage` for privacy. Full CRUD for sessions/messages.
-
-**Components:**
-- `src/components/Sidebar.jsx` — Mobile slide-out (hamburger menu), Pin/Rename/Delete actions, no "Powered by AI" footer.
-- `src/components/MessageBubble.jsx` — ReactMarkdown, clean unique document citations, action tooltips.
-- `src/components/ChatInput.jsx` — Glowing rounded pill, auto-growing textarea, removed bottom disclaimer text.
-- `src/components/ChatWindow.jsx` — Blank slate home state ("What would you like to know?"), dark background.
-- `src/components/JurisdictionSelector.jsx` — Compact, rounded dropdown for AE-Dubai.
-- `src/App.jsx` — Slices the last 4 messages and sends them as history.
-
----
-
-## 6. Roadblocks & Resolutions (Complete History)
-
-1. **`notepad++` not recognized** → `start notepad++ "file"`. ✅
-2. **`pip install` failed on Python 3.14** → Chroma's `chroma-hnswlib` link error. **Resolution:** swapped Chroma → FAISS, bumped pydantic ≥2.13.0. ✅
-3. **`/api/chat` 502 `proxies` error** → `openai==1.54.0` vs `httpx>=0.28`. Bumped to `openai>=1.55.3`. ✅
-4. **Markdown rendering issue** → Installed `react-markdown`. ✅
-5. **Slow Response Time (Blocking)** → Implemented Server-Sent Events (SSE). ✅
-6. **Input "Red Circle" Bug** → Ensured `preventDefault()` on the `Enter` keydown handler. ✅
-7. **Clearing Cache Deletes Chats** → Migrated to Supabase PostgreSQL. ✅
-8. **GitHub Push Protection Error** → Real API keys were accidentally committed. **Resolution:** Reset git history, replaced keys with placeholders. ✅
-9. **Render Deployment Port Scan Timeout** → Wrapped the command in `sh -c "uvicorn ... --port $PORT"`. ✅
-10. **Render Deployment Out of Memory (512MB)** → `sentence-transformers` loaded PyTorch at startup. **Resolution:** Migrated to cloud embeddings. ✅
-11. **Gemini Embedding Rate Limits (429)** → Migrated to Cohere. ✅
-12. **Cohere API Key Header Error** → Trailing newline in Render env var caused `Illegal header value`. **Resolution:** Added `.strip()` to `config.py` and fixed Render dashboard. ✅
-13. **Corrupted Text Encoding** → Notepad++ saved `.txt` files in ANSI/UTF-16. **Resolution:** Used a Python script (`fix_text.py`) to generate clean UTF-8 text files for all 4 rulebooks. ✅
-14. **Shared Chat History** → `guest-user-001` hardcoded, exposing your chats to anyone with the link. **Resolution:** Implemented unique `vara_browser_id` in `localStorage` for every new browser. ✅
+1. **Render OOM (512MB)** → Migrated to Cohere Cloud Embeddings.
+2. **Gemini Embedding Rate Limits (429)** → Cohere.
+3. **VARA PDF Footer Contamination** → `clean_vara_pdf_text()`.
+4. **First Ingest Duplicate Danger** → Skip-check logic in `ingest.py`.
+5. **SSE Parse Error ("Unterminated string")** → `client.js` buffers chunks until `\n\n`.
+6. **Slow Response (~2.5–4.5s TTFT)** → Module-level cache for FAISS, TOP_K hardcoded to 5.
+7. **Session Lost on Refresh** → `currentSessionId` persisted in `localStorage`.
+8. **Page Auto-Scrolls to Top During Streaming** → Fixed via `justSentRef` and `key={i}` on messages.
+9. **Markdown Numbers & Bold Text Appear Blue** → Overrode global Tailwind `prose` styles.
+10. **EU AI Act "Corpus covers VARA only" Refusal** → `SYSTEM_PROMPT` rewritten to be jurisdiction-neutral.
+11. **EU AI Act Article Numbers Stripped** → Added `_is_vara_document()` guard in `ingestion.py`.
+12. **Markdown Tables Rendered as Raw Pipes** → Installed `remark-gfm` and custom table overrides.
+13. **Table Clipping on Mobile** → Added `w-full min-w-0` to the table wrapper.
+14. **Ugly Native Mobile Dropdown** → Replaced `<select>` with custom React popover.
+15. **Web Fallback Refusing Out-of-Scope Questions** → Added an exception in `SYSTEM_PROMPT` for "Web Search Result" chunks.
+16. **Empty Query Rewriter Crash** → Fell back to `req.question` if the rewritten query is empty.
+17. **"US" Substring Match Bug** → "Custody" triggered "us". Fixed by using regex `\b` (word boundaries).
+18. **Source Chips Bleeding out of Bubble** → Switched to `flex-col` stacked cards with `break-words`.
+19. **Groq Rate Limits in Eval** → The eval script fired questions too fast, hitting Groq's 8K TPM limit. Fixed by adding a 25-second sleep between tests and graceful fallback.
+20. **Missing `source_url` in Non-Streaming API** → `/api/chat` stripped web URLs from the response, breaking the eval's web-detection logic. Fixed by adding `source_url: str = ""` to `SourceReference` in `schemas.py` and passing it in `routes.py`.
+21. **Unicode Hyphen Eval Bug** → LLM output `general‑purpose` with a non-breaking hyphen (`\u2011`). Python string matching failed. Fixed by adding a Unicode normalizer in `run_eval.py`.
+22. **Rewriter Truncation on 429** → Rewriter returned partial strings, causing garbage retrieval. Fixed by adding `_postprocess_rewrite` in `llm.py` to detect truncation and fall back to a sanitized version of the original question.
+23. **Cross-Cutting Service Stripping Failure** → LLM ignored prompt instructions to strip "Custody provider" for AML questions. Fixed by adding deterministic regex stripping in `_postprocess_rewrite`.
 
 ### ⚠️ Security — RESOLVED
-Groq and Cohere API keys were rotated. `.strip()` applied to config to prevent whitespace bugs. Browser history is now isolated per device.
+API keys rotated. `.strip()` applied. Browser history isolated per device. Clipboard sanitization prevents markdown leakage. External links use `rel="noopener noreferrer"`.
 
 ---
 
-## 7. Breakthroughs
+## 6. Breakthroughs
 
-- **Full Stack Deployment:** Both frontend and backend are live on Render.
-- **Chat Privacy:** Every browser gets a unique anonymous ID, ensuring Terry sees a clean slate.
-- **Conversational Memory:** The AI can now handle follow-up questions contextually.
-- **Cloud Embeddings (Cohere):** Solved the rate limit bottleneck permanently.
-- **ChatGPT-like Speed:** Implementing SSE streaming means users see the response start typing immediately.
-- **Persistent Storage:** Supabase integration means chat history is permanently saved.
-- **Premium UI/UX:** Unified Midnight Blue dark theme, mobile hamburger menu, and clean source pills.
-- **Expanded Corpus:** Ingested all 4 core VARA rulebooks. The database now has 487 clean chunks.
-- **Robust Queries:** Added the Query Rewriter to fix vague questions before searching the database.
-- **Blank Slate Startup:** App opens to a clean, welcoming home screen rather than auto-loading an old chat.
+- **Full Stack Deployment:** Both frontend and backend live on Render.
+- **Multi-Jurisdiction Architecture:** Successfully ingested and queried the EU AI Act alongside VARA.
+- **Hybrid Search (Internal + Web):** Routes out-of-scope questions to Tavily and synthesizes live web data with clickable sources.
+- **Automated RAG Evaluation (Phase 1 RSI):** Transitioned from "vibes-based testing" to an objective 10-question Golden Dataset with a measurable baseline score (8/10). This is the foundation for Phase 2 automated prompt optimization.
+- **Deterministic Rewriter Guardrails:** Post-processes LLM output to catch truncation and cross-cutting service preambles, making retrieval significantly more robust.
+- **Amendment Awareness:** LLM correctly identifies that the 2026 Omnibus delays high-risk obligations to 2027.
+- **Premium Table & Card Rendering:** Dark-mode Markdown tables and source cards render beautifully on mobile.
+- **Custom Popover UI:** Native mobile dropdowns eliminated in favor of a sleek, app-like selector.
+- **Strict Citations:** Every claim is backed by a document name and page number, or a live web URL.
+- **Session Persistence & Memory:** Refresh-safe, context-aware conversations.
 
 ---
 
-## 8. API Contract (Live on Render)
+## 7. API Contract (Live on Render)
 
-### `POST /api/chat/stream`
-**Request:** `{"question":"...","jurisdiction":"AE-Dubai","history":[{"role":"user","content":"..."},{"role":"assistant","content":"..."}]}`
-**Response (SSE stream):** 
-- First chunk: `{"type": "sources", "sources": [...]}`
+### `POST /api/chat` (Non-Streaming, used by Eval)
+**Request:** `{"question":"...","jurisdiction":"EU","history":[]}`
+**Response:** 
+```json
+{
+  "answer": "...",
+  "sources": [{"page": 53, "section": "...", "document": "...", "source_url": "..."}],
+  "session_id": "...",
+  "model_used": "..."
+}
+```
+
+### `POST /api/chat/stream` (Streaming, used by Frontend)
+**Response (SSE):**
+- First chunk: `{"type": "sources", "sources": [{"page": 53, "section": "...", "document": "...", "source_url": "..."}]}`
 - Subsequent chunks: `{"type": "text", "text": "word "}`
 
-### `POST /api/title`
-**Request:** `{"question":"What are the duties of the Compliance Officer?"}`
-**Response:** `{"title": "Compliance Officer Duties"}`
-
-### `GET /api/health`
-**Response:** `{"status":"ok","vector_store_loaded":true,"chunk_count":487,...}`
-
-### `GET /api/warmup`
-**Response:** `{"status":"warm","message":"Embedding model loaded successfully"}`
+### `GET /api/jurisdictions`
+**Response:** Returns the list of supported jurisdictions (`AE-Dubai`, `EU`) for the frontend dropdown.
 
 ---
 
-## 9. How to Resume in a New Chat
+## 8. How to Resume in a New Chat
 
 **Step 1:** Paste the Universal Master Prompt.
 **Step 2:** Paste this `STATE.md`.
 **Step 3:** Say one of:
-- **"Pitch to Terence"** — The app is fully complete. Let's finalize the business pitch and demo script for today.
-- **"Add Nigeria (CBN)"** — to test the multi-jurisdiction feature by dropping a new PDF into `backend/data`.
-- **"Fix page numbers"** — to add a `page` metadata property to the `.txt` ingestion so sources say `p.8` instead of `p.1`.
+- **"CBUAE decision came back — proceed / don't proceed"** — If Terry approves, add 9 CBUAE docs to `config.py`, run `ingest.py --reset`, verify.
+- **"Pitch to Terence"** — Finalize the business pitch and demo script.
+- **"Run Phase 2 RSI"** — Implement DSPy or TextGrad to automatically optimize the `REWRITER_PROMPT` based on the Golden Dataset.
+- **"Run the eval"** — Run `python eval/run_eval.py` to check the current baseline.
 
 ---
 
-## 10. What's Done vs. What's Next
+## 9. What's Done vs. What's Next
 
-### ✅ DONE (Live on Render, Premium UI, Privacy Fixed, Memory Added)
-- All 13 backend files, ingestion (487 stable chunks across 4 rulebooks), `/chat/stream`, `/title`, `/warmup`.
+### ✅ DONE
+- All backend files, ingestion pipeline, `/chat/stream`, `/title`, `/warmup`, `/jurisdictions`, `/chat`.
 - Backend deployed to Render.
-- Supabase PostgreSQL integrated with unique browser ID isolation.
+- Supabase PostgreSQL with unique browser ID.
 - Frontend deployed to Render (Static Site).
-- Frontend uses SSE streaming and Supabase.
-- Smart 3-5 word title generation.
-- Migrated to Cohere Cloud Embeddings.
-- Premium Midnight Blue UI with mobile hamburger menu, action buttons, and clean unique document citations.
-- Added Query Rewriter to fix vague user questions before searching.
-- Blank Slate home screen.
-- **Conversational memory** for follow-up questions.
+- **VARA Corpus:** 17 docs, 1,388 chunks.
+- **EU AI Act Corpus:** 2 docs, 1,290 chunks.
+- **Tavily Web Fallback:** Live web search for out-of-scope queries.
+- **RAG Eval Harness (Phase 1 RSI):** 10-question Golden Dataset with automated scoring.
+- **Deterministic Query Rewriter:** Regex-based post-processing prevents truncation and service-preamble noise.
+- **Multi-Jurisdiction UI:** Custom React popover replacing native select.
+- **Markdown Tables:** `remark-gfm` + dark-mode styling.
+- **Stacked Source Cards:** Premium UI for long web URLs.
+- **Prompt Engineering:** Jurisdiction-aware system prompt, web fallback exceptions, amendment checking.
+- **Ingestion Safeguard:** VARA footer cleaner isolated from EU PDFs.
+- **Scroll, Color, Remount, Regex, Unicode, and Empty-String Fixes.**
 
-### ⏳ NEXT (Final Step)
-1. Demo to Terence. (App is live and ready).
-2. Pitch the vision and business model.
+### ⏸️ BLOCKED
+- **CBUAE ingestion** — 9 documents staged in `backend/data/cbuae/`. Awaiting Terry's decision on multi-jurisdiction scope.
+
+### ⏳ NEXT
+1. If approved: add `AE-CBUAE` jurisdiction to `config.py`, run `ingest.py --reset`, verify.
+2. **Demo to Terence.** Show VARA, EU, and the Web Search Fallback (e.g., UK FCA). Mention the automated evaluation score (8/10).
+3. **Pitch the vision and business model.**
+4. **Phase 2 RSI:** Automated prompt optimization targeting the remaining eval failures.
 
 ### 🔮 FUTURE (Post-POC)
-- Add CBN (Nigeria) — uncomment config, drop PDFs, `python scripts\ingest.py --reset`.
-- Enable Supabase Auth (Row Level Security) for cross-device login.
+- **DFSA (DIFC) corpus.**
+- Add CBN (Nigeria) — `--reset` rebuild.
 - Swap FAISS → Qdrant for filtered search at scale.
+- Expand to FCA (UK), SEC (US).
+- Expand the Golden Dataset to 30+ questions for production-grade RSI.
 
 ---
 
-## 11. Constraints & Environment
+## 10. Constraints & Environment
 
 - **OS:** Windows (`C:\Users\HP ProBook 6460b\Desktop\vara-reg-chat`)
 - **Python:** 3.14 — **always activate `.venv` before Python commands**
 - **Node:** v24.18.0 — **npm:** 11.16.0
 - **Shell:** CMD
-- **Editor:** `start notepad++ "file"`
-- **No paid API budget** — Groq & Cohere free tiers only.
+- **No paid API budget** — Groq, Cohere, & Tavily free tiers only.
 - **Deployment:** Render (Frontend & Backend Live).
 - **Database:** Supabase (Project ref: `bqdzealwfriwzxwqfqnd`).
-- **Deadline:** Wednesday (TODAY) for VARA POC.
 
 ---
 
-## 12. Confidence Log
+## 11. Confidence Log
 
 | Milestone | Confidence | Evidence |
 |---|---|---|
-| Backend compiles | **HIGH** | `compileall` clean |
-| Ingestion works | **HIGH** | `Total chunks stored: 487` (Cohere) |
+| Backend compiles | **HIGH** | `compileall` clean, syntax error resolved |
+| Ingestion works | **HIGH** | `Total chunks stored: 2678` (VARA + EU) |
+| FAISS + metadata sync | **HIGH** | Index and metadata both at 2,678 entries |
 | Streaming endpoint works | **HIGH** | Verified SSE text chunks arrive in UI |
-| Supabase privacy | **HIGH** | Browser ID isolates chats per device |
-| Render Backend Deployment | **HIGH** | "Your service is live 🎉" in Render logs |
-| Render Frontend Deployment | **HIGH** | Live URL provided by Render |
-| Premium UI | **HIGH** | Dark theme, tooltips, mobile menu applied |
-| Query Rewriter | **HIGH** | Tested locally, improves vague questions |
-| Conversational Memory | **HIGH** | Sent history in payload, LLM handles follow-ups |
+| Multi-Jurisdiction UI | **HIGH** | Custom popover loads, switches contexts perfectly |
+| EU AI Act Retrieval | **HIGH** | Cites Article 6, Article 50, and 2026 Omnibus correctly |
+| VARA Regression | **HIGH** | Confirmed working post-refactor |
+| Web Search Fallback | **HIGH** | Verified live query for UK FCA crypto staking |
+| RAG Eval Harness | **HIGH** | 8/10 baseline verified on local `/api/chat` |
+| Rewriter Post-Processor | **HIGH** | Deterministic regex strips cross-cutting preambles |
+| Mobile Layout | **HIGH** | Tables scroll horizontally, popover and source cards don't break screen |
 
 **Demo risks to watch:**
-- Render free tier spins down after inactivity — first request after idle might take 30s to wake up. (Solution: Ping `/api/warmup` 5 minutes before the demo).
+- **Render free tier spins down after inactivity** — first request after idle ~30s to wake. **Mitigation:** Ping `/api/warmup` 5 min before demo.
+- **`.env` / Render env var drift** — Always check Render Environment tab after any config change. `TAVILY_API_KEY` must be present.
+- **Tavily Limits** — 1,000 free searches/month. If exhausted, the app gracefully degrades to the internal refusal message.
+- **Groq Rate Limits** — Free tier limits 8K TPM. Heavy concurrent use in a demo might cause a 429 error. **Mitigation:** Space out questions during live demo.
 
 ---
 
-## 13. Next Chat Opening Prompt (Copy-Paste)
+## 12. Next Chat Opening Prompt (Copy-Paste)
 
-> "Resuming the VARA Regulatory Knowledge Base Chat project. **The app is fully live, deployed, stable, and private.** Backend uses Cohere Cloud Embeddings and Groq streaming. It now has 4 rulebooks ingested (487 chunks), an LLM query rewriter, and conversational memory for follow-up questions. Frontend is a premium Midnight Blue dark theme with Supabase storage, mobile menu, and action buttons. Chat history is now isolated per browser. Here is STATE.md. **Next action:** Prepare the final business pitch and demo script for Terence today."
+> "Resuming the Multi-Jurisdiction Regulatory Knowledge Base Chat project. **The app is fully live, deployed, stable, auditable, fast, and polished.** Backend uses Cohere Cloud Embeddings + Groq streaming with **2,678 chunks across 19 documents**. We have successfully ingested both **VARA (Dubai)** and the **EU AI Act (with its 2026 Omnibus amendment)**. We also implemented a **Tavily web search fallback** that triggers for out-of-scope questions (like UK FCA), providing live synthesized answers with clickable web links. **NEW:** We have implemented **Phase 1 of our RSI initiative** — a fully automated **RAG Evaluation Harness** (`eval/run_eval.py`) running a 10-question Golden Dataset against the `/api/chat` endpoint. It features Unicode normalization, smart keyword matching, and a deterministic rewriter post-processor (`_postprocess_rewrite` in `llm.py`) to fix cross-cutting topic bugs. The baseline score is currently 8/10. **⏸️ CURRENT STATE:** 9 CBUAE documents are staged in `backend/data/cbuae/` but **ingestion is paused** awaiting Terry's decision. Here is STATE.md. **Next action:** [CBUAE DECISION CAME BACK / PITCH TO TERENCE / RUN PHASE 2 RSI (PROMPT OPTIMIZATION) / RUN REGRESSION SUITE / OTHER]."
 
 ---
-
-**End of STATE.md**
 ```

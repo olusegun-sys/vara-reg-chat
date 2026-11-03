@@ -13,6 +13,10 @@ class SourceReference(BaseModel):
     page: int
     section: str
     document: str
+    # ADDED: source_url enables /api/chat (non-streaming) to return web URLs.
+    # Without this, eval scripts and API clients can't distinguish internal
+    # rulebook sources from live web-search fallback results.
+    source_url: str = ""
 
 
 class ChatResponse(BaseModel):

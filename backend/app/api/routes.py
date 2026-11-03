@@ -107,11 +107,14 @@ def chat(req: ChatRequest):
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"LLM provider error: {str(e)}")
 
+    # FIXED: include source_url so API clients (and the eval script) can
+    # distinguish internal rulebook sources from web-search fallback results.
     sources = [
         SourceReference(
             page=c["page"],
             section=c["section"],
             document=c["document"],
+            source_url=c.get("source_url", ""),
         )
         for c in chunks
     ]
@@ -187,8 +190,9 @@ def debug_search(q: str, jurisdiction: str = "AE-Dubai"):
                     "page": c["page"],
                     "section": c["section"],
                     "document": c["document"],
+                    "source_url": c.get("source_url", ""),
                     "distance": c.get("distance", 0),
-                    "text_snippet": c["text"][:150] + "..." 
+                    "text_snippet": c["text"][:150] + "..."
                 }
                 for c in chunks
             ]
