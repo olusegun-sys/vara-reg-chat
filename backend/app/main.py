@@ -19,21 +19,38 @@ from app.api.routes import router
 from app import config
 
 
-def _allowed_origins() -> list[str]:
+def _cors_config() -> dict:
     """
-    Read CORS origins from environment.
+    Build CORS middleware kwargs from environment.
 
-    Why env-driven:
-    - Local dev needs http://localhost:5173 (Vite default).
-    - Render needs the deployed frontend URL.
-    - Hardcoding either breaks the other. Env var solves both without code changes.
-
-    Default "*" is safe for a POC but should be tightened in production.
+    Why this shape:
+    - allow_origins=["*"] + allow_credentials=True is ILLEGAL per W3C spec.
+      The browser silently discards the wildcard header, which manifests as
+      a misleading "No 'Access-Control-Allow-Origin' header" error.
+    - To allow credentials from any origin, the spec-compliant path is
+      allow_origin_regex=".*" (regex wildcard), NOT allow_origins=["*"].
+    - If specific origins are provided, use allow_origins normally.
     """
     raw = os.getenv("CORS_ORIGINS", "*").strip()
+
     if raw == "*":
-        return ["*"]
-    return [origin.strip() for origin in raw.split(",") if origin.strip()]
+        # Wildcard mode: allow any origin, but via regex (required when
+        # credentials are enabled — allow_origins=["*"] would be rejected).
+        return {
+            "allow_origin_regex": ".*",
+            "allow_credentials": True,
+            "allow_methods": ["*"],
+            "allow_headers": ["*"],
+        }
+
+    # Explicit list mode: comma-separated origins from env.
+    origins = [origin.strip() for origin in raw.split(",") if origin.strip()]
+    return {
+        "allow_origins": origins,
+        "allow_credentials": True,
+        "allow_methods": ["*"],
+        "allow_headers": ["*"],
+    }
 
 
 app = FastAPI(
@@ -42,13 +59,7 @@ app = FastAPI(
     description="RAG chat over regulatory rulebooks. Multi-jurisdiction by design.",
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=_allowed_origins(),
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app.add_middleware(CORSMiddleware, **_cors_config())
 
 # All API routes live under /api so a reverse proxy or static frontend
 # can coexist on the same domain without path conflicts.
