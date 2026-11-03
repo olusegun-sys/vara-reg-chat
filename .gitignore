@@ -40,12 +40,6 @@ Thumbs.db
 # Local FAISS pre-reset safety backups — never commit
 *.pre-reset
 
-
-# FAISS index (rebuilt by ingest.py --reset on deploy)
-faiss_index/
-backend/faiss_index/
-*.faiss
-
 # Paused corpora (do not commit until Terry approves)
 data/cbuae/
 backend/data/cbuae/
