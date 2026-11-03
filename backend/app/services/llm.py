@@ -52,7 +52,8 @@ Do NOT: say "you should", say "option A is better", say "I recommend", give a nu
 
 ## WEB SEARCH FALLBACK
 If the retrieved excerpts are labeled "Web Search Result", you are answering from live web data. 
-- For out-of-scope questions (like UK FCA or US SEC), you MUST answer the question using this web data. Do NOT refuse just because the user's dropdown says VARA or EU.
+- For out-of-scope questions (like UK FCA or US SEC), you MUST answer the question using this web data. Do NOT refuse just because the user's dropdown says VARA or EU. The mere presence of "Web Search Result" chunks means you HAVE the information.
+- **CRITICAL:** Do NOT output a refusal message (e.g., "I don't have that information") if "Web Search Result" chunks are present. If the web chunks are relevant, answer the question.
 - Clearly state: "This information comes from a live web search, not the ingested rulebooks."
 - Treat web results with maximum skepticism. If a web snippet does not explicitly state a fact (e.g., a specific number, date, or requirement), do NOT infer it. Say "the source does not specify."
 - Never synthesize across sources — cite each source separately.
@@ -138,9 +139,6 @@ Output: transparency obligations Article 50 AI systems interacting with natural 
 # when the topic is cross-cutting (AML, governance, etc.). The prompt asks it
 # to, but gpt-oss-20b doesn't always obey. A deterministic post-processor is
 # more reliable than prompt engineering for this narrow case.
-#
-# Topics that live in cross-cutting rulebooks (Compliance, Company, Technology,
-# Market Conduct) regardless of service line.
 _CROSS_CUTTING_TOPICS = [
     "aml", "anti-money laundering", "kyc", "cdd", "edd",
     "sanctions", "governance", "board", "capital",
@@ -148,7 +146,6 @@ _CROSS_CUTTING_TOPICS = [
     "record-keeping", "record keeping", "notifications",
 ]
 
-# Service-type words that should be stripped when the topic is cross-cutting.
 _SERVICE_TYPES = [
     "custody", "exchange", "broker-dealer", "broker dealer",
     "lending", "borrowing", "advisory", "management",
@@ -159,23 +156,17 @@ _SERVICE_TYPES = [
 def _postprocess_rewrite(rewritten: str, original_question: str) -> str:
     """
     Deterministic cleanup of the rewriter output. Two jobs:
-    1. If the topic is cross-cutting, strip service-type words. This makes
-       "AML for Custody providers" search the Compliance Rulebook, not the
-       Custody Rulebook.
-    2. If the output was truncated (ends with '-' or ',' or ' and'), fall back
-       to a sanitized version of the original question.
+    1. If the topic is cross-cutting, strip service-type words.
+    2. If the output was truncated, fall back to a sanitized version of the original question.
     """
     text = rewritten.strip()
     
-    # Detect truncation: rewriter sometimes gets cut off by rate limits.
     if not text or text.endswith(("-", ",", " and", " or", " the", " a")):
-        # Fall back to the raw question, stripped of common preamble phrases.
         fallback = original_question
         for preamble in ["we're a ", "we are a ", "i'm a ", "i am a ",
                          "our firm is a ", "my firm is a ",
                          "we're an ", "we are an ", "i'm an ", "i am an "]:
             if fallback.lower().startswith(preamble):
-                # Keep the sentence after the first comma or period
                 parts = re.split(r"[,.]", fallback, maxsplit=1)
                 if len(parts) > 1:
                     fallback = parts[1].strip()
@@ -183,17 +174,13 @@ def _postprocess_rewrite(rewritten: str, original_question: str) -> str:
         print(f"[rewrite] Truncated output detected, falling back to: '{fallback}'")
         text = fallback
     
-    # Check if topic is cross-cutting.
     lower_text = text.lower()
     is_cross_cutting = any(topic in lower_text for topic in _CROSS_CUTTING_TOPICS)
     
     if is_cross_cutting:
-        # Strip service-type words from the rewritten query.
         stripped = text
         for svc in _SERVICE_TYPES:
-            # Case-insensitive word-boundary replacement
             stripped = re.sub(rf"\b{re.escape(svc)}\b", "", stripped, flags=re.IGNORECASE)
-        # Collapse multiple spaces.
         stripped = re.sub(r"\s+", " ", stripped).strip()
         if stripped and stripped != text:
             print(f"[rewrite] Cross-cutting topic detected, stripped service context: '{stripped}'")
@@ -211,9 +198,6 @@ def _build_context(chunks: List[Dict[str, Any]]) -> str:
 
 def _build_user_message(question: str, chunks: List[Dict[str, Any]], jurisdiction: str = "") -> str:
     context = _build_context(chunks)
-    # Jurisdiction header tells the model which corpus it's answering from.
-    # Without this, the model has to infer from chunk metadata, which leads to
-    # "I don't have EU loaded" responses even when EU chunks are present.
     header = ""
     if jurisdiction:
         header = f"JURISDICTION: {jurisdiction}\n\n"
@@ -240,18 +224,12 @@ def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
             max_tokens=300,
             messages=[
                 {"role": "system", "content": REWRITER_PROMPT},
-                # Prefix the user message with the jurisdiction so the rewriter
-                # knows which guidance block to apply. No jurisdiction = VARA
-                # default, preserving the existing behaviour for callers that
-                # haven't been updated yet.
                 {"role": "user", "content": f"jurisdiction: {jurisdiction}\n\n{question}"}
             ],
         )
         rewritten = (response.choices[0].message.content or "").strip()
         print(f"[query_rewrite] ({jurisdiction}) '{question}' -> '{rewritten}'")
         
-        # Apply deterministic post-processing: strips service context for
-        # cross-cutting topics, and recovers from truncated rewriter output.
         processed = _postprocess_rewrite(rewritten, question)
         if processed != rewritten:
             print(f"[query_rewrite] Post-processed -> '{processed}'")
@@ -266,7 +244,6 @@ def generate_answer(question: str, chunks: List[Dict[str, Any]], history: List[D
         return "I don't have that information in the retrieved excerpts."
 
     client = _get_client()
-    
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     
     if history:
@@ -298,8 +275,6 @@ def generate_answer(question: str, chunks: List[Dict[str, Any]], history: List[D
 
 def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dict[str, str]] = None, jurisdiction: str = ""):
     if not chunks:
-        # Inner message uses a double-quoted string so the apostrophe in
-        # "don't" needs no escaping. (Single-quoted with \\' was a syntax error.)
         yield f"data: {json.dumps({'type': 'text', 'text': "I don't have that information in the retrieved excerpts or web search. Check that the right jurisdiction is selected."})}\n\n"
         return
 
@@ -315,7 +290,6 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
     yield f"data: {json.dumps({'type': 'sources', 'sources': sources_data})}\n\n"
 
     client = _get_client()
-    
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     
     if history:
