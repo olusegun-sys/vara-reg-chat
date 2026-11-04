@@ -124,9 +124,19 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
                         <svg className="w-3.5 h-3.5 mr-2 mt-[2px] text-brand-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
-                        <span className="break-words whitespace-normal leading-tight flex-1 pr-2">
-                          {docName}<span className="text-slate-400 font-medium">{sectionName}</span>
-                        </span>
+                        <div className="flex flex-col flex-1 min-w-0">
+                          <span className="break-words whitespace-normal leading-tight">
+                            {docName}<span className="text-slate-400 font-medium">{sectionName}</span>
+                          </span>
+                          
+                          {/* The exact text snippet (Perplexity/Anthropic style) */}
+                          {sourceEntry.snippet && (
+                            <span className="text-[10.5px] text-slate-400 italic mt-1.5 leading-snug line-clamp-2 pr-4">
+                              "{sourceEntry.snippet}..."
+                            </span>
+                          )}
+                        </div>
+                        
                         {url && (
                           <svg className="w-3.5 h-3.5 text-slate-500 group-hover:text-brand-400 transition-colors shrink-0 mt-[1px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>

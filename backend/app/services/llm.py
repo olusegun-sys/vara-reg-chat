@@ -285,6 +285,7 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
             "section": c["section"],
             "document": c["document"],
             "source_url": c.get("source_url", ""),
+            "snippet": c.get("text", "")[:250].strip(),  # Pass the exact text snippet to the frontend
         } 
         for c in chunks
     ]
@@ -314,7 +315,6 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
                 yield f"data: {json.dumps({'type': 'text', 'text': text})}\n\n"
                 
     except Exception as exc:
-        # If Groq rate limits us mid-stream, we yield a clear error instead of just dropping the connection.
         print(f"[llm] Streaming error: {exc}")
         error_msg = f"⚠️ The AI model is currently rate-limited (too many requests). Please wait 10 seconds and try again."
         yield f"data: {json.dumps({'type': 'text', 'text': error_msg})}\n\n"
