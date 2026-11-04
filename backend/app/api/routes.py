@@ -19,11 +19,36 @@ from app import config
 router = APIRouter()
 
 
+# --- Out-of-scope jurisdiction helper ---------------------------------------
+# Why: the old code inlined this regex in 3 places. Centralising it means:
+#   1. Adding a new jurisdiction (e.g. "baFin", "cma") is a one-line edit.
+#   2. The pattern is \b-anchored so "us" doesn't match inside "custody".
+#   3. It's obvious this is a "shortcut for known other regulators", not the
+#      primary web-fallback mechanism. The primary mechanism is now the
+#      confidence check (retrieval.is_low_confidence).
+_OUT_OF_SCOPE_PATTERN = re.compile(
+    r"\b(fca|sec|mas|finma|cbn|uk|us|usa|singapore|nigeria|bafin|cma|asic)\b",
+    re.IGNORECASE,
+)
+
+
+def _needs_web_fallback(question: str, chunks: list) -> tuple:
+    """
+    Return (should_fallback: bool, reason: str).
+    Two independent reasons to hit the web:
+      A. The question explicitly names another regulator (FCA/SEC/etc.).
+      B. FAISS returned low-confidence chunks (question doesn't really match the corpus).
+    Either is sufficient. Both produce a helpful log line so we can debug.
+    """
+    if _OUT_OF_SCOPE_PATTERN.search(question):
+        return True, "out-of-scope jurisdiction mentioned"
+    if retrieval.is_low_confidence(chunks):
+        best = min((c.get("distance", 99) for c in chunks), default=99)
+        return True, f"low retrieval confidence (best distance={best:.3f})"
+    return False, ""
+
+
 # --- Session facts memory endpoint -----------------------------------------
-# Why: the frontend extracts durable facts after each send. This endpoint runs
-# the extraction LLM call and returns the extracted facts. The frontend then
-# persists them to Supabase using its own client (which already handles
-# browser-id isolation). Fails gracefully — never blocks chat flow.
 class SaveFactsRequest(BaseModel):
     session_id: str
     user_message: str
@@ -35,7 +60,6 @@ def extract_and_return_facts(req: SaveFactsRequest):
         facts = memory.extract_facts(req.user_message)
         return {"facts_saved": len(facts), "facts": facts}
     except Exception as e:
-        # Never raise on fact extraction — it's a best-effort enrichment.
         return {"facts_saved": 0, "facts": [], "error": str(e)}
 
 
@@ -81,24 +105,23 @@ def chat(req: ChatRequest):
         raise HTTPException(status_code=400, detail=f"Unknown jurisdiction: {req.jurisdiction}")
 
     search_query = llm.rewrite_query(req.question, req.jurisdiction)
-    
-    # Fix 1: If the LLM fails and returns an empty string, fall back to the raw question
     if not search_query.strip():
         search_query = req.question
-        
-    # Fix 2: Use regex word boundaries (\b) so "us" doesn't match inside "custody"
-    out_of_scope_pattern = r"\b(fca|sec|mas|finma|cbn|uk|us|singapore|nigeria)\b"
-    is_out_of_scope = re.search(out_of_scope_pattern, req.question, re.IGNORECASE) is not None
-    
-    if is_out_of_scope:
-        print(f"[fallback] Out-of-scope jurisdiction detected. Triggering web search.")
-        chunks = web_search.search_web(req.question)
-    else:
-        chunks = retrieval.retrieve_chunks(search_query, req.jurisdiction)
-        if not chunks:
-            print(f"[fallback] No internal docs found. Triggering web search.")
-            chunks = web_search.search_web(req.question)
-        
+
+    # Retrieve from internal corpus first.
+    chunks = retrieval.retrieve_chunks(search_query, req.jurisdiction)
+
+    # Ask the helper whether we should escalate to web search.
+    should_fallback, reason = _needs_web_fallback(req.question, chunks)
+    if should_fallback:
+        print(f"[fallback] {reason}. Triggering web search.")
+        web_chunks = web_search.search_web(req.question)
+        # Prefer web results if we got any — they're more likely to be relevant
+        # than a low-confidence FAISS hit. If web returned nothing, keep the
+        # internal chunks so the answer is still grounded in something.
+        if web_chunks:
+            chunks = web_chunks
+
     if not chunks:
         raise HTTPException(status_code=404, detail="No relevant content found in the documents or the web.")
 
@@ -107,8 +130,6 @@ def chat(req: ChatRequest):
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"LLM provider error: {str(e)}")
 
-    # FIXED: include source_url so API clients (and the eval script) can
-    # distinguish internal rulebook sources from web-search fallback results.
     sources = [
         SourceReference(
             page=c["page"],
@@ -133,23 +154,17 @@ def chat_stream(req: ChatRequest):
         raise HTTPException(status_code=400, detail=f"Unknown jurisdiction: {req.jurisdiction}")
 
     search_query = llm.rewrite_query(req.question, req.jurisdiction)
-    
-    # Fix 1: If the LLM fails and returns an empty string, fall back to the raw question
     if not search_query.strip():
         search_query = req.question
-        
-    # Fix 2: Use regex word boundaries (\b) so "us" doesn't match inside "custody"
-    out_of_scope_pattern = r"\b(fca|sec|mas|finma|cbn|uk|us|singapore|nigeria)\b"
-    is_out_of_scope = re.search(out_of_scope_pattern, req.question, re.IGNORECASE) is not None
-    
-    if is_out_of_scope:
-        print(f"[fallback] Out-of-scope jurisdiction detected. Triggering web search.")
-        chunks = web_search.search_web(req.question)
-    else:
-        chunks = retrieval.retrieve_chunks(search_query, req.jurisdiction)
-        if not chunks:
-            print(f"[fallback] No internal docs found. Triggering web search.")
-            chunks = web_search.search_web(req.question)
+
+    chunks = retrieval.retrieve_chunks(search_query, req.jurisdiction)
+
+    should_fallback, reason = _needs_web_fallback(req.question, chunks)
+    if should_fallback:
+        print(f"[fallback] {reason}. Triggering web search.")
+        web_chunks = web_search.search_web(req.question)
+        if web_chunks:
+            chunks = web_chunks
 
     return StreamingResponse(
         llm.stream_answer(req.question, chunks, req.history, req.jurisdiction),
@@ -167,23 +182,28 @@ def title(req: TitleRequest):
 def debug_search(q: str, jurisdiction: str = "AE-Dubai"):
     try:
         search_query = llm.rewrite_query(q, jurisdiction)
-        
         if not search_query.strip():
             search_query = q
-            
-        out_of_scope_pattern = r"\b(fca|sec|mas|finma|cbn|uk|us|singapore|nigeria)\b"
-        is_out_of_scope = re.search(out_of_scope_pattern, q, re.IGNORECASE) is not None
-        
-        if is_out_of_scope:
-            chunks = web_search.search_web(q)
-        else:
-            chunks = retrieval.retrieve_chunks(search_query, jurisdiction)
-            if not chunks:
-                chunks = web_search.search_web(q)
+
+        chunks = retrieval.retrieve_chunks(search_query, jurisdiction)
+
+        should_fallback, reason = _needs_web_fallback(q, chunks)
+        internal_chunks = chunks  # preserve for the debug payload
+        if should_fallback:
+            print(f"[debug-search fallback] {reason}. Triggering web search.")
+            web_chunks = web_search.search_web(q)
+            if web_chunks:
+                chunks = web_chunks
+
+        best_dist = min((c.get("distance", 99) for c in internal_chunks), default=None)
 
         return {
             "original_query": q,
             "rewritten_query": search_query,
+            "fallback_triggered": should_fallback,
+            "fallback_reason": reason,
+            "best_internal_distance": best_dist,
+            "low_confidence_threshold": retrieval.LOW_CONFIDENCE_DISTANCE,
             "num_chunks_found": len(chunks),
             "chunks": [
                 {

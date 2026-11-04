@@ -41,10 +41,40 @@ def _load_index_and_metadata() -> tuple:
     return _INDEX, _METADATA
 
 
+# --- Confidence threshold ---------------------------------------------------
+# Why: FAISS with embed-english-v3.0 returns squared L2 distances (lower=better).
+# A "good" match in a regulatory corpus typically lands around 0.4–0.9. A "junk"
+# match (question has nothing to do with the corpus) typically lands at 1.2+.
+# We treat anything above LOW_CONFIDENCE_DISTANCE as "not really a match" and
+# let the route layer decide to fall back to web search.
+# NOTE: this number is a starting value. Tune it after running 10-20 real
+# queries through /debug-search and comparing good vs junk results.
+LOW_CONFIDENCE_DISTANCE = 1.15
+
+
+def _best_distance(chunks: List[Dict[str, Any]]) -> float:
+    """
+    Return the smallest (best) distance among the chunks, or +inf if empty.
+    Why: a fallback trigger needs a single scalar to compare against a threshold.
+    """
+    if not chunks:
+        return float("inf")
+    return min(c.get("distance", float("inf")) for c in chunks)
+
+
+def is_low_confidence(chunks: List[Dict[str, Any]]) -> bool:
+    """
+    Return True when the retrieval result is not confident enough to trust.
+    Used by routes.py to decide whether to invoke web search fallback.
+    Exposed as a public function so routes.py doesn't have to reimplement logic.
+    """
+    return _best_distance(chunks) > LOW_CONFIDENCE_DISTANCE
+
+
 # --- VARA "Part" Mapping ---------------------------------------------------
 # Why: Terry wants to see the exact "Part" (e.g., Part 3, Part 1A) in the UI.
 # The PDFs do not contain this text in a machine-readable way. We map page
-# ranges to Part names here. 
+# ranges to Part names here.
 # NOTE: You must update the start/end pages to match the actual VARA PDFs.
 _VARA_PART_MAPPING = {
     "Exchange Services Rulebook": [
@@ -72,33 +102,33 @@ def _attach_source_urls(chunks: List[Dict[str, Any]], jurisdiction: str) -> List
     """
     registry = config.JURISDICTIONS.get(jurisdiction, {}).get("documents", [])
     url_by_title = {d["title"]: d.get("source_url", "") for d in registry}
-    
+
     for c in chunks:
         title = c.get("document", "")
         page = c.get("page", 1)
         url = url_by_title.get(title, "")
-        
+
         # 1. Inject the VARA "Part" name if we have a mapping for this doc
         if title in _VARA_PART_MAPPING:
             for mapping in _VARA_PART_MAPPING[title]:
                 if mapping["start"] <= page <= mapping["end"]:
                     c["section"] = mapping["section"]
                     break
-                    
+
         # 2. Deep Linking & Text Highlighting for PDFs
         if url and url.lower().endswith('.pdf') and page > 1:
             # Take the first 50 characters of the chunk text to use as a search string.
             # Why 50? Long enough to be unique, short enough to URL encode safely.
             # We strip newlines so the search parameter doesn't break.
             search_phrase = c.get("text", "")[:50].replace("\n", " ").strip()
-            
+
             # URL encode the phrase so it's safe for browsers
             encoded_phrase = urllib.parse.quote(search_phrase)
-            
+
             # Append BOTH page jump and search highlight
             # Format: #page=53&search="Due skill, care and diligence"
             url = f"{url}#page={page}&search=%22{encoded_phrase}%22"
-            
+
         c["source_url"] = url
     return chunks
 
