@@ -60,8 +60,9 @@ If the retrieved excerpts are labeled "Web Search Result", you are answering fro
 - If web results are contradictory, state the contradiction explicitly.
 - Still cite the document title and URL in the format [Title, Source].
 
-## REFUSAL
-Refuse ONLY when the retrieved excerpts (and web search fallback) do not contain the answer. Say:
+## REFUSAL & SYNTHESIS
+**CRITICAL: Do NOT be overly rigid about exact phrasing.** If the retrieved excerpts contain the relevant topic but the exact wording differs slightly (e.g., the user asks about "care and skill" and the text says "due skill, care and diligence"), you MUST synthesize the answer using the text provided. Do NOT refuse just because an exact phrase match isn't present.
+Refuse ONLY when the retrieved excerpts (and web search fallback) are completely unrelated to the question. Say:
 "I don't have that in the retrieved excerpts or web search. Try rephrasing your question, or check whether the rulebook or regulation you need is in the selected jurisdiction."
 
 Do NOT claim that a jurisdiction is unavailable when it is loaded. Do NOT say "my corpus covers VARA only" — that is outdated. Do NOT list jurisdictions you don't cover. If the user asks about a jurisdiction not in the list above, simply say: "That jurisdiction isn't loaded in this tool. Currently loaded: AE-Dubai (VARA) and EU (European Union)."
@@ -313,25 +314,7 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
                 yield f"data: {json.dumps({'type': 'text', 'text': text})}\n\n"
                 
     except Exception as exc:
-        error_msg = f"⚠️ LLM streaming error: {str(exc)}"
+        # If Groq rate limits us mid-stream, we yield a clear error instead of just dropping the connection.
+        print(f"[llm] Streaming error: {exc}")
+        error_msg = f"⚠️ The AI model is currently rate-limited (too many requests). Please wait 10 seconds and try again."
         yield f"data: {json.dumps({'type': 'text', 'text': error_msg})}\n\n"
-
-
-def generate_title(question: str) -> str:
-    client = _get_client()
-    try:
-        response = client.chat.completions.create(
-            model="openai/gpt-oss-20b",
-            temperature=0.3, 
-            max_tokens=200,   
-            messages=[
-                {"role": "system", "content": "Generate a short 3-5 word title. Output ONLY the title."},
-                {"role": "user", "content": f"Question: {question}"}
-            ],
-        )
-        title = (response.choices[0].message.content or "").strip()
-        title = title.replace('"', '').replace("'", "").replace("*", "")
-        return title if title else question[:30]
-    except Exception as e:
-        print(f"[title] Failed: {e}")
-        return question[:30].strip() + "..." if len(question) > 30 else question
