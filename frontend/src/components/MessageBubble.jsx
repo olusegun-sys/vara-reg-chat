@@ -24,7 +24,6 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
   const isUser = role === "user";
   const [copied, setCopied] = useState(false);
 
-  // Detect if this message used live web data.
   const isWebSearch = sources && sources.some(s => s.section === "Web Search Result");
 
   const handleCopy = () => {
@@ -76,7 +75,6 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
                     strong: ({ node, ...props }) => <strong className="font-semibold text-white" {...props} />,
                     a: ({ node, ...props }) => <a className="text-brand-400 hover:underline" {...props} />,
                     
-                    // Premium OpenAI/Claude table styling.
                     table: ({ node, ...props }) => (
                       <div className="w-full min-w-0 overflow-x-auto my-4 border border-slate-700/60 rounded-lg shadow-sm">
                         <table className="w-full text-[13.5px] text-left border-collapse" {...props} />
@@ -94,7 +92,6 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
               </div>
             )}
 
-            {/* Warning Badge for Web Search Results */}
             {!isUser && isWebSearch && (
               <div className="mt-3 flex items-start gap-2 bg-amber-900/20 border border-amber-700/40 rounded-lg p-2.5">
                 <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,11 +109,14 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
                   Documents Referenced
                 </p>
                 <div className="flex flex-col gap-1.5 w-full">
-                  {[...new Set(sources.map(s => s.document))].map((docName, i) => {
-                    const sourceEntry = sources.find(s => s.document === docName);
-                    const url = sourceEntry?.source_url;
+                  {/* Deduplicate by document AND section to show the exact part */}
+                  {[...new Map(sources.map(s => [`${s.document}-${s.section}`, s])).values()].map((sourceEntry, i) => {
+                    const docName = sourceEntry.document;
+                    const url = sourceEntry.source_url;
+                    const sectionName = sourceEntry.section && sourceEntry.section !== "General" && sourceEntry.section !== "Web Search Result"
+                      ? ` (${sourceEntry.section})` 
+                      : "";
                     
-                    // Premium card-like styling for source chips
                     const baseClasses = "group flex items-start w-full text-[12px] bg-slate-800/60 hover:bg-slate-700/80 text-slate-300 hover:text-white px-3 py-2 rounded-lg border border-slate-700/50 transition-all text-left";
                     
                     const innerContent = (
@@ -124,7 +124,9 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
                         <svg className="w-3.5 h-3.5 mr-2 mt-[2px] text-brand-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
-                        <span className="break-words whitespace-normal leading-tight flex-1 pr-2">{docName}</span>
+                        <span className="break-words whitespace-normal leading-tight flex-1 pr-2">
+                          {docName}<span className="text-slate-400 font-medium">{sectionName}</span>
+                        </span>
                         {url && (
                           <svg className="w-3.5 h-3.5 text-slate-500 group-hover:text-brand-400 transition-colors shrink-0 mt-[1px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>

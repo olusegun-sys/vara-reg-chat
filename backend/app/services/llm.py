@@ -318,3 +318,23 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
         print(f"[llm] Streaming error: {exc}")
         error_msg = f"⚠️ The AI model is currently rate-limited (too many requests). Please wait 10 seconds and try again."
         yield f"data: {json.dumps({'type': 'text', 'text': error_msg})}\n\n"
+
+
+def generate_title(question: str) -> str:
+    client = _get_client()
+    try:
+        response = client.chat.completions.create(
+            model="openai/gpt-oss-20b",
+            temperature=0.3, 
+            max_tokens=200,   
+            messages=[
+                {"role": "system", "content": "Generate a short 3-5 word title. Output ONLY the title."},
+                {"role": "user", "content": f"Question: {question}"}
+            ],
+        )
+        title = (response.choices[0].message.content or "").strip()
+        title = title.replace('"', '').replace("'", "").replace("*", "")
+        return title if title else question[:30]
+    except Exception as e:
+        print(f"[title] Failed: {e}")
+        return question[:30].strip() + "..." if len(question) > 30 else question

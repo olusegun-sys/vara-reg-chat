@@ -1,4 +1,5 @@
 import json
+import urllib.parse
 from typing import List, Dict, Any
 
 import faiss
@@ -16,9 +17,6 @@ co = cohere.Client(api_key=config.COHERE_API_KEY)
 # benefit — the files only change when you re-ingest. Cache them in module
 # memory (loaded once per process, shared across all requests) for a
 # one-time cost and near-instant lookups thereafter.
-#
-# IMPORTANT: after running `ingest.py --reset`, restart the backend process
-# so this cache is invalidated. Render does this automatically on redeploy.
 _INDEX = None
 _METADATA = None
 
@@ -43,17 +41,65 @@ def _load_index_and_metadata() -> tuple:
     return _INDEX, _METADATA
 
 
+# --- VARA "Part" Mapping ---------------------------------------------------
+# Why: Terry wants to see the exact "Part" (e.g., Part 3, Part 1A) in the UI.
+# The PDFs do not contain this text in a machine-readable way. We map page
+# ranges to Part names here. 
+# NOTE: You must update the start/end pages to match the actual VARA PDFs.
+_VARA_PART_MAPPING = {
+    "Exchange Services Rulebook": [
+        {"start": 1, "end": 20, "section": "Part 1 (General)"},
+        {"start": 21, "end": 40, "section": "Part 2 (Licensing)"},
+        {"start": 41, "end": 60, "section": "Part 3 (Market Surveillance)"},
+    ],
+    "Custody Services Rulebook": [
+        {"start": 1, "end": 15, "section": "Part 1 (General)"},
+        {"start": 16, "end": 35, "section": "Part 2 (Client Assets)"},
+    ],
+    "Compliance and Risk Management Rulebook": [
+        {"start": 1, "end": 10, "section": "Part 1 (General)"},
+        {"start": 11, "end": 30, "section": "Part 2 (AML/CFT)"},
+    ]
+}
+
+
 def _attach_source_urls(chunks: List[Dict[str, Any]], jurisdiction: str) -> List[Dict[str, Any]]:
     """
     Enrich each chunk dict with the source_url of its parent document.
-    Why: the FAISS metadata doesn't store URLs. Rather than re-ingest 1,388
-    chunks just to add one field, we look up the URL by matching the chunk's
-    `document` title against the document registry in config.
+    Also injects VARA "Part" numbers into the section field, and appends
+    #page=X&search=Y to PDF URLs so the browser jumps to the exact page
+    and highlights the exact text.
     """
     registry = config.JURISDICTIONS.get(jurisdiction, {}).get("documents", [])
     url_by_title = {d["title"]: d.get("source_url", "") for d in registry}
+    
     for c in chunks:
-        c["source_url"] = url_by_title.get(c.get("document", ""), "")
+        title = c.get("document", "")
+        page = c.get("page", 1)
+        url = url_by_title.get(title, "")
+        
+        # 1. Inject the VARA "Part" name if we have a mapping for this doc
+        if title in _VARA_PART_MAPPING:
+            for mapping in _VARA_PART_MAPPING[title]:
+                if mapping["start"] <= page <= mapping["end"]:
+                    c["section"] = mapping["section"]
+                    break
+                    
+        # 2. Deep Linking & Text Highlighting for PDFs
+        if url and url.lower().endswith('.pdf') and page > 1:
+            # Take the first 50 characters of the chunk text to use as a search string.
+            # Why 50? Long enough to be unique, short enough to URL encode safely.
+            # We strip newlines so the search parameter doesn't break.
+            search_phrase = c.get("text", "")[:50].replace("\n", " ").strip()
+            
+            # URL encode the phrase so it's safe for browsers
+            encoded_phrase = urllib.parse.quote(search_phrase)
+            
+            # Append BOTH page jump and search highlight
+            # Format: #page=53&search="Due skill, care and diligence"
+            url = f"{url}#page={page}&search=%22{encoded_phrase}%22"
+            
+        c["source_url"] = url
     return chunks
 
 
@@ -63,9 +109,6 @@ def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List
     if index.ntotal == 0:
         return []
 
-    # Cohere embed — unavoidable ~150-250ms. Could be parallelized with the
-    # query rewriter in llm.py for further speedup, but that's a bigger
-    # refactor. Caching index is the biggest single win.
     response = co.embed(
         texts=[question],
         model="embed-english-v3.0",
