@@ -1,5 +1,6 @@
 import json
 import urllib.parse
+import re
 from typing import List, Dict, Any
 
 import faiss
@@ -12,11 +13,6 @@ from app import config
 co = cohere.Client(api_key=config.COHERE_API_KEY)
 
 # --- Module-level cache -----------------------------------------------------
-# Why: _load_index_and_metadata() reads a ~2MB FAISS index and ~3MB metadata
-# JSON on EVERY query. That's ~250-400ms of disk I/O per request with no
-# benefit — the files only change when you re-ingest. Cache them in module
-# memory (loaded once per process, shared across all requests) for a
-# one-time cost and near-instant lookups thereafter.
 _INDEX = None
 _METADATA = None
 
@@ -42,40 +38,19 @@ def _load_index_and_metadata() -> tuple:
 
 
 # --- Confidence threshold ---------------------------------------------------
-# Why: FAISS with embed-english-v3.0 returns squared L2 distances (lower=better).
-# A "good" match in a regulatory corpus typically lands around 0.4–0.9. A "junk"
-# match (question has nothing to do with the corpus) typically lands at 1.2+.
-# We treat anything above LOW_CONFIDENCE_DISTANCE as "not really a match" and
-# let the route layer decide to fall back to web search.
-# NOTE: this number is a starting value. Tune it after running 10-20 real
-# queries through /debug-search and comparing good vs junk results.
 LOW_CONFIDENCE_DISTANCE = 1.15
 
-
 def _best_distance(chunks: List[Dict[str, Any]]) -> float:
-    """
-    Return the smallest (best) distance among the chunks, or +inf if empty.
-    Why: a fallback trigger needs a single scalar to compare against a threshold.
-    """
     if not chunks:
         return float("inf")
     return min(c.get("distance", float("inf")) for c in chunks)
 
 
 def is_low_confidence(chunks: List[Dict[str, Any]]) -> bool:
-    """
-    Return True when the retrieval result is not confident enough to trust.
-    Used by routes.py to decide whether to invoke web search fallback.
-    Exposed as a public function so routes.py doesn't have to reimplement logic.
-    """
     return _best_distance(chunks) > LOW_CONFIDENCE_DISTANCE
 
 
 # --- VARA "Part" Mapping ---------------------------------------------------
-# Why: Terry wants to see the exact "Part" (e.g., Part 3, Part 1A) in the UI.
-# The PDFs do not contain this text in a machine-readable way. We map page
-# ranges to Part names here.
-# NOTE: You must update the start/end pages to match the actual VARA PDFs.
 _VARA_PART_MAPPING = {
     "Exchange Services Rulebook": [
         {"start": 1, "end": 20, "section": "Part 1 (General)"},
@@ -94,12 +69,6 @@ _VARA_PART_MAPPING = {
 
 
 def _attach_source_urls(chunks: List[Dict[str, Any]], jurisdiction: str) -> List[Dict[str, Any]]:
-    """
-    Enrich each chunk dict with the source_url of its parent document.
-    Also injects VARA "Part" numbers into the section field, and appends
-    #page=X&search=Y to PDF URLs so the browser jumps to the exact page
-    and highlights the exact text.
-    """
     registry = config.JURISDICTIONS.get(jurisdiction, {}).get("documents", [])
     url_by_title = {d["title"]: d.get("source_url", "") for d in registry}
 
@@ -117,30 +86,31 @@ def _attach_source_urls(chunks: List[Dict[str, Any]], jurisdiction: str) -> List
 
         # 2. Deep Linking & Text Highlighting for PDFs
         if url and url.lower().endswith('.pdf') and page > 1:
-            # Take the first 50 characters of the chunk text to use as a search string.
-            # Why 50? Long enough to be unique, short enough to URL encode safely.
-            # We strip newlines so the search parameter doesn't break.
             search_phrase = c.get("text", "")[:50].replace("\n", " ").strip()
-
-            # URL encode the phrase so it's safe for browsers
             encoded_phrase = urllib.parse.quote(search_phrase)
-
-            # Append BOTH page jump and search highlight
-            # Format: #page=53&search="Due skill, care and diligence"
             url = f"{url}#page={page}&search=%22{encoded_phrase}%22"
 
         c["source_url"] = url
     return chunks
 
 
-def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List[Dict[str, Any]]:
-    top_k = top_k or config.TOP_K_RESULTS
-    index, metadata = _load_index_and_metadata()
-    if index.ntotal == 0:
-        return []
+def _extract_keywords(text: str) -> str:
+    """
+    Strips filler words to create a broader search query if the primary
+    search fails. e.g. "What are the rules for high risk AI systems?" -> "rules high risk AI systems"
+    """
+    stopwords = {"what", "are", "the", "for", "is", "a", "an", "and", "or", "in", "on", "of", "to", "with", "by", "from", "how", "does", "do", "can", "could", "should", "would"}
+    words = re.findall(r'\b\w+\b', text.lower())
+    filtered = [w for w in words if w not in stopwords and len(w) > 2]
+    return " ".join(filtered)
 
+
+def _search_faiss(query: str, jurisdiction: str, top_k: int) -> List[Dict[str, Any]]:
+    """Internal helper to embed a query and search FAISS."""
+    index, metadata = _load_index_and_metadata()
+    
     response = co.embed(
-        texts=[question],
+        texts=[query],
         model="embed-english-v3.0",
         input_type="search_query"
     )
@@ -152,7 +122,7 @@ def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List
     candidates = min(top_k * 5, index.ntotal)
     distances, indices = index.search(query_vec, candidates)
 
-    chunks: List[Dict[str, Any]] = []
+    chunks = []
     for dist, idx in zip(distances[0], indices[0]):
         if idx < 0 or idx >= len(metadata):
             continue
@@ -168,6 +138,36 @@ def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List
         })
         if len(chunks) >= top_k:
             break
+            
+    return chunks
+
+
+def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List[Dict[str, Any]]:
+    top_k = top_k or config.TOP_K_RESULTS
+    index, _ = _load_index_and_metadata()
+    if index.ntotal == 0:
+        return []
+
+    # 1. Primary Search
+    chunks = _search_faiss(question, jurisdiction, top_k)
+
+    # 2. Check Confidence
+    if is_low_confidence(chunks):
+        print(f"[retrieval] Low confidence (dist: {_best_distance(chunks):.2f}). Attempting broader keyword search...")
+        
+        # 3. Broaden the query by stripping filler words
+        broader_query = _extract_keywords(question)
+        if broader_query:
+            broader_chunks = _search_faiss(broader_query, jurisdiction, top_k)
+            
+            # If the broader search actually found something better, use it.
+            if broader_chunks and _best_distance(broader_chunks) < _best_distance(chunks):
+                print(f"[retrieval] Broader search improved confidence (new dist: {_best_distance(broader_chunks):.2f}). Using broader results.")
+                chunks = broader_chunks
+            else:
+                print(f"[retrieval] Broader search did not improve results (dist: {_best_distance(broader_chunks):.2f}). Sticking with original.")
+        else:
+            print(f"[retrieval] Could not extract keywords for broader search. Sticking with original.")
 
     return _attach_source_urls(chunks, jurisdiction)
 
