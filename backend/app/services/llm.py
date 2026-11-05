@@ -48,12 +48,14 @@ If the user asks a general industry definition (e.g., "What is AML?", "What is a
 Refuse ONLY if every retrieved chunk is completely unrelated to the question.
 Do NOT be overly rigid about exact phrasing. If the topic is relevant, synthesize the answer.
 Do NOT say "my corpus covers VARA only".
-Refusal message: "No authoritative source found for this question. Try asking about a specific regulator or rule."
+Refusal message: "I couldn't find authoritative sources that directly address this question. Try rephrasing with more specific terms — for example, name the specific article, obligation, or regulator you're asking about."
 
 Be precise, be direct, be honest about limits."""
 
 
 REWRITER_PROMPT = """You rewrite user messages into keyword-rich search queries for a multi-jurisdiction regulatory database.
+
+**CRITICAL — MULTI-CONCEPT QUESTIONS:** If the user's question mentions multiple distinct regulatory concepts (e.g., "credit scoring" + "biometric data" + "open-source model"), you MUST preserve ALL of them in the rewritten query. Do NOT condense or drop concepts. A question about three topics needs a query covering three topics.
 
 The user's question is about ONE of these jurisdictions:
 - AE-Dubai (VARA)
@@ -64,7 +66,8 @@ The user's question is about ONE of these jurisdictions:
 2. Separate firm/context preamble from the question.
 3. Expand vague terms into regulatory synonyms.
 4. Preserve specific article numbers, dates, and technical terms.
-5. Output ONLY the rewritten query.
+5. **Preserve ALL regulatory concepts — do not condense multi-concept questions.**
+6. Output ONLY the rewritten query.
 
 ## GUIDANCE
 **VARA:** Cross-cutting topics (AML, governance, data protection) → strip service preamble. Service-specific topics (market surveillance, staking) → keep the service type.
@@ -174,6 +177,13 @@ def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
         )
         rewritten = (response.choices[0].message.content or "").strip()
         print(f"[query_rewrite] ({jurisdiction}) '{question}' -> '{rewritten}'")
+        
+        # SAFETY: if the rewrite is suspiciously short (fewer than 4 words),
+        # it likely dropped critical concepts. Fall back to the raw question.
+        if len(rewritten.split()) < 4:
+            print(f"[query_rewrite] Rewrite too short, using raw question.")
+            return question
+            
         return _postprocess_rewrite(rewritten, question) or question
     except Exception as e:
         print(f"[query_rewrite] Failed: {e}")
@@ -182,7 +192,7 @@ def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
 
 def generate_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dict[str, str]] = None, jurisdiction: str = "") -> str:
     if not chunks:
-        return "No authoritative source found for this question."
+        return "I couldn't find authoritative sources that directly address this question. Try rephrasing with more specific terms — for example, name the specific article, obligation, or regulator you're asking about."
 
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
 
@@ -205,7 +215,6 @@ def generate_answer(question: str, chunks: List[Dict[str, Any]], history: List[D
         err_str = str(exc)
         print(f"[llm] Generate failed (Primary): {err_str}")
         
-        # Failover Logic
         if "429" in err_str or "rate limit" in err_str.lower():
             if config.BACKUP_LLM_API_KEY:
                 print("[llm] Failing over to backup provider...")
@@ -227,8 +236,6 @@ def generate_answer(question: str, chunks: List[Dict[str, Any]], history: List[D
 
 def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dict[str, str]] = None, jurisdiction: str = ""):
     if not chunks:
-        # If no chunks are found, we still let the LLM answer if it's a general definition.
-        # But to be safe with the prompt, we pass a dummy chunk telling it there's no context.
         chunks = [{"page": 1, "section": "No Context", "document": "No Context", "text": "No internal rulebook context found."}]
 
     sources_data = [
@@ -241,7 +248,7 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
             "snippet": c.get("text", "")[:250].strip(),
         }
         for c in chunks
-        if c["document"] != "No Context" # Don't show dummy context in UI
+        if c["document"] != "No Context"
     ]
     
     if sources_data:
@@ -275,7 +282,6 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
         err_str = str(exc)
         print(f"[llm] Streaming error (Primary): {err_str}")
         
-        # Failover Logic
         if "429" in err_str or "rate limit" in err_str.lower():
             if config.BACKUP_LLM_API_KEY:
                 print("[llm] Failing over to backup provider...")
@@ -299,7 +305,6 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
                     yield f"data: {json.dumps({'type': 'text', 'text': error_msg})}\n\n"
                     return
 
-        # Generic failure
         error_msg = "⚠️ An error occurred processing your request. Please try again."
         yield f"data: {json.dumps({'type': 'text', 'text': error_msg})}\n\n"
 
@@ -317,8 +322,14 @@ def generate_title(question: str) -> str:
             ],
         )
         title = (response.choices[0].message.content or "").strip()
-        title = title.replace('"', '').replace("'", "").replace("*", "")
-        return title if title else question[:30]
+        title = title.replace('"', '').replace("'", "").replace("*", "").strip()
+        
+        # SAFETY: never return empty or None — Supabase rejects null titles.
+        if not title:
+            title = (question[:30] + "...") if len(question) > 30 else question
+        return title
     except Exception as e:
         print(f"[title] Failed: {e}")
-        return question[:30].strip() + "..." if len(question) > 30 else question
+        # Fallback: use the first 30 chars of the question. Never None.
+        fallback = (question[:30] + "...") if len(question) > 30 else question
+        return fallback or "New Conversation"

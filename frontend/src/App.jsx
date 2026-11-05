@@ -13,13 +13,10 @@ import {
 const SESSION_OPENING = 2;
 const RECENT_WINDOW = 8;
 const SESSION_STORAGE_KEY = "vara_current_session_id";
-// ADDED: persists the user's jurisdiction choice across refreshes
 const JURISDICTION_STORAGE_KEY = "vara_selected_jurisdiction";
 
 export default function App() {
   const [jurisdictions, setJurisdictions] = useState([]);
-  // Persist the user's jurisdiction choice. If none saved, "" (will be
-  // defaulted once the backend returns the list of jurisdictions).
   const [selectedJurisdiction, setSelectedJurisdiction] = useState(() => {
     try {
       return localStorage.getItem(JURISDICTION_STORAGE_KEY) || "";
@@ -51,11 +48,9 @@ export default function App() {
   useEffect(() => {
     getJurisdictions().then(data => {
       setJurisdictions(data);
-      // Only set a default if the user hasn't picked one yet OR their saved
-      // choice is no longer available (e.g., they saved "EU" but we removed it).
       setSelectedJurisdiction(prev => {
         if (prev && data.some(j => j.code === prev)) {
-          return prev; // keep the saved choice
+          return prev;
         }
         return data.length > 0 ? data[0].code : "";
       });
@@ -86,7 +81,6 @@ export default function App() {
     }
   }, [currentSessionId]);
 
-  // ADDED: Persist jurisdiction choice to localStorage on every change.
   useEffect(() => {
     try {
       if (selectedJurisdiction) {
@@ -183,7 +177,6 @@ export default function App() {
     const question = inputValue.trim();
     if (!question || isSending || !selectedJurisdiction) return;
 
-    // Set before any await so the message-loading effect bails on this render.
     sendingInProgressRef.current = true;
 
     let activeSessionId = currentSessionId;
@@ -210,12 +203,16 @@ export default function App() {
 
     if (messages.length === 0) {
       generateChatTitle(question).then(newTitle => {
-        setSessions(prev => prev.map(s => s.id === activeSessionId ? { ...s, title: newTitle } : s));
-        updateSessionTitle(activeSessionId, newTitle);
-      });
+        // SAFETY: never send null/undefined to Supabase — the column has
+        // a NOT NULL constraint. Fall back to a truncated question.
+        const safeTitle = newTitle || (question.slice(0, 30) + (question.length > 30 ? "..." : ""));
+        setSessions(prev => prev.map(s => s.id === activeSessionId ? { ...s, title: safeTitle } : s));
+        updateSessionTitle(activeSessionId, safeTitle).catch(err => 
+          console.warn("[app] Title update failed:", err)
+        );
+      }).catch(err => console.warn("[app] Title generation failed:", err));
     }
 
-    // --- HYBRID MEMORY: fetch USER facts (not session facts) --------------
     let userFacts = [];
     try {
       userFacts = await getUserFacts();
@@ -223,7 +220,6 @@ export default function App() {
       console.warn("[app] Could not fetch user facts:", err);
     }
 
-    // --- RECENCY WINDOW ---------------------------------------------------
     let historyPayload = [];
     if (messages.length <= (SESSION_OPENING + RECENT_WINDOW)) {
       historyPayload = messages;
@@ -238,7 +234,6 @@ export default function App() {
       content: m.content
     }));
 
-    // Prepend the facts block as a synthetic system message.
     if (userFacts.length > 0) {
       const factsText = userFacts.map(f => `- ${f.fact_text}`).join("\n");
       chatHistory.unshift({
@@ -280,7 +275,6 @@ export default function App() {
         return updated;
       });
 
-      // Fire-and-forget fact extraction. Facts save at user scope.
       extractFacts(activeSessionId, question)
         .then(newFacts => {
           if (newFacts && newFacts.length > 0) {
