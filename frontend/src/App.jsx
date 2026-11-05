@@ -13,10 +13,20 @@ import {
 const SESSION_OPENING = 2;
 const RECENT_WINDOW = 8;
 const SESSION_STORAGE_KEY = "vara_current_session_id";
+// ADDED: persists the user's jurisdiction choice across refreshes
+const JURISDICTION_STORAGE_KEY = "vara_selected_jurisdiction";
 
 export default function App() {
   const [jurisdictions, setJurisdictions] = useState([]);
-  const [selectedJurisdiction, setSelectedJurisdiction] = useState("");
+  // Persist the user's jurisdiction choice. If none saved, "" (will be
+  // defaulted once the backend returns the list of jurisdictions).
+  const [selectedJurisdiction, setSelectedJurisdiction] = useState(() => {
+    try {
+      return localStorage.getItem(JURISDICTION_STORAGE_KEY) || "";
+    } catch {
+      return "";
+    }
+  });
   const [inputValue, setInputValue] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [loadError, setLoadError] = useState(null);
@@ -41,7 +51,14 @@ export default function App() {
   useEffect(() => {
     getJurisdictions().then(data => {
       setJurisdictions(data);
-      if (data.length > 0) setSelectedJurisdiction(data[0].code);
+      // Only set a default if the user hasn't picked one yet OR their saved
+      // choice is no longer available (e.g., they saved "EU" but we removed it).
+      setSelectedJurisdiction(prev => {
+        if (prev && data.some(j => j.code === prev)) {
+          return prev; // keep the saved choice
+        }
+        return data.length > 0 ? data[0].code : "";
+      });
     }).catch(err => setLoadError(err.message));
   }, []);
 
@@ -68,6 +85,19 @@ export default function App() {
       console.warn("[app] Could not persist session ID:", e);
     }
   }, [currentSessionId]);
+
+  // ADDED: Persist jurisdiction choice to localStorage on every change.
+  useEffect(() => {
+    try {
+      if (selectedJurisdiction) {
+        localStorage.setItem(JURISDICTION_STORAGE_KEY, selectedJurisdiction);
+      } else {
+        localStorage.removeItem(JURISDICTION_STORAGE_KEY);
+      }
+    } catch (e) {
+      console.warn("[app] Could not persist jurisdiction:", e);
+    }
+  }, [selectedJurisdiction]);
 
   useEffect(() => {
     if (!currentSessionId) {
@@ -318,7 +348,7 @@ export default function App() {
                 value={selectedJurisdiction} 
                 onChange={setSelectedJurisdiction} 
                 disabled={isSending || jurisdictions.length === 0} 
-                isSending={isSending} // Pass isSending to show the spinner natively in the selector
+                isSending={isSending}
               />
             </div>
           </div>
