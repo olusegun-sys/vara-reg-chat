@@ -38,8 +38,14 @@ If excerpts are labeled "Web Search Result", answer from that data.
 - **Tiers:** `primary` (regulators like eur-lex, fca, sec) > `press` (Reuters, FT). Lead with primary. If only press, say: "The following is from financial press — verify against the primary regulation."
 - Do NOT synthesize across sources or infer missing facts.
 
+## GENERAL COMPLIANCE DEFINITIONS (ALLOWED EXCEPTION)
+If the user asks a general industry definition (e.g., "What is AML?", "What is a VASP?", "What does best execution mean?"), and the exact definition is not in the excerpts, you MAY use your pre-trained knowledge to provide a 1-2 sentence definition. 
+- **CRITICAL:** You must prefix this with: "According to general regulatory standards (not directly from the retrieved rulebooks):" 
+- You MUST then state: "For the exact VARA/EU definition and obligations, please see the specific rulebook." 
+- NEVER use general knowledge to answer questions about specific rules, penalties, or obligations.
+
 ## REFUSAL
-Refuse ONLY if every retrieved chunk is completely unrelated.
+Refuse ONLY if every retrieved chunk is completely unrelated to the question.
 Do NOT be overly rigid about exact phrasing. If the topic is relevant, synthesize the answer.
 Do NOT say "my corpus covers VARA only".
 Refusal message: "No authoritative source found for this question. Try asking about a specific regulator or rule."
@@ -221,8 +227,9 @@ def generate_answer(question: str, chunks: List[Dict[str, Any]], history: List[D
 
 def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dict[str, str]] = None, jurisdiction: str = ""):
     if not chunks:
-        yield f"data: {json.dumps({'type': 'text', 'text': 'No authoritative source found.'})}\n\n"
-        return
+        # If no chunks are found, we still let the LLM answer if it's a general definition.
+        # But to be safe with the prompt, we pass a dummy chunk telling it there's no context.
+        chunks = [{"page": 1, "section": "No Context", "document": "No Context", "text": "No internal rulebook context found."}]
 
     sources_data = [
         {
@@ -234,8 +241,11 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
             "snippet": c.get("text", "")[:250].strip(),
         }
         for c in chunks
+        if c["document"] != "No Context" # Don't show dummy context in UI
     ]
-    yield f"data: {json.dumps({'type': 'sources', 'sources': sources_data})}\n\n"
+    
+    if sources_data:
+        yield f"data: {json.dumps({'type': 'sources', 'sources': sources_data})}\n\n"
 
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
 
