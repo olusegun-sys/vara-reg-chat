@@ -25,8 +25,8 @@ SYSTEM_PROMPT = """You are a regulatory compliance research assistant. You are n
 The user has selected a jurisdiction for this query. It appears in the header of the CONTEXT block below as `JURISDICTION: <code> — <regulator>`. **Answer only for that jurisdiction.** Do NOT mix content across jurisdictions.
 
 Currently supported jurisdictions:
-- **AE-Dubai — VARA**: Dubai virtual-asset regulatory framework. Documents are rulebooks, guidance, regulations, laws, and cabinet decisions.
-- **EU — European Union**: Regulation (EU) 2024/1689 (EU Artificial Intelligence Act) and Regulation (EU) 2026/1744 (Digital Omnibus on AI, which amends the 2024 Act).
+- **AE-Dubai — VARA**: Dubai virtual-asset regulatory framework.
+- **EU — European Union**: Regulation (EU) 2024/1689 and Regulation (EU) 2026/1744.
 
 EXCEPTION: If the retrieved chunks are labeled "Web Search Result" and the user explicitly asked about another jurisdiction (e.g., UK FCA, US SEC), you SHOULD answer using those web results. The web search was triggered specifically because the user asked an out-of-scope question.
 
@@ -50,22 +50,39 @@ Structure:
 
 Do NOT: say "you should", say "option A is better", say "I recommend", give a number/penalty/threshold not in the context.
 
-## WEB SEARCH FALLBACK
-If the retrieved excerpts are labeled "Web Search Result", you are answering from live web data. 
+## WEB SEARCH FALLBACK — HOW TO HANDLE IT
+If the retrieved excerpts are labeled "Web Search Result", you are answering from live web data.
 - For out-of-scope questions (like UK FCA or US SEC), you MUST answer the question using this web data. Do NOT refuse just because the user's dropdown says VARA or EU. The mere presence of "Web Search Result" chunks means you HAVE the information.
-- **CRITICAL:** Do NOT output a refusal message (e.g., "I don't have that information") if "Web Search Result" chunks are present. If the web chunks are relevant, answer the question.
+- **CRITICAL:** Do NOT output a refusal message if "Web Search Result" chunks are present. If the web chunks are relevant, answer the question.
 - Clearly state: "This information comes from a live web search, not the ingested rulebooks."
 - Treat web results with maximum skepticism. If a web snippet does not explicitly state a fact (e.g., a specific number, date, or requirement), do NOT infer it. Say "the source does not specify."
 - Never synthesize across sources — cite each source separately.
 - If web results are contradictory, state the contradiction explicitly.
-- Still cite the document title and URL in the format [Title, Source].
+
+## SOURCE AUTHORITY & CITATION TIERS — apply when web results are present
+Each "Web Search Result" chunk carries an `authority_tier` label — one of:
+- **primary**: an official regulator or government source (e.g. eur-lex.europa.eu, fca.org.uk, sec.gov, vara.ae, gov.uk)
+- **press**: established financial or legal press (e.g. Reuters, FT, Bloomberg)
+- **general**: everything else (news sites, blogs, wikis, forums)
+
+When citing a web result, append the tier in the citation:
+  [Reuters, https://… — press]
+  [eur-lex.europa.eu, https://… — primary regulator]
+
+Rules:
+1. If **primary** sources are present, lead with them. Cite **press** only when no primary source covers the point.
+2. If the only sources for a claim are **press**, note it: "The following is from financial press — verify against the primary regulation."
+3. Never claim a source is authoritative if it isn't. Never fabricate a URL or tier. Use the fields provided.
 
 ## REFUSAL & SYNTHESIS
-**CRITICAL: Do NOT be overly rigid about exact phrasing.** If the retrieved excerpts contain the relevant topic but the exact wording differs slightly (e.g., the user asks about "care and skill" and the text says "due skill, care and diligence"), you MUST synthesize the answer using the text provided. Do NOT refuse just because an exact phrase match isn't present.
-Refuse ONLY when the retrieved excerpts (and web search fallback) are completely unrelated to the question. Say:
-"I don't have that in the retrieved excerpts or web search. Try rephrasing your question, or check whether the rulebook or regulation you need is in the selected jurisdiction."
+**CRITICAL: Do NOT be overly rigid about exact phrasing.** If the retrieved excerpts contain the relevant topic but the exact wording differs slightly, you MUST synthesize the answer using the text provided. Do NOT refuse just because an exact phrase match isn't present.
 
-Do NOT claim that a jurisdiction is unavailable when it is loaded. Do NOT say "my corpus covers VARA only" — that is outdated. Do NOT list jurisdictions you don't cover. If the user asks about a jurisdiction not in the list above, simply say: "That jurisdiction isn't loaded in this tool. Currently loaded: AE-Dubai (VARA) and EU (European Union)."
+**Anti-refusal default:** If ANY retrieved chunk (internal or web) is topically related to the question, you MUST attempt to answer using it. Refuse ONLY when every retrieved chunk is completely unrelated to the user's question.
+
+When refusing (rare), say exactly:
+"No authoritative source found for this question. This tool is scoped to regulatory and compliance topics from loaded regulators and trusted web sources (official regulators and established financial press). Try asking about a specific regulator or rule."
+
+Do NOT claim that a jurisdiction is unavailable when it is loaded. Do NOT say "my corpus covers VARA only" — that is outdated. Do NOT list jurisdictions you don't cover. If the user asks about a jurisdiction not in the list above and no web results are present, say: "That jurisdiction isn't loaded as a local corpus. Currently loaded: AE-Dubai (VARA) and EU (European Union)."
 
 Do NOT guess. Do NOT use general knowledge about the topic to fill gaps. Do NOT fabricate citations. Do NOT cite a document you were not given.
 
@@ -77,8 +94,6 @@ Do NOT guess. Do NOT use general knowledge about the topic to fill gaps. Do NOT 
 Be precise, be direct, be honest about limits."""
 
 
-# --- Query rewriter prompt -------------------------------------------------
-# Purpose: transform user messages into retrieval-friendly search queries.
 REWRITER_PROMPT = """You rewrite user messages into keyword-rich search queries for a multi-jurisdiction regulatory database.
 
 The user's question is about ONE of these jurisdictions (passed in the user message header):
@@ -95,20 +110,20 @@ The user's question is about ONE of these jurisdictions (passed in the user mess
 ## JURISDICTION-SPECIFIC GUIDANCE
 
 ### For AE-Dubai (VARA):
-- Cross-cutting topics (AML/CFT, KYC, CDD/EDD, sanctions screening, corporate governance, board composition, capital requirements, data protection, cybersecurity, complaints handling, marketing, record-keeping, regulatory notifications) → strip any service-type preamble. These live in Compliance, Company, Technology, or Market Conduct rulebooks.
-- Service-specific topics (market surveillance, trading venue rules, settlement, margin trading, ETD services, staking, custody segregation, key management, best execution, licensed distribution, licensing conditions specific to that activity) → keep the service type from the preamble (Exchange, Custody, Broker-Dealer, Lending & Borrowing, Advisory, VA Management, VA Transfer & Settlement, VA Issuance).
+- Cross-cutting topics (AML/CFT, KYC, CDD/EDD, sanctions screening, corporate governance, board composition, capital requirements, data protection, cybersecurity, complaints handling, marketing, record-keeping, regulatory notifications) → strip any service-type preamble.
+- Service-specific topics (market surveillance, trading venue rules, settlement, margin trading, ETD services, staking, custody segregation, key management, best execution, licensed distribution) → keep the service type from the preamble.
 - Expand: "AML" → "Anti-Money Laundering AML/CFT", "CO" → "Compliance Officer".
 
 ### For EU (AI Act):
-- Expand acronyms: "GPAI" → "general-purpose AI model", "HRAI" → "high-risk AI system", "AI Act" → "Regulation (EU) 2024/1689 Artificial Intelligence Act".
-- For questions about dates, obligations applying, deadlines, entry into force, or transition periods: include BOTH "Regulation 2024/1689" AND "Regulation 2026/1744 Digital Omnibus amendment" in the query, so retrieval pulls the original text and the amendment.
-- For questions about high-risk classification: include "Annex I", "Annex III", "Article 6", "safety component", "conformity assessment".
-- For questions about transparency: include "Article 50", "transparency obligations", "AI interaction disclosure", "synthetic content marking".
-- For questions about prohibited practices: include "Article 5", "prohibited AI practices".
-- For questions about GPAI: include "Article 53", "general-purpose AI models", "GPAI Code of Practice".
+- Expand acronyms: "GPAI" → "general-purpose AI model", "HRAI" → "high-risk AI system".
+- For date/deadline questions: include BOTH "Regulation 2024/1689" AND "Regulation 2026/1744 Digital Omnibus amendment".
+- For high-risk classification: include "Annex I", "Annex III", "Article 6".
+- For transparency: include "Article 50", "transparency obligations".
+- For prohibited practices: include "Article 5".
+- For GPAI: include "Article 53".
 
 ## OUT-OF-SCOPE JURISDICTIONS
-If the user asks about a jurisdiction, regulator, or country that is NOT AE-Dubai (VARA) or EU (e.g., UK FCA, US SEC, Singapore MAS), DO NOT try to map their question to VARA or EU rulebooks. Keep the out-of-scope jurisdiction name in the rewritten query exactly as the user wrote it. (Example: "UK FCA crypto staking guidance").
+If the user asks about a jurisdiction, regulator, or country that is NOT AE-Dubai (VARA) or EU, DO NOT try to map their question to VARA or EU rulebooks. Keep the out-of-scope jurisdiction name in the rewritten query exactly as the user wrote it.
 
 ## WORKED EXAMPLES
 
@@ -121,25 +136,11 @@ Output: market surveillance obligations notifications to VARA Exchange Services 
 Input (jurisdiction: AE-Dubai): "I'm a Broker-Dealer. What are the best execution rules?"
 Output: best execution rules client order execution Broker-Dealer Services Rulebook Part II
 
-Input (jurisdiction: AE-Dubai): "We have 500 institutional clients. What are the governance requirements?"
-Output: corporate governance requirements Board of directors Company Rulebook
-
 Input (jurisdiction: EU): "What are the classification rules for high-risk AI systems?"
 Output: high-risk AI system classification Article 6 Annex I Annex III safety component conformity assessment Regulation 2024/1689
-
-Input (jurisdiction: EU): "When do high-risk AI obligations apply?"
-Output: high-risk AI obligations application date 2 August 2026 Regulation 2024/1689 and Regulation 2026/1744 Digital Omnibus amendment delaying high-risk obligations to 2 December 2027
-
-Input (jurisdiction: EU): "What are the transparency obligations for AI systems that interact with humans?"
-Output: transparency obligations Article 50 AI systems interacting with natural persons disclosure Regulation 2024/1689
 """
 
 
-# --- Cross-cutting topic service-stripping --------------------------------
-# Why: The rewriter LLM reliably fails to strip "Custody provider" context
-# when the topic is cross-cutting (AML, governance, etc.). The prompt asks it
-# to, but gpt-oss-20b doesn't always obey. A deterministic post-processor is
-# more reliable than prompt engineering for this narrow case.
 _CROSS_CUTTING_TOPICS = [
     "aml", "anti-money laundering", "kyc", "cdd", "edd",
     "sanctions", "governance", "board", "capital",
@@ -155,13 +156,8 @@ _SERVICE_TYPES = [
 
 
 def _postprocess_rewrite(rewritten: str, original_question: str) -> str:
-    """
-    Deterministic cleanup of the rewriter output. Two jobs:
-    1. If the topic is cross-cutting, strip service-type words.
-    2. If the output was truncated, fall back to a sanitized version of the original question.
-    """
     text = rewritten.strip()
-    
+
     if not text or text.endswith(("-", ",", " and", " or", " the", " a")):
         fallback = original_question
         for preamble in ["we're a ", "we are a ", "i'm a ", "i am a ",
@@ -174,10 +170,10 @@ def _postprocess_rewrite(rewritten: str, original_question: str) -> str:
                 break
         print(f"[rewrite] Truncated output detected, falling back to: '{fallback}'")
         text = fallback
-    
+
     lower_text = text.lower()
     is_cross_cutting = any(topic in lower_text for topic in _CROSS_CUTTING_TOPICS)
-    
+
     if is_cross_cutting:
         stripped = text
         for svc in _SERVICE_TYPES:
@@ -186,22 +182,24 @@ def _postprocess_rewrite(rewritten: str, original_question: str) -> str:
         if stripped and stripped != text:
             print(f"[rewrite] Cross-cutting topic detected, stripped service context: '{stripped}'")
             text = stripped
-    
+
     return text
 
 
 def _build_context(chunks: List[Dict[str, Any]]) -> str:
     parts = []
     for c in chunks:
-        parts.append(f"[Page {c['page']} | {c['section']} | {c['document']}]\n{c['text']}")
+        tier = c.get("authority_tier", "")
+        tier_str = f" | tier={tier}" if tier else ""
+        parts.append(
+            f"[Page {c['page']} | {c['section']} | {c['document']}{tier_str}]\n{c['text']}"
+        )
     return "\n\n---\n\n".join(parts)
 
 
 def _build_user_message(question: str, chunks: List[Dict[str, Any]], jurisdiction: str = "") -> str:
     context = _build_context(chunks)
-    header = ""
-    if jurisdiction:
-        header = f"JURISDICTION: {jurisdiction}\n\n"
+    header = f"JURISDICTION: {jurisdiction}\n\n" if jurisdiction else ""
     return f"""{header}CONTEXT:
 {context}
 
@@ -230,7 +228,7 @@ def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
         )
         rewritten = (response.choices[0].message.content or "").strip()
         print(f"[query_rewrite] ({jurisdiction}) '{question}' -> '{rewritten}'")
-        
+
         processed = _postprocess_rewrite(rewritten, question)
         if processed != rewritten:
             print(f"[query_rewrite] Post-processed -> '{processed}'")
@@ -242,15 +240,20 @@ def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
 
 def generate_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dict[str, str]] = None, jurisdiction: str = "") -> str:
     if not chunks:
-        return "I don't have that information in the retrieved excerpts."
+        return (
+            "No authoritative source found for this question. This tool is scoped "
+            "to regulatory and compliance topics from loaded regulators and trusted "
+            "web sources (official regulators and established financial press). "
+            "Try asking about a specific regulator or rule."
+        )
 
     client = _get_client()
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-    
+
     if history:
         for msg in history:
             messages.append({"role": msg["role"], "content": msg["content"]})
-            
+
     messages.append({"role": "user", "content": _build_user_message(question, chunks, jurisdiction)})
 
     try:
@@ -276,7 +279,13 @@ def generate_answer(question: str, chunks: List[Dict[str, Any]], history: List[D
 
 def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dict[str, str]] = None, jurisdiction: str = ""):
     if not chunks:
-        yield f"data: {json.dumps({'type': 'text', 'text': "I don't have that information in the retrieved excerpts or web search. Check that the right jurisdiction is selected."})}\n\n"
+        no_chunks_msg = (
+            "No authoritative source found for this question. This tool is scoped "
+            "to regulatory and compliance topics from loaded regulators and trusted "
+            "web sources (official regulators and established financial press). "
+            "Try asking about a specific regulator or rule."
+        )
+        yield f"data: {json.dumps({'type': 'text', 'text': no_chunks_msg})}\n\n"
         return
 
     sources_data = [
@@ -285,21 +294,22 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
             "section": c["section"],
             "document": c["document"],
             "source_url": c.get("source_url", ""),
-            "snippet": c.get("text", "")[:250].strip(),  # Pass the exact text snippet to the frontend
-        } 
+            "authority_tier": c.get("authority_tier", ""),
+            "snippet": c.get("text", "")[:250].strip(),
+        }
         for c in chunks
     ]
     yield f"data: {json.dumps({'type': 'sources', 'sources': sources_data})}\n\n"
 
     client = _get_client()
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-    
+
     if history:
         for msg in history:
             messages.append({"role": msg["role"], "content": msg["content"]})
-            
+
     messages.append({"role": "user", "content": _build_user_message(question, chunks, jurisdiction)})
-    
+
     try:
         response = client.chat.completions.create(
             model=config.LLM_MODEL,
@@ -308,15 +318,15 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
             stream=True,
             messages=messages,
         )
-        
+
         for chunk in response:
             if chunk.choices and chunk.choices[0].delta.content:
                 text = chunk.choices[0].delta.content
                 yield f"data: {json.dumps({'type': 'text', 'text': text})}\n\n"
-                
+
     except Exception as exc:
         print(f"[llm] Streaming error: {exc}")
-        error_msg = f"⚠️ The AI model is currently rate-limited (too many requests). Please wait 10 seconds and try again."
+        error_msg = "⚠️ The AI model is currently rate-limited (too many requests). Please wait 10 seconds and try again."
         yield f"data: {json.dumps({'type': 'text', 'text': error_msg})}\n\n"
 
 
@@ -325,8 +335,8 @@ def generate_title(question: str) -> str:
     try:
         response = client.chat.completions.create(
             model="openai/gpt-oss-20b",
-            temperature=0.3, 
-            max_tokens=200,   
+            temperature=0.3,
+            max_tokens=200,
             messages=[
                 {"role": "system", "content": "Generate a short 3-5 word title. Output ONLY the title."},
                 {"role": "user", "content": f"Question: {question}"}

@@ -1,29 +1,18 @@
 """
 Central configuration for the Regulatory Knowledge Base Chat.
-
-Why this file exists:
-- Every path, provider setting, and magic number lives here — nowhere else.
-- Adding a new regulator (CBN, FCA, etc.) means editing JURISDICTIONS, nothing else.
-- Switching LLM providers (Groq -> DeepSeek) means editing .env, nothing else.
-- Switching vector stores (FAISS -> Qdrant) means editing the path settings here.
 """
 
 import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load .env into the process environment. Must run before any os.getenv calls.
 load_dotenv()
 
 # --- Paths ---
-# BASE_DIR points to the backend/ folder regardless of where Python is run from.
-# Why: relative paths like ./data break if someone runs the script from a different directory.
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 
 # --- LLM Provider Settings (OpenAI-compatible) ---
-# .strip() is crucial here. It removes accidental trailing spaces or newlines
-# that can happen when copying/pasting keys into dashboards like Render.
 LLM_API_KEY = os.getenv("LLM_API_KEY", "").strip()
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.groq.com/openai/v1").strip()
 LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b").strip()
@@ -31,13 +20,10 @@ LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
 LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "2048"))
 
 # --- Embeddings (Cohere) ---
-# We use Cohere to avoid PyTorch RAM overhead and strict rate limits.
 COHERE_API_KEY = os.getenv("COHERE_API_KEY", "").strip()
 EMBEDDING_MODEL = "embed-english-v3.0"
 
 # --- Web Search Fallback (Tavily) ---
-# Why Tavily: Built specifically for LLMs, returns clean snippets and URLs.
-# Free tier: 1,000 credits/month (1 credit per basic search).
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "").strip()
 
 # --- Vector Store (FAISS) ---
@@ -53,14 +39,129 @@ FAISS_METADATA_PATH = os.getenv(
 # --- Chunking & Retrieval ---
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "800"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "150"))
-
-# UPDATED: Bumped from 5 to 8. 
-# Why: VARA rulebooks are massive. When a user asks a specific term like "default management", 
-# the top 5 chunks were sometimes spread across multiple documents but missed the exact 
-# paragraph that defined the obligation. 
-# Impact: 8 chunks × ~250 tokens = 2,000 tokens of context. Slightly slower TTFT, 
-# but massively reduces "I don't know" errors.
 TOP_K_RESULTS = 8
+
+# ============================================================================
+# --- Fallback & Authority Policy ---
+# ============================================================================
+
+# FAISS confidence threshold. 1.15 sits in the gap between good (~0.5-0.9)
+# and junk (~1.3+) matches on this corpus.
+LOW_CONFIDENCE_DISTANCE = 1.15
+
+# If the user's question contains one of these tokens (\b-anchored), route
+# directly to web search. Add a regulator: append to the list.
+OUT_OF_SCOPE_JURISDICTION_TOKENS = [
+    "fca", "sec", "mas", "finma", "cbn", "uk", "us", "usa",
+    "singapore", "nigeria", "bafin", "cma", "asic",
+]
+
+# If the LLM's answer contains one of these phrases (case-insensitive), treat
+# as a refusal and retry once with web search.
+REFUSAL_PATTERNS = [
+    "i don't have that information",
+    "i don't have that in",
+    "not mentioned in the retrieved",
+    "not in the retrieved excerpts",
+    "not contained in the provided",
+    "the provided documents do not",
+    "the retrieved excerpts do not",
+    "i cannot answer this based on",
+]
+
+# Tavily tuning.
+WEB_SEARCH_DEPTH = "advanced"
+WEB_SEARCH_MAX_RESULTS = 5
+
+# ============================================================================
+# --- Web Search Authority Filtering ---
+# The web fallback will ONLY return results from domains in this list. Any
+# result from a blog, aggregator, social media, or unknown site is dropped
+# silently. This is deliberate: a compliance tool must cite regulators and
+# established press, not LinkedIn posts.
+# ============================================================================
+
+TRUSTED_DOMAINS = {
+    # Primary regulators / official government sources
+    "primary": [
+        # UAE / Dubai
+        "vara.ae",
+        "mof.gov.ae",
+        "centralbank.ae",
+        # EU
+        "eur-lex.europa.eu",
+        "europa.eu",
+        # UK
+        "fca.org.uk",
+        "gov.uk",
+        "hmrc.gov.uk",
+        "bankofengland.co.uk",
+        # US
+        "sec.gov",
+        "irs.gov",
+        "federalreserve.gov",
+        "treasury.gov",
+        "cftc.gov",
+        # Singapore
+        "mas.gov.sg",
+        # Switzerland
+        "finma.ch",
+        # Nigeria
+        "firs.gov.ng",
+        "nrs.gov.ng",
+        "cbn.gov.ng",
+        "sec.gov.ng",
+        # Germany
+        "bafin.de",
+        # Australia
+        "asic.gov.au",
+        # Saudi
+        "cma.gov.sa",
+    ],
+    # Established financial / legal press
+    "press": [
+        "reuters.com",
+        "ft.com",
+        "bloomberg.com",
+        "wsj.com",
+        "economist.com",
+        "lawfaremedia.org",
+        "businessday.ng",
+        "punchng.com",
+        "premiumtimesng.com",
+        "guardian.ng",
+        "thecable.ng",
+    ],
+}
+
+# Maps a country/regulator keyword found in the question to the domains Tavily
+# should restrict its search to. Used as Pass 1 of the two-pass strategy.
+# Extend freely — no code changes needed.
+JURISDICTION_DOMAIN_MAP = {
+    "nigeria": [
+        "firs.gov.ng", "nrs.gov.ng", "cbn.gov.ng", "sec.gov.ng",
+        "businessday.ng", "punchng.com", "premiumtimesng.com",
+        "guardian.ng", "thecable.ng",
+    ],
+    "cbn": ["cbn.gov.ng", "businessday.ng", "punchng.com"],
+    "uk": [
+        "fca.org.uk", "gov.uk", "hmrc.gov.uk", "bankofengland.co.uk",
+        "reuters.com", "ft.com",
+    ],
+    "fca": ["fca.org.uk", "gov.uk", "reuters.com", "ft.com"],
+    "us": ["sec.gov", "irs.gov", "federalreserve.gov", "cftc.gov", "reuters.com", "bloomberg.com"],
+    "sec": ["sec.gov", "reuters.com", "bloomberg.com"],
+    "singapore": ["mas.gov.sg", "reuters.com", "bloomberg.com"],
+    "mas": ["mas.gov.sg", "reuters.com"],
+    "switzerland": ["finma.ch", "reuters.com"],
+    "finma": ["finma.ch", "reuters.com"],
+    "germany": ["bafin.de", "reuters.com"],
+    "bafin": ["bafin.de", "reuters.com"],
+    "australia": ["asic.gov.au", "reuters.com"],
+    "asic": ["asic.gov.au", "reuters.com"],
+    "saudi": ["cma.gov.sa", "reuters.com"],
+    "eu": ["eur-lex.europa.eu", "europa.eu", "reuters.com"],
+}
 
 # --- Jurisdiction Registry ---
 JURISDICTIONS = {
@@ -68,16 +169,6 @@ JURISDICTIONS = {
         "regulator": "VARA",
         "name": "Dubai Virtual Assets Regulatory Authority",
         "documents": [
-            # ================================================================
-            # STATE AS OF 2026-10-29 EVENING: 17 documents configured.
-            # FAISS index on disk: 1,388 vectors (clean --reset rebuild).
-            #
-            # This list is the SOURCE OF TRUTH for a --reset rebuild.
-            # New ingestions use scripts/ingest.py which skips titles already
-            # present in metadata.json, so re-running is safe (no duplicates).
-            # ================================================================
-
-            # --- Compulsory Rulebooks (4/4) ---
             {
                 "file": "vara_compliance_risk_rulebook.txt",
                 "title": "Compliance and Risk Management Rulebook",
@@ -106,8 +197,6 @@ JURISDICTIONS = {
                 "source_url": "https://rulebooks.vara.ae/index.php/rulebook/market-conduct-rulebook",
                 "document_type": "rulebook",
             },
-
-            # --- VA Activity Rulebooks (7/9, already ingested) ---
             {
                 "file": "VARA_EN_258_VER20260331.pdf",
                 "title": "Exchange Services Rulebook",
@@ -143,8 +232,6 @@ JURISDICTIONS = {
                 "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_243_VER20250519.pdf",
                 "document_type": "rulebook",
             },
-
-            # --- Guidance Documents (2/2, already ingested) ---
             {
                 "file": "VARA_EN_388_VER1.pdf",
                 "title": "Guidance on Marketing of Virtual Assets",
@@ -159,14 +246,6 @@ JURISDICTIONS = {
                 "source_url": "https://rulebooks.vara.ae/index.php/rulebook/virtual-asset-issuance-rulebook",
                 "document_type": "guidance",
             },
-
-            # ================================================================
-            # NEW (2026-10-29 EVENING): 6 VARA framework documents
-            # These complete the framework layer: Laws, Cabinet Decisions,
-            # master Regulations, plus the last 2 VA Activity rulebooks.
-            # ================================================================
-
-            # --- VA Activity Rulebooks (2 more, completing 9/9) ---
             {
                 "file": "VARA_EN_317_VER20250519.pdf",
                 "title": "VA Management and Investment Services Rulebook",
@@ -181,8 +260,6 @@ JURISDICTIONS = {
                 "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_347_VER20250519.pdf",
                 "document_type": "rulebook",
             },
-
-            # --- Master Regulation (foundation of the whole framework) ---
             {
                 "file": "VARA_EN_18_VER992_2.pdf",
                 "title": "Virtual Assets and Related Activities Regulations 2023",
@@ -190,8 +267,6 @@ JURISDICTIONS = {
                 "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_18_VER992_2.pdf",
                 "document_type": "regulation",
             },
-
-            # --- Laws & Cabinet Decisions (the legal framework above VARA) ---
             {
                 "file": "VARA_EN_338_VER1.pdf",
                 "title": "Law No. (4) of 2022 Regulating Virtual Assets in the Emirate of Dubai",
@@ -219,34 +294,19 @@ JURISDICTIONS = {
         "regulator": "European Union",
         "name": "European Union — Artificial Intelligence",
         "documents": [
-            # ================================================================
-            # EU AI Act — the primary AI regulation for the EU.
-            # Source: EUR-Lex, Official Journal, 12 July 2024.
-            # NOTE: pypdf extraction of this PDF was verified clean on
-            # Article 6 — no garbled text, no broken numbering. The VARA
-            # footer cleaner is SKIPPED for this jurisdiction (see ingestion.py
-            # _is_vara_document guard) so article/paragraph numbers survive.
-            # ================================================================
             {
                 "file": "EU_AI_Act_Regulation_2024_1689.pdf",
                 "title": "Regulation (EU) 2024/1689 — EU Artificial Intelligence Act",
-                "effective_date": "2026-08-02",  # Main application date (most obligations start here)
+                "effective_date": "2026-08-02",
                 "source_url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
                 "document_type": "regulation",
             },
-            # ================================================================
-            # Digital Omnibus on AI — amends the 2024 Act, notably delaying
-            # high-risk obligations from 2026-08-02 to 2027-12-02 for Annex III
-            # systems, and to 2028-08-02 for Annex I product-embedded systems.
-            # Stored as a separate document so the model can explain BOTH the
-            # original date and the amendment when asked "when does this apply?"
-            # ================================================================
             {
                 "file": "EU_AI_Act_Omnibus_2026_1744.pdf",
                 "title": "Regulation (EU) 2026/1744 — Digital Omnibus on AI (amending the EU AI Act)",
-                "effective_date": "2026-07-27",  # Date it entered into force (does NOT change the 2024 Act's effective_date field)
+                "effective_date": "2026-07-27",
                 "source_url": "https://eur-lex.europa.eu/eli/reg/2026/1744/oj",
-                "document_type": "amendment",  # New type — no downstream code filters on document_type, safe to add
+                "document_type": "amendment",
             },
         ],
     },
@@ -254,9 +314,6 @@ JURISDICTIONS = {
 
 
 def validate_config() -> None:
-    """
-    Fail fast at startup if the required API keys are missing.
-    """
     if not LLM_API_KEY:
         raise ValueError(
             "LLM_API_KEY is not set. Copy .env.example to .env and add your Groq API key."
