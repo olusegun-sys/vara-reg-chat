@@ -34,8 +34,9 @@ GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash").strip()
 COHERE_API_KEY = os.getenv("COHERE_API_KEY", "").strip()
 EMBEDDING_MODEL = "embed-english-v3.0"
 
-# --- Web Search Fallback (Tavily) ---
+# --- Web Search Fallback (Tier 1: Tavily, Tier 2: Serper) ---
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "").strip()
+SERPER_API_KEY = os.getenv("SERPER_API_KEY", "").strip()
 
 # --- Vector Store (FAISS) ---
 FAISS_INDEX_PATH = os.getenv(
@@ -54,9 +55,6 @@ CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "150"))
 TOP_K_RESULTS = 5
 
 # --- Web Fallback Configuration ---
-# Changed from "basic" to "advanced". Why: "basic" failed to find FCA consultations
-# and Nigerian SEC news. "advanced" costs 2 credits instead of 1 but reads deeper
-# into the web pages, which is crucial for regulatory lookups.
 WEB_SEARCH_DEPTH = "advanced"
 WEB_SEARCH_MAX_RESULTS = 3
 LOW_CONFIDENCE_DISTANCE = 1.15
