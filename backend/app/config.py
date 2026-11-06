@@ -20,10 +20,14 @@ LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b").strip()
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
 LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "2048"))
 
-# --- LLM Provider Settings (Backup: OpenRouter) ---
+# --- LLM Provider Settings (Backup 1: OpenRouter) ---
 BACKUP_LLM_API_KEY = os.getenv("BACKUP_LLM_API_KEY", "").strip()
 BACKUP_LLM_BASE_URL = os.getenv("BACKUP_LLM_BASE_URL", "https://openrouter.ai/api/v1").strip()
 BACKUP_LLM_MODEL = os.getenv("BACKUP_LLM_MODEL", "meta-llama/llama-3-70b-instruct:free").strip()
+
+# --- LLM Provider Settings (Backup 2: Google Gemini) ---
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash").strip()
 
 # --- Embeddings (Cohere) ---
 COHERE_API_KEY = os.getenv("COHERE_API_KEY", "").strip()
@@ -45,9 +49,7 @@ FAISS_METADATA_PATH = os.getenv(
 # --- Chunking & Retrieval ---
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "800"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "150"))
-# Changed from 8 to 5. Why: A very long user question + 8 chunks (~2000 tokens)
-# + system prompt + history exceeded Groq's 8,000 TPM (single request) limit.
-# 5 chunks keeps us safely under the ceiling while still providing plenty of context.
+# 5 chunks keeps us safely under the 8k token limit while providing context.
 TOP_K_RESULTS = 5
 
 # --- Web Fallback Configuration ---

@@ -3,6 +3,7 @@ import re
 import time
 from typing import List, Dict, Any
 from openai import OpenAI
+import google.generativeai as genai
 
 from app import config
 
@@ -162,6 +163,22 @@ def _get_backup_client() -> OpenAI:
         timeout=60.0,
     )
 
+def _get_gemini_client():
+    genai.configure(api_key=config.GEMINI_API_KEY)
+    return genai.GenerativeModel(
+        model_name=config.GEMINI_MODEL,
+        system_instruction=SYSTEM_PROMPT
+    )
+
+def _format_gemini_history(messages: List[Dict[str, str]]) -> list:
+    history = []
+    for msg in messages:
+        if msg["role"] == "system":
+            continue
+        role = "model" if msg["role"] == "assistant" else "user"
+        history.append({"role": role, "parts": [msg["content"]]})
+    return history
+
 
 def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
     client = _get_client()
@@ -190,131 +207,128 @@ def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
 
 def generate_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dict[str, str]] = None, jurisdiction: str = "") -> str:
     if not chunks:
-        return "I couldn't find authoritative sources that directly address this question. Try rephrasing with more specific terms — for example, name the specific article, obligation, or regulator you're asking about."
+        return "I couldn't find authoritative sources..."
 
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-
     if history:
-        for msg in history:
-            messages.append({"role": msg["role"], "content": msg["content"]})
-
+        messages.extend(history)
     messages.append({"role": "user", "content": _build_user_message(question, chunks, jurisdiction)})
 
+    # Tier 1: Groq
     try:
         client = _get_client()
         response = client.chat.completions.create(
-            model=config.LLM_MODEL,
-            temperature=config.LLM_TEMPERATURE,
-            max_tokens=config.LLM_MAX_TOKENS,
-            messages=messages,
+            model=config.LLM_MODEL, temperature=config.LLM_TEMPERATURE, max_tokens=config.LLM_MAX_TOKENS, messages=messages
         )
         return (response.choices[0].message.content or "").strip()
-    except Exception as exc:
-        err_str = str(exc)
-        print(f"[llm] Generate failed (Primary): {err_str}")
-        
-        is_rate_limit = "429" in err_str or "rate limit" in err_str.lower()
-        is_too_large = "413" in err_str or "too large" in err_str.lower() or "reduce your message" in err_str.lower()
-        
-        if (is_rate_limit or is_too_large) and config.BACKUP_LLM_API_KEY:
-            print(f"[llm] Failing over to backup provider (reason: {'413' if is_too_large else '429'})...")
-            try:
-                backup_client = _get_backup_client()
-                response = backup_client.chat.completions.create(
-                    model=config.BACKUP_LLM_MODEL,
+    except Exception as e:
+        print(f"[llm] Tier 1 (Groq) failed: {e}")
+
+    # Tier 2: OpenRouter
+    if config.BACKUP_LLM_API_KEY:
+        try:
+            print("[llm] Trying Tier 2 (OpenRouter)...")
+            client = _get_backup_client()
+            response = client.chat.completions.create(
+                model=config.BACKUP_LLM_MODEL, temperature=config.LLM_TEMPERATURE, max_tokens=config.LLM_MAX_TOKENS, messages=messages
+            )
+            return (response.choices[0].message.content or "").strip()
+        except Exception as e:
+            print(f"[llm] Tier 2 (OpenRouter) failed: {e}")
+
+    # Tier 3: Gemini
+    if config.GEMINI_API_KEY:
+        try:
+            print("[llm] Trying Tier 3 (Gemini)...")
+            gemini = _get_gemini_client()
+            gemini_messages = _format_gemini_history(messages)
+            prompt = gemini_messages.pop()["parts"][0]
+            
+            response = gemini.generate_content(
+                contents=gemini_messages + [{"role": "user", "parts": [prompt]}],
+                generation_config=genai.types.GenerationConfig(
                     temperature=config.LLM_TEMPERATURE,
-                    max_tokens=config.LLM_MAX_TOKENS,
-                    messages=messages,
+                    max_output_tokens=config.LLM_MAX_TOKENS,
                 )
-                return (response.choices[0].message.content or "").strip()
-            except Exception as backup_exc:
-                print(f"[llm] Backup also failed: {backup_exc}")
-                if is_too_large:
-                    raise RuntimeError("Your question is too long for the AI model. Try rephrasing it shorter.")
-                raise RuntimeError("Both primary and backup AI providers are currently unavailable. Please wait a moment.")
-        
-        raise exc
+            )
+            return response.text.strip()
+        except Exception as e:
+            print(f"[llm] Tier 3 (Gemini) failed: {e}")
+
+    raise RuntimeError("All AI providers are currently unavailable. Please wait 60 seconds and try again.")
 
 
 def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dict[str, str]] = None, jurisdiction: str = ""):
     if not chunks:
-        chunks = [{"page": 1, "section": "No Context", "document": "No Context", "text": "No internal rulebook context found."}]
+        chunks = [{"page": 1, "section": "No Context", "document": "No Context", "text": "No context."}]
 
     sources_data = [
-        {
-            "page": c["page"],
-            "section": c["section"],
-            "document": c["document"],
-            "source_url": c.get("source_url", ""),
-            "authority_tier": c.get("authority_tier", ""),
-            "snippet": c.get("text", "")[:250].strip(),
-        }
-        for c in chunks
-        if c["document"] != "No Context"
+        {"page": c["page"], "section": c["section"], "document": c["document"], "source_url": c.get("source_url", ""), "authority_tier": c.get("authority_tier", ""), "snippet": c.get("text", "")[:250].strip()}
+        for c in chunks if c["document"] != "No Context"
     ]
     
     if sources_data:
         yield f"data: {json.dumps({'type': 'sources', 'sources': sources_data})}\n\n"
 
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-
     if history:
-        for msg in history:
-            messages.append({"role": msg["role"], "content": msg["content"]})
-
+        messages.extend(history)
     messages.append({"role": "user", "content": _build_user_message(question, chunks, jurisdiction)})
 
+    # --- TIER 1: Groq ---
     try:
         client = _get_client()
         response = client.chat.completions.create(
-            model=config.LLM_MODEL,
-            temperature=config.LLM_TEMPERATURE,
-            max_tokens=config.LLM_MAX_TOKENS,
-            stream=True,
-            messages=messages,
+            model=config.LLM_MODEL, temperature=config.LLM_TEMPERATURE, max_tokens=config.LLM_MAX_TOKENS, stream=True, messages=messages
         )
-
         for chunk in response:
             if chunk.choices and chunk.choices[0].delta.content:
-                text = chunk.choices[0].delta.content
-                yield f"data: {json.dumps({'type': 'text', 'text': text})}\n\n"
+                yield f"data: {json.dumps({'type': 'text', 'text': chunk.choices[0].delta.content})}\n\n"
         return
-        
-    except Exception as exc:
-        err_str = str(exc)
-        print(f"[llm] Streaming error (Primary): {err_str}")
-        
-        is_rate_limit = "429" in err_str or "rate limit" in err_str.lower()
-        is_too_large = "413" in err_str or "too large" in err_str.lower() or "reduce your message" in err_str.lower()
-        
-        if (is_rate_limit or is_too_large) and config.BACKUP_LLM_API_KEY:
-            print(f"[llm] Failing over to backup provider (reason: {'413' if is_too_large else '429'})...")
-            try:
-                backup_client = _get_backup_client()
-                backup_response = backup_client.chat.completions.create(
-                    model=config.BACKUP_LLM_MODEL,
-                    temperature=config.LLM_TEMPERATURE,
-                    max_tokens=config.LLM_MAX_TOKENS,
-                    stream=True,
-                    messages=messages,
-                )
-                for chunk in backup_response:
-                    if chunk.choices and chunk.choices[0].delta.content:
-                        text = chunk.choices[0].delta.content
-                        yield f"data: {json.dumps({'type': 'text', 'text': text})}\n\n"
-                return
-            except Exception as backup_exc:
-                print(f"[llm] Backup also failed: {backup_exc}")
-                if is_too_large:
-                    error_msg = "⚠️ Your question is too long for the current AI model. Try rephrasing it shorter, or break it into two separate questions."
-                else:
-                    error_msg = "⚠️ The system is currently experiencing high demand. Please try again in a few minutes."
-                yield f"data: {json.dumps({'type': 'text', 'text': error_msg})}\n\n"
-                return
+    except Exception as e:
+        print(f"[llm] Tier 1 (Groq) failed: {e}")
 
-        # Generic failure
-        error_msg = "⚠️ An error occurred processing your request. Please try again."
-        yield f"data: {json.dumps({'type': 'text', 'text': error_msg})}\n\n"
+    # --- TIER 2: OpenRouter ---
+    if config.BACKUP_LLM_API_KEY:
+        try:
+            print("[llm] Falling back to Tier 2 (OpenRouter)...")
+            client = _get_backup_client()
+            response = client.chat.completions.create(
+                model=config.BACKUP_LLM_MODEL, temperature=config.LLM_TEMPERATURE, max_tokens=config.LLM_MAX_TOKENS, stream=True, messages=messages
+            )
+            for chunk in response:
+                if chunk.choices and chunk.choices[0].delta.content:
+                    yield f"data: {json.dumps({'type': 'text', 'text': chunk.choices[0].delta.content})}\n\n"
+            return
+        except Exception as e:
+            print(f"[llm] Tier 2 (OpenRouter) failed: {e}")
+
+    # --- TIER 3: Gemini ---
+    if config.GEMINI_API_KEY:
+        try:
+            print("[llm] Falling back to Tier 3 (Gemini)...")
+            gemini = _get_gemini_client()
+            gemini_messages = _format_gemini_history(messages)
+            prompt = gemini_messages.pop()["parts"][0]
+            
+            response = gemini.generate_content(
+                contents=gemini_messages + [{"role": "user", "parts": [prompt]}],
+                generation_config=genai.types.GenerationConfig(
+                    temperature=config.LLM_TEMPERATURE,
+                    max_output_tokens=config.LLM_MAX_TOKENS,
+                ),
+                stream=True
+            )
+            
+            for chunk in response:
+                if chunk.text:
+                    yield f"data: {json.dumps({'type': 'text', 'text': chunk.text})}\n\n"
+            return
+        except Exception as e:
+            print(f"[llm] Tier 3 (Gemini) failed: {e}")
+
+    error_msg = "⚠️ All AI providers are currently unavailable. Please wait 60 seconds and try again."
+    yield f"data: {json.dumps({'type': 'text', 'text': error_msg})}\n\n"
 
 
 def generate_title(question: str) -> str:
