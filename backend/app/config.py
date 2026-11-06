@@ -18,7 +18,8 @@ LLM_API_KEY = os.getenv("LLM_API_KEY", "").strip()
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.groq.com/openai/v1").strip()
 LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b").strip()
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
-LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "2048"))
+# Reduced from 2048 to 1200 for faster generation and lower TPM usage.
+LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "1200"))
 
 # --- LLM Provider Settings (Backup 1: OpenRouter) ---
 BACKUP_LLM_API_KEY = os.getenv("BACKUP_LLM_API_KEY", "").strip()
@@ -53,7 +54,10 @@ CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "150"))
 TOP_K_RESULTS = 5
 
 # --- Web Fallback Configuration ---
-WEB_SEARCH_DEPTH = "basic"
+# Changed from "basic" to "advanced". Why: "basic" failed to find FCA consultations
+# and Nigerian SEC news. "advanced" costs 2 credits instead of 1 but reads deeper
+# into the web pages, which is crucial for regulatory lookups.
+WEB_SEARCH_DEPTH = "advanced"
 WEB_SEARCH_MAX_RESULTS = 3
 LOW_CONFIDENCE_DISTANCE = 1.15
 OUT_OF_SCOPE_JURISDICTION_TOKENS = ["fca", "sec", "mas", "finma", "cbn", "uk", "us", "singapore", "nigeria"]

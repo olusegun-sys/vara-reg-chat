@@ -181,6 +181,12 @@ def _format_gemini_history(messages: List[Dict[str, str]]) -> list:
 
 
 def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
+    # FAST PATH: skip the rewriter for short, direct questions. The rewriter
+    # is only useful for vague questions like "what about custody?" — it
+    # wastes 1-2 seconds on every question otherwise.
+    if len(question.split()) < 8:
+        return question
+        
     client = _get_client()
     try:
         response = client.chat.completions.create(
@@ -284,7 +290,7 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
         for chunk in response:
             if chunk.choices and chunk.choices[0].delta.content:
                 yield f"data: {json.dumps({'type': 'text', 'text': chunk.choices[0].delta.content})}\n\n"
-        return
+        return # Success
     except Exception as e:
         print(f"[llm] Tier 1 (Groq) failed: {e}")
 
@@ -299,7 +305,7 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
             for chunk in response:
                 if chunk.choices and chunk.choices[0].delta.content:
                     yield f"data: {json.dumps({'type': 'text', 'text': chunk.choices[0].delta.content})}\n\n"
-            return
+            return # Success
         except Exception as e:
             print(f"[llm] Tier 2 (OpenRouter) failed: {e}")
 
@@ -323,7 +329,7 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
             for chunk in response:
                 if chunk.text:
                     yield f"data: {json.dumps({'type': 'text', 'text': chunk.text})}\n\n"
-            return
+            return # Success
         except Exception as e:
             print(f"[llm] Tier 3 (Gemini) failed: {e}")
 
