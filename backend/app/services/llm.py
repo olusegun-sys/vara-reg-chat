@@ -178,8 +178,6 @@ def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
         rewritten = (response.choices[0].message.content or "").strip()
         print(f"[query_rewrite] ({jurisdiction}) '{question}' -> '{rewritten}'")
         
-        # SAFETY: if the rewrite is suspiciously short (fewer than 4 words),
-        # it likely dropped critical concepts. Fall back to the raw question.
         if len(rewritten.split()) < 4:
             print(f"[query_rewrite] Rewrite too short, using raw question.")
             return question
@@ -215,21 +213,25 @@ def generate_answer(question: str, chunks: List[Dict[str, Any]], history: List[D
         err_str = str(exc)
         print(f"[llm] Generate failed (Primary): {err_str}")
         
-        if "429" in err_str or "rate limit" in err_str.lower():
-            if config.BACKUP_LLM_API_KEY:
-                print("[llm] Failing over to backup provider...")
-                try:
-                    backup_client = _get_backup_client()
-                    response = backup_client.chat.completions.create(
-                        model=config.BACKUP_LLM_MODEL,
-                        temperature=config.LLM_TEMPERATURE,
-                        max_tokens=config.LLM_MAX_TOKENS,
-                        messages=messages,
-                    )
-                    return (response.choices[0].message.content or "").strip()
-                except Exception as backup_exc:
-                    print(f"[llm] Backup also failed: {backup_exc}")
-                    raise RuntimeError("Both primary and backup AI providers are currently rate-limited. Please wait a moment.")
+        is_rate_limit = "429" in err_str or "rate limit" in err_str.lower()
+        is_too_large = "413" in err_str or "too large" in err_str.lower() or "reduce your message" in err_str.lower()
+        
+        if (is_rate_limit or is_too_large) and config.BACKUP_LLM_API_KEY:
+            print(f"[llm] Failing over to backup provider (reason: {'413' if is_too_large else '429'})...")
+            try:
+                backup_client = _get_backup_client()
+                response = backup_client.chat.completions.create(
+                    model=config.BACKUP_LLM_MODEL,
+                    temperature=config.LLM_TEMPERATURE,
+                    max_tokens=config.LLM_MAX_TOKENS,
+                    messages=messages,
+                )
+                return (response.choices[0].message.content or "").strip()
+            except Exception as backup_exc:
+                print(f"[llm] Backup also failed: {backup_exc}")
+                if is_too_large:
+                    raise RuntimeError("Your question is too long for the AI model. Try rephrasing it shorter.")
+                raise RuntimeError("Both primary and backup AI providers are currently unavailable. Please wait a moment.")
         
         raise exc
 
@@ -282,29 +284,35 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
         err_str = str(exc)
         print(f"[llm] Streaming error (Primary): {err_str}")
         
-        if "429" in err_str or "rate limit" in err_str.lower():
-            if config.BACKUP_LLM_API_KEY:
-                print("[llm] Failing over to backup provider...")
-                try:
-                    backup_client = _get_backup_client()
-                    backup_response = backup_client.chat.completions.create(
-                        model=config.BACKUP_LLM_MODEL,
-                        temperature=config.LLM_TEMPERATURE,
-                        max_tokens=config.LLM_MAX_TOKENS,
-                        stream=True,
-                        messages=messages,
-                    )
-                    for chunk in backup_response:
-                        if chunk.choices and chunk.choices[0].delta.content:
-                            text = chunk.choices[0].delta.content
-                            yield f"data: {json.dumps({'type': 'text', 'text': text})}\n\n"
-                    return
-                except Exception as backup_exc:
-                    print(f"[llm] Backup also failed: {backup_exc}")
+        is_rate_limit = "429" in err_str or "rate limit" in err_str.lower()
+        is_too_large = "413" in err_str or "too large" in err_str.lower() or "reduce your message" in err_str.lower()
+        
+        if (is_rate_limit or is_too_large) and config.BACKUP_LLM_API_KEY:
+            print(f"[llm] Failing over to backup provider (reason: {'413' if is_too_large else '429'})...")
+            try:
+                backup_client = _get_backup_client()
+                backup_response = backup_client.chat.completions.create(
+                    model=config.BACKUP_LLM_MODEL,
+                    temperature=config.LLM_TEMPERATURE,
+                    max_tokens=config.LLM_MAX_TOKENS,
+                    stream=True,
+                    messages=messages,
+                )
+                for chunk in backup_response:
+                    if chunk.choices and chunk.choices[0].delta.content:
+                        text = chunk.choices[0].delta.content
+                        yield f"data: {json.dumps({'type': 'text', 'text': text})}\n\n"
+                return
+            except Exception as backup_exc:
+                print(f"[llm] Backup also failed: {backup_exc}")
+                if is_too_large:
+                    error_msg = "⚠️ Your question is too long for the current AI model. Try rephrasing it shorter, or break it into two separate questions."
+                else:
                     error_msg = "⚠️ The system is currently experiencing high demand. Please try again in a few minutes."
-                    yield f"data: {json.dumps({'type': 'text', 'text': error_msg})}\n\n"
-                    return
+                yield f"data: {json.dumps({'type': 'text', 'text': error_msg})}\n\n"
+                return
 
+        # Generic failure
         error_msg = "⚠️ An error occurred processing your request. Please try again."
         yield f"data: {json.dumps({'type': 'text', 'text': error_msg})}\n\n"
 
@@ -324,12 +332,10 @@ def generate_title(question: str) -> str:
         title = (response.choices[0].message.content or "").strip()
         title = title.replace('"', '').replace("'", "").replace("*", "").strip()
         
-        # SAFETY: never return empty or None — Supabase rejects null titles.
         if not title:
             title = (question[:30] + "...") if len(question) > 30 else question
         return title
     except Exception as e:
         print(f"[title] Failed: {e}")
-        # Fallback: use the first 30 chars of the question. Never None.
         fallback = (question[:30] + "...") if len(question) > 30 else question
         return fallback or "New Conversation"

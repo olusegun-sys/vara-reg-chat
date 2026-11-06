@@ -23,7 +23,7 @@ LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "2048"))
 # --- LLM Provider Settings (Backup: OpenRouter) ---
 BACKUP_LLM_API_KEY = os.getenv("BACKUP_LLM_API_KEY", "").strip()
 BACKUP_LLM_BASE_URL = os.getenv("BACKUP_LLM_BASE_URL", "https://openrouter.ai/api/v1").strip()
-BACKUP_LLM_MODEL = os.getenv("BACKUP_LLM_MODEL", "meta-llama/llama-3-70b-instruct").strip()
+BACKUP_LLM_MODEL = os.getenv("BACKUP_LLM_MODEL", "meta-llama/llama-3-70b-instruct:free").strip()
 
 # --- Embeddings (Cohere) ---
 COHERE_API_KEY = os.getenv("COHERE_API_KEY", "").strip()
@@ -45,7 +45,10 @@ FAISS_METADATA_PATH = os.getenv(
 # --- Chunking & Retrieval ---
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "800"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "150"))
-TOP_K_RESULTS = 8
+# Changed from 8 to 5. Why: A very long user question + 8 chunks (~2000 tokens)
+# + system prompt + history exceeded Groq's 8,000 TPM (single request) limit.
+# 5 chunks keeps us safely under the ceiling while still providing plenty of context.
+TOP_K_RESULTS = 5
 
 # --- Web Fallback Configuration ---
 WEB_SEARCH_DEPTH = "basic"
