@@ -30,7 +30,8 @@ def _search_tavily(query: str) -> List[Dict[str, Any]]:
             if not _is_trusted(url): continue
             
             results.append({
-                "text": res.get("content", ""),
+                # Inject the URL directly into the text so the LLM sees it as context.
+                "text": f"Source URL: {url}\n\n{res.get('content', '')}",
                 "page": i + 1,
                 "section": "Web Search Result",
                 "document": res.get("title", "Web Source"),
@@ -62,12 +63,12 @@ def _search_serper(query: str) -> List[Dict[str, Any]]:
             if not _is_trusted(link): continue
             
             # Serper doesn't return full page text, just a snippet.
-            # We combine title + snippet so the LLM has enough context.
-            text = res.get("snippet", "")
+            # We combine title + snippet + URL so the LLM has enough context.
+            snippet = res.get("snippet", "")
             title = res.get("title", "Web Source")
             
             results.append({
-                "text": f"{title}\n{text}",
+                "text": f"Source URL: {link}\n\n{title}\n{snippet}",
                 "page": i + 1,
                 "section": "Web Search Result",
                 "document": title,
@@ -86,13 +87,13 @@ def search_web(query: str, max_results: int = 3) -> List[Dict[str, Any]]:
     """
     print(f"[web_search] Searching for: {query}")
     
-    # 1. Try Tavily (great for standard web content)
+    # 1. Try Tavily
     results = _search_tavily(query)
     if results:
         print(f"[web_search] Tavily found {len(results)} results.")
         return results[:max_results]
         
-    # 2. Fallback to Serper (Google) for obscure PDFs and news
+    # 2. Fallback to Serper
     print("[web_search] Tavily found nothing. Falling back to Serper (Google)...")
     results = _search_serper(query)
     if results:
