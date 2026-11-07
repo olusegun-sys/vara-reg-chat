@@ -56,6 +56,16 @@ TRUSTED_DOMAINS = [
     "finma.ch", "cbn.gov.ng", "vara.ae", "reuters.com", "ft.com", "bloomberg.com"
 ]
 
+# Phrases the LLM emits when it can't find an answer. If the generated answer
+# contains any of these, routes.py silently retries with web search.
+REFUSAL_PATTERNS = [
+    "I couldn't find authoritative sources",
+    "I don't have that information",
+    "no authoritative source found",
+    "not stated in the retrieved sources",
+    "not in the provided document",
+]
+
 # --- Query Hint Map (Fix for Article 50 & Omnibus Deadline) ---
 # If the query contains these trigger words, append the hints to force the
 # retriever to look at the correct amendment chunk.
