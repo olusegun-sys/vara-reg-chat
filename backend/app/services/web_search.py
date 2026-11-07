@@ -30,7 +30,6 @@ def _search_tavily(query: str) -> List[Dict[str, Any]]:
             if not _is_trusted(url): continue
             
             results.append({
-                # Inject the URL directly into the text so the LLM sees it as context.
                 "text": f"Source URL: {url}\n\n{res.get('content', '')}",
                 "page": i + 1,
                 "section": "Web Search Result",
@@ -62,8 +61,6 @@ def _search_serper(query: str) -> List[Dict[str, Any]]:
             link = res.get("link", "")
             if not _is_trusted(link): continue
             
-            # Serper doesn't return full page text, just a snippet.
-            # We combine title + snippet + URL so the LLM has enough context.
             snippet = res.get("snippet", "")
             title = res.get("title", "Web Source")
             
@@ -83,22 +80,32 @@ def _search_serper(query: str) -> List[Dict[str, Any]]:
 
 def search_web(query: str, max_results: int = 3) -> List[Dict[str, Any]]:
     """
-    Try Tavily first. If it returns nothing (e.g. misses obscure PDFs), try Serper (Google).
+    Try Tavily first. If it returns fewer than 2 results, ALSO try Serper and merge.
     """
     print(f"[web_search] Searching for: {query}")
     
-    # 1. Try Tavily
-    results = _search_tavily(query)
-    if results:
-        print(f"[web_search] Tavily found {len(results)} results.")
-        return results[:max_results]
-        
-    # 2. Fallback to Serper
-    print("[web_search] Tavily found nothing. Falling back to Serper (Google)...")
-    results = _search_serper(query)
-    if results:
-        print(f"[web_search] Serper found {len(results)} results.")
-        return results[:max_results]
-        
-    print("[web_search] Both Tavily and Serper returned no trusted results.")
-    return []
+    tavily_results = _search_tavily(query)
+    print(f"[web_search] Tavily found {len(tavily_results)} results.")
+    
+    serper_results = []
+    # If Tavily found < 2 results, also try Serper. More sources = richer context.
+    if len(tavily_results) < 2:
+        print("[web_search] Tavily found fewer than 2 results. Falling back to Serper...")
+        serper_results = _search_serper(query)
+        print(f"[web_search] Serper found {len(serper_results)} results.")
+    
+    # Merge and deduplicate by URL
+    seen_urls = set()
+    merged = []
+    for r in tavily_results + serper_results:
+        url = r.get("source_url", "")
+        if url and url not in seen_urls:
+            seen_urls.add(url)
+            merged.append(r)
+    
+    if not merged:
+        print("[web_search] No trusted results found.")
+        return []
+    
+    print(f"[web_search] Returning {min(len(merged), max_results)} merged results.")
+    return merged[:max_results]
