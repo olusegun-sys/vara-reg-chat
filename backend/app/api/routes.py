@@ -31,8 +31,6 @@ _OUT_OF_SCOPE_RE = _out_of_scope_regex()
 
 
 def _needs_web_fallback(question: str, chunks: list) -> tuple:
-    # Only trigger out-of-scope if it's a short/direct question. 
-    # Long scenario questions might just mention "US" or "UK" in passing.
     if _OUT_OF_SCOPE_RE.search(question):
         if len(question.split()) < 40:
             return True, "out-of-scope jurisdiction mentioned"
@@ -185,6 +183,7 @@ def chat_stream(req: ChatRequest):
         print(f"[fallback:pre] {reason}. Triggering web search.")
         chunks, _ = _apply_web_fallback(req.question)
 
+    # Note: llm.stream_answer now handles the Critic agent internally.
     return StreamingResponse(
         llm.stream_answer(req.question, chunks, req.history, req.jurisdiction),
         media_type="text/event-stream",

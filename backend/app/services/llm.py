@@ -99,6 +99,21 @@ Output: high-risk AI system classification Article 6 Annex I Annex III safety co
 """
 
 
+CRITIC_PROMPT = """You are a strict legal compliance auditor. Your job is to review a draft answer written by an AI assistant and verify its accuracy against the provided source context.
+
+## YOUR CHECKLIST
+1. **Hallucinations:** Does the answer contain ANY specific facts, numbers, dates, penalty amounts, or article numbers that do NOT appear in the source context? (FAIL)
+2. **Missing Citations:** Does the answer make factual claims without citing a source? (FAIL)
+3. **Source Mismatch:** Does the answer cite a document that isn't actually in the provided sources? (FAIL)
+
+## HOW TO RESPOND
+Output ONLY one of these two strings:
+- "PASS" (if the answer is factually grounded and properly cited)
+- "FAIL" (if the answer has hallucinations, missing citations, or source mismatches)
+
+Do NOT output any other text. Just "PASS" or "FAIL"."""
+
+
 _CROSS_CUTTING_TOPICS = [
     "aml", "anti-money laundering", "kyc", "cdd", "edd",
     "sanctions", "governance", "board", "capital",
@@ -143,8 +158,6 @@ def _postprocess_rewrite(rewritten: str, original_question: str) -> str:
 
 
 def _apply_query_hints(question: str, query: str) -> str:
-    """If the question contains trigger words (e.g., 'deadline', 'article 50'),
-    append the hints from config.QUERY_HINT_MAP to the search query."""
     question_lower = question.lower()
     for trigger, hints in config.QUERY_HINT_MAP.items():
         if trigger in question_lower:
@@ -206,11 +219,8 @@ def _format_gemini_history(messages: List[Dict[str, str]]) -> list:
 
 
 def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
-    # FAST PATH: skip the rewriter for short OR very long questions.
     word_count = len(question.split())
     if word_count < 8 or word_count > 40:
-        # Even if we skip the LLM rewriter, still apply the query hints
-        # so "deadline" or "article 50" triggers the correct amendment chunks.
         return _apply_query_hints(question, question)
         
     client = _get_client()
@@ -229,15 +239,43 @@ def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
         
         if len(rewritten.split()) < 4:
             print(f"[query_rewrite] Rewrite too short, using raw question.")
-            # Apply hints to the raw question if the rewrite failed
             return _apply_query_hints(question, question)
             
         processed = _postprocess_rewrite(rewritten, question) or question
-        # Apply hints to the processed rewrite
         return _apply_query_hints(question, processed)
     except Exception as e:
         print(f"[query_rewrite] Failed: {e}")
         return _apply_query_hints(question, question)
+
+
+def critic_check(question: str, chunks: List[Dict[str, Any]], draft_answer: str) -> bool:
+    """Run a fast LLM to check the draft answer for hallucinations."""
+    context = _build_context(chunks)
+    check_message = f"""CONTEXT:
+{context}
+
+DRAFT ANSWER:
+{draft_answer}
+
+Review the draft answer against the context. Output ONLY 'PASS' or 'FAIL'."""
+    
+    try:
+        client = _get_client()
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant", # Fast, cheap model for the critic
+            temperature=0.0,
+            max_tokens=10,
+            messages=[
+                {"role": "system", "content": CRITIC_PROMPT},
+                {"role": "user", "content": check_message}
+            ],
+        )
+        result = (response.choices[0].message.content or "").strip().upper()
+        print(f"[critic] Result: {result}")
+        return "PASS" in result
+    except Exception as e:
+        print(f"[critic] Failed: {e}")
+        return True # Fail open (allow the answer if critic crashes)
 
 
 def generate_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dict[str, str]] = None, jurisdiction: str = "") -> str:
@@ -282,8 +320,7 @@ def generate_answer(question: str, chunks: List[Dict[str, Any]], history: List[D
             response = gemini.generate_content(
                 contents=gemini_messages + [{"role": "user", "parts": [prompt]}],
                 generation_config=genai.types.GenerationConfig(
-                    temperature=config.LLM_TEMPERATURE,
-                    max_output_tokens=config.LLM_MAX_TOKENS,
+                    temperature=config.LLM_TEMPERATURE, max_output_tokens=config.LLM_MAX_TOKENS,
                 )
             )
             return response.text.strip()
@@ -305,65 +342,26 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
     if sources_data:
         yield f"data: {json.dumps({'type': 'sources', 'sources': sources_data})}\n\n"
 
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-    if history:
-        messages.extend(history)
-    messages.append({"role": "user", "content": _build_user_message(question, chunks, jurisdiction)})
-
-    # --- TIER 1: Groq ---
-    try:
-        client = _get_client()
-        response = client.chat.completions.create(
-            model=config.LLM_MODEL, temperature=config.LLM_TEMPERATURE, max_tokens=config.LLM_MAX_TOKENS, stream=True, messages=messages
-        )
-        for chunk in response:
-            if chunk.choices and chunk.choices[0].delta.content:
-                yield f"data: {json.dumps({'type': 'text', 'text': chunk.choices[0].delta.content})}\n\n"
+    # Option A: Generate full answer, check with Critic, THEN stream
+    draft = generate_answer(question, chunks, history, jurisdiction)
+    
+    # If the draft is a refusal, stream it immediately (Critic can't fix "I don't know")
+    if "couldn't find authoritative" in draft or "don't have that information" in draft:
+        yield f"data: {json.dumps({'type': 'text', 'text': draft})}\n\n"
         return
-    except Exception as e:
-        print(f"[llm] Tier 1 (Groq) failed: {e}")
-
-    # --- TIER 2: OpenRouter ---
-    if config.BACKUP_LLM_API_KEY:
-        try:
-            print("[llm] Falling back to Tier 2 (OpenRouter)...")
-            client = _get_backup_client()
-            response = client.chat.completions.create(
-                model=config.BACKUP_LLM_MODEL, temperature=config.LLM_TEMPERATURE, max_tokens=config.LLM_MAX_TOKENS, stream=True, messages=messages
-            )
-            for chunk in response:
-                if chunk.choices and chunk.choices[0].delta.content:
-                    yield f"data: {json.dumps({'type': 'text', 'text': chunk.choices[0].delta.content})}\n\n"
-            return
-        except Exception as e:
-            print(f"[llm] Tier 2 (OpenRouter) failed: {e}")
-
-    # --- TIER 3: Gemini ---
-    if config.GEMINI_API_KEY:
-        try:
-            print("[llm] Falling back to Tier 3 (Gemini)...")
-            gemini = _get_gemini_client()
-            gemini_messages = _format_gemini_history(messages)
-            prompt = gemini_messages.pop()["parts"][0]
-            
-            response = gemini.generate_content(
-                contents=gemini_messages + [{"role": "user", "parts": [prompt]}],
-                generation_config=genai.types.GenerationConfig(
-                    temperature=config.LLM_TEMPERATURE,
-                    max_output_tokens=config.LLM_MAX_TOKENS,
-                ),
-                stream=True
-            )
-            
-            for chunk in response:
-                if chunk.text:
-                    yield f"data: {json.dumps({'type': 'text', 'text': chunk.text})}\n\n"
-            return
-        except Exception as e:
-            print(f"[llm] Tier 3 (Gemini) failed: {e}")
-
-    error_msg = "⚠️ All AI providers are currently unavailable. Please wait 60 seconds and try again."
-    yield f"data: {json.dumps({'type': 'text', 'text': error_msg})}\n\n"
+        
+    # Run the Critic
+    is_safe = critic_check(question, chunks, draft)
+    
+    if is_safe:
+        yield f"data: {json.dumps({'type': 'text', 'text': draft})}\n\n"
+    else:
+        print("[critic] Hallucination detected. Retrying with original question...")
+        # Retry with the raw question (often the rewriter stripped vital context)
+        fallback_chunks = retrieval.retrieve_chunks(question, jurisdiction) if jurisdiction else chunks
+        
+        retry_draft = generate_answer(question, fallback_chunks, history, jurisdiction)
+        yield f"data: {json.dumps({'type': 'text', 'text': retry_draft})}\n\n"
 
 
 def generate_title(question: str) -> str:
