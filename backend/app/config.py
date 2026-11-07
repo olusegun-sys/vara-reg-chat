@@ -37,14 +37,8 @@ TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "").strip()
 SERPER_API_KEY = os.getenv("SERPER_API_KEY", "").strip()
 
 # --- Vector Store (FAISS) ---
-FAISS_INDEX_PATH = os.getenv(
-    "FAISS_INDEX_PATH",
-    str(BASE_DIR / "faiss_index" / "index.faiss"),
-)
-FAISS_METADATA_PATH = os.getenv(
-    "FAISS_METADATA_PATH",
-    str(BASE_DIR / "faiss_index" / "metadata.json"),
-)
+FAISS_INDEX_PATH = os.getenv("FAISS_INDEX_PATH", str(BASE_DIR / "faiss_index" / "index.faiss"))
+FAISS_METADATA_PATH = os.getenv("FAISS_METADATA_PATH", str(BASE_DIR / "faiss_index" / "metadata.json"))
 
 # --- Chunking & Retrieval ---
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "800"))
@@ -55,18 +49,23 @@ TOP_K_RESULTS = 5
 WEB_SEARCH_DEPTH = "advanced"
 WEB_SEARCH_MAX_RESULTS = 3
 LOW_CONFIDENCE_DISTANCE = 1.15
-
-# REMOVED "us" and "uk". 
-# Why: Questions like "A US bank..." were incorrectly triggering web search 
-# for EU questions, causing false refusals.
-OUT_OF_SCOPE_JURISDICTION_TOKENS = [
-    "fca", "sec", "mas", "finma", "cbn", "singapore", "nigeria"
-]
+OUT_OF_SCOPE_JURISDICTION_TOKENS = ["fca", "sec", "mas", "finma", "cbn", "singapore", "nigeria"]
 
 TRUSTED_DOMAINS = [
     "eur-lex.europa.eu", "fca.org.uk", "sec.gov", "gov.uk", "mas.gov.sg",
     "finma.ch", "cbn.gov.ng", "vara.ae", "reuters.com", "ft.com", "bloomberg.com"
 ]
+
+# --- Query Hint Map (Fix for Article 50 & Omnibus Deadline) ---
+# If the query contains these trigger words, append the hints to force the
+# retriever to look at the correct amendment chunk.
+QUERY_HINT_MAP = {
+    "deadline": ["2026/1744", "Digital Omnibus", "2 December 2027", "high-risk obligations"],
+    "apply": ["2026/1744", "Digital Omnibus", "2 December 2027", "high-risk obligations"],
+    "date": ["2026/1744", "Digital Omnibus", "2 December 2027", "high-risk obligations"],
+    "article 50": ["Article 50", "transparency obligations", "synthetic content"],
+    "transparency": ["Article 50", "transparency obligations", "synthetic content"],
+}
 
 # --- Jurisdiction Registry ---
 JURISDICTIONS = {
