@@ -35,9 +35,9 @@ If an EU AI Act question involves personal data, biometrics, or automated decisi
 
 ## WEB SEARCH & SOURCE AUTHORITY
 If excerpts are labeled "Web Search Result", answer from that data.
-- State: "This information comes from a live web search, not the ingested rulebooks."
+- **If the source is a Google/Tavily snippet (short text) and it identifies the exact document the user asked for:** You MUST acknowledge that you found the document. Explain what the snippet says, and provide the URL so the user can read the full text. Do NOT refuse just because the full legal text isn't in the snippet.
 - **Tiers:** `primary` (regulators like eur-lex, fca, sec) > `press` (Reuters, FT). Lead with primary. If only press, say: "The following is from financial press — verify against the primary regulation."
-- Do NOT synthesize across sources or infer missing facts.
+- Do NOT synthesize across sources or infer missing facts not present in the snippets.
 
 ## GENERAL COMPLIANCE DEFINITIONS (ALLOWED EXCEPTION)
 If the user asks a general industry definition (e.g., "What is AML?", "What is a VASP?", "What does best execution mean?"), and the exact definition is not in the excerpts, you MAY use your pre-trained knowledge to provide a 1-2 sentence definition. 
@@ -48,7 +48,6 @@ If the user asks a general industry definition (e.g., "What is AML?", "What is a
 ## REFUSAL
 Refuse ONLY if every retrieved chunk is completely unrelated to the question.
 Do NOT be overly rigid about exact phrasing. If the topic is relevant, synthesize the answer.
-Do NOT say "my corpus covers VARA only".
 Refusal message: "I couldn't find authoritative sources that directly address this question. Try rephrasing with more specific terms — for example, name the specific article, obligation, or regulator you're asking about."
 
 Be precise, be direct, be honest about limits."""
@@ -181,9 +180,7 @@ def _format_gemini_history(messages: List[Dict[str, str]]) -> list:
 
 
 def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
-    # FAST PATH: skip the rewriter for short, direct questions. The rewriter
-    # is only useful for vague questions like "what about custody?" — it
-    # wastes 1-2 seconds on every question otherwise.
+    # FAST PATH: skip the rewriter for short, direct questions.
     if len(question.split()) < 8:
         return question
         
@@ -290,7 +287,7 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
         for chunk in response:
             if chunk.choices and chunk.choices[0].delta.content:
                 yield f"data: {json.dumps({'type': 'text', 'text': chunk.choices[0].delta.content})}\n\n"
-        return # Success
+        return
     except Exception as e:
         print(f"[llm] Tier 1 (Groq) failed: {e}")
 
@@ -305,7 +302,7 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
             for chunk in response:
                 if chunk.choices and chunk.choices[0].delta.content:
                     yield f"data: {json.dumps({'type': 'text', 'text': chunk.choices[0].delta.content})}\n\n"
-            return # Success
+            return
         except Exception as e:
             print(f"[llm] Tier 2 (OpenRouter) failed: {e}")
 
@@ -329,7 +326,7 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
             for chunk in response:
                 if chunk.text:
                     yield f"data: {json.dumps({'type': 'text', 'text': chunk.text})}\n\n"
-            return # Success
+            return
         except Exception as e:
             print(f"[llm] Tier 3 (Gemini) failed: {e}")
 
