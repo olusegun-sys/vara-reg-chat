@@ -18,8 +18,8 @@ LLM_API_KEY = os.getenv("LLM_API_KEY", "").strip()
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.groq.com/openai/v1").strip()
 LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b").strip()
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
-# Reduced from 2048 to 1200 for faster generation and lower TPM usage.
-LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "1200"))
+# Changed from 1200 to 1500 to prevent complex legal answers from being cut off mid-sentence.
+LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "1500"))
 
 # --- LLM Provider Settings (Backup 1: OpenRouter) ---
 BACKUP_LLM_API_KEY = os.getenv("BACKUP_LLM_API_KEY", "").strip()
