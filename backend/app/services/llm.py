@@ -185,8 +185,9 @@ def _format_gemini_history(messages: List[Dict[str, str]]) -> list:
 
 
 def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
-    # FAST PATH: skip the rewriter for short, direct questions.
-    if len(question.split()) < 8:
+    # FAST PATH: skip the rewriter for short OR very long questions.
+    word_count = len(question.split())
+    if word_count < 8 or word_count > 40:
         return question
         
     client = _get_client()
@@ -194,7 +195,7 @@ def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
         response = client.chat.completions.create(
             model="openai/gpt-oss-20b",
             temperature=0.0,
-            max_tokens=300,
+            max_tokens=500,
             messages=[
                 {"role": "system", "content": REWRITER_PROMPT},
                 {"role": "user", "content": f"jurisdiction: {jurisdiction}\n\n{question}"}

@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load .env into the process environment. Must run before any os.getenv calls.
 load_dotenv()
 
 # --- Paths ---
@@ -18,7 +17,6 @@ LLM_API_KEY = os.getenv("LLM_API_KEY", "").strip()
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.groq.com/openai/v1").strip()
 LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b").strip()
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))
-# Changed from 1200 to 1500 to prevent complex legal answers from being cut off mid-sentence.
 LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "1500"))
 
 # --- LLM Provider Settings (Backup 1: OpenRouter) ---
@@ -51,14 +49,19 @@ FAISS_METADATA_PATH = os.getenv(
 # --- Chunking & Retrieval ---
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "800"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "150"))
-# 5 chunks keeps us safely under the 8k token limit while providing context.
 TOP_K_RESULTS = 5
 
 # --- Web Fallback Configuration ---
 WEB_SEARCH_DEPTH = "advanced"
 WEB_SEARCH_MAX_RESULTS = 3
 LOW_CONFIDENCE_DISTANCE = 1.15
-OUT_OF_SCOPE_JURISDICTION_TOKENS = ["fca", "sec", "mas", "finma", "cbn", "uk", "us", "singapore", "nigeria"]
+
+# REMOVED "us" and "uk". 
+# Why: Questions like "A US bank..." were incorrectly triggering web search 
+# for EU questions, causing false refusals.
+OUT_OF_SCOPE_JURISDICTION_TOKENS = [
+    "fca", "sec", "mas", "finma", "cbn", "singapore", "nigeria"
+]
 
 TRUSTED_DOMAINS = [
     "eur-lex.europa.eu", "fca.org.uk", "sec.gov", "gov.uk", "mas.gov.sg",

@@ -20,13 +20,9 @@ router = APIRouter()
 
 
 def _out_of_scope_regex() -> re.Pattern:
-    """
-    Build a \b-anchored regex from config.OUT_OF_SCOPE_JURISDICTION_TOKENS.
-    Adding a regulator = append to the list in config.py; no code change here.
-    """
     tokens = config.OUT_OF_SCOPE_JURISDICTION_TOKENS
     if not tokens:
-        return re.compile(r"(?!x)x")  # never matches
+        return re.compile(r"(?!x)x")
     pattern = r"\b(" + "|".join(re.escape(t) for t in tokens) + r")\b"
     return re.compile(pattern, re.IGNORECASE)
 
@@ -35,15 +31,12 @@ _OUT_OF_SCOPE_RE = _out_of_scope_regex()
 
 
 def _needs_web_fallback(question: str, chunks: list) -> tuple:
-    """
-    Pre-generation check. Two reasons to hit the web before asking the LLM:
-      A. The question explicitly names an out-of-scope regulator.
-      B. FAISS returned low-confidence chunks (question doesn't match the corpus).
-    A third trigger fires AFTER generation (refusal-detection retry) — see
-    _answer_refused() and the retry logic in chat() / chat_stream().
-    """
+    # Only trigger out-of-scope if it's a short/direct question. 
+    # Long scenario questions might just mention "US" or "UK" in passing.
     if _OUT_OF_SCOPE_RE.search(question):
-        return True, "out-of-scope jurisdiction mentioned"
+        if len(question.split()) < 40:
+            return True, "out-of-scope jurisdiction mentioned"
+            
     if retrieval.is_low_confidence(chunks):
         best = min((c.get("distance", 99) for c in chunks), default=99)
         return True, f"low retrieval confidence (best distance={best:.3f})"
@@ -51,11 +44,6 @@ def _needs_web_fallback(question: str, chunks: list) -> tuple:
 
 
 def _answer_refused(answer_text: str) -> bool:
-    """
-    Detect whether the LLM's answer contains any refusal phrase from config.
-    Used to trigger a silent web-retry so the user never sees "I don't know"
-    when the web could have answered.
-    """
     if not answer_text:
         return True
     lower = answer_text.lower()
@@ -63,11 +51,6 @@ def _answer_refused(answer_text: str) -> bool:
 
 
 def _apply_web_fallback(question: str) -> tuple:
-    """
-    Run the web search and return (chunks, succeeded: bool).
-    If Tavily returns zero trusted sources, we return ([], False) so the caller
-    knows to refuse honestly instead of falling back to internal junk.
-    """
     web_chunks = web_search.search_web(question)
     if not web_chunks:
         print("[fallback] Web search returned no trusted sources. Refusing honestly.")
@@ -137,13 +120,9 @@ def chat(req: ChatRequest):
     should_fallback, reason = _needs_web_fallback(req.question, chunks)
     if should_fallback:
         print(f"[fallback:pre] {reason}. Triggering web search.")
-        # CRITICAL: when fallback fires, TRUST the fallback result — even if empty.
-        # We must not silently keep the low-confidence internal chunks, because
-        # that would cause the LLM to hallucinate a citation from an irrelevant page.
         chunks, _ = _apply_web_fallback(req.question)
 
     if not chunks:
-        # Honest refusal — no internal, no trusted web source.
         refusal = (
             "No authoritative source found for this question. This tool is scoped "
             "to regulatory and compliance topics from loaded regulators and trusted "
@@ -162,9 +141,6 @@ def chat(req: ChatRequest):
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"LLM provider error: {str(e)}")
 
-    # Post-generation retry: if the LLM refused and we haven't already gone to
-    # the web, retry once with web results — so the user never sees a refusal
-    # when the web could have answered.
     if not should_fallback and _answer_refused(answer):
         print("[fallback:post] LLM refused; retrying with web search.")
         web_chunks, ok = _apply_web_fallback(req.question)
@@ -207,12 +183,8 @@ def chat_stream(req: ChatRequest):
     should_fallback, reason = _needs_web_fallback(req.question, chunks)
     if should_fallback:
         print(f"[fallback:pre] {reason}. Triggering web search.")
-        # Trust the fallback. If it returns empty, chunks = [] and stream_answer
-        # will emit the honest refusal. No silent fallback to internal junk.
         chunks, _ = _apply_web_fallback(req.question)
 
-    # Streaming note: we cannot retry mid-stream without the user seeing a
-    # partial answer, so post-generation retry is only applied to /chat.
     return StreamingResponse(
         llm.stream_answer(req.question, chunks, req.history, req.jurisdiction),
         media_type="text/event-stream",
