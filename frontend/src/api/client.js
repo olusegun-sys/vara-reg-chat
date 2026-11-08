@@ -21,18 +21,38 @@ export async function generateChatTitle(question) {
   }
 }
 
-export async function streamChat(question, jurisdiction, history, onChunk, onSources) {
-  const response = await fetch(`${BASE_URL}/api/chat/stream`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ 
-      question, 
-      jurisdiction,
-      history: history || []
-    }),
-  });
+export async function streamChat(question, jurisdiction, history, onChunk, onSources, onWarming) {
+  // If the server doesn't send the first byte within 4 seconds, the user
+  // will see a "Warming up" message. This happens on Render's free tier
+  // when the backend has been idle for 15+ min and the container is cold.
+  let firstByteReceived = false;
+  const warmingTimeout = setTimeout(() => {
+    if (!firstByteReceived && onWarming) {
+      console.log("[client] Backend cold start detected — showing warmup message");
+      onWarming(true);
+    }
+  }, 4000);
+
+  let response;
+  try {
+    response = await fetch(`${BASE_URL}/api/chat/stream`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question,
+        jurisdiction,
+        history: history || []
+      }),
+    });
+  } catch (err) {
+    clearTimeout(warmingTimeout);
+    if (onWarming) onWarming(false);
+    throw err;
+  }
 
   if (!response.ok) {
+    clearTimeout(warmingTimeout);
+    if (onWarming) onWarming(false);
     let detail = "Something went wrong.";
     try {
       const err = await response.json();
@@ -43,27 +63,29 @@ export async function streamChat(question, jurisdiction, history, onChunk, onSou
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder("utf-8");
-  
-  // SSE BUFFERING FIX
-  // Network reads don't respect event boundaries. A single read can
-  // contain half an event or multiple events merged. Buffer across reads,
-  // split on "\n\n", keep the incomplete tail for next read.
   let buffer = "";
-  
+
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
-    
+
+    // First byte arrived — clear the warming message
+    if (!firstByteReceived) {
+      firstByteReceived = true;
+      clearTimeout(warmingTimeout);
+      if (onWarming) onWarming(false);
+    }
+
     buffer += decoder.decode(value, { stream: true });
     const events = buffer.split("\n\n");
     buffer = events.pop() || "";
-    
+
     for (const event of events) {
       for (const line of event.split("\n")) {
         if (!line.startsWith("data: ")) continue;
         const dataStr = line.slice(6).trim();
         if (!dataStr) continue;
-        
+
         try {
           const data = JSON.parse(dataStr);
           if (data.type === "sources") {
@@ -77,8 +99,7 @@ export async function streamChat(question, jurisdiction, history, onChunk, onSou
       }
     }
   }
-  
-  // Flush any trailing event if the stream ended without "\n\n".
+
   if (buffer.trim()) {
     for (const line of buffer.split("\n")) {
       if (!line.startsWith("data: ")) continue;
@@ -86,15 +107,14 @@ export async function streamChat(question, jurisdiction, history, onChunk, onSou
         const data = JSON.parse(line.slice(6).trim());
         if (data.type === "sources") onSources(data.sources);
         else if (data.type === "text") onChunk(data.text);
-      } catch {
-        // ignore — likely a partial heartbeat
-      }
+      } catch {}
     }
   }
+
+  clearTimeout(warmingTimeout);
+  if (onWarming) onWarming(false);
 }
 
-// Extract durable facts from a user message via the backend.
-// Returns [] on any failure — never blocks the chat flow.
 export async function extractFacts(sessionId, userMessage) {
   try {
     const response = await fetch(`${BASE_URL}/api/memory/facts`, {

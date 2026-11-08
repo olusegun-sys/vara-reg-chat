@@ -26,6 +26,7 @@ export default function App() {
   });
   const [inputValue, setInputValue] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [isWarming, setIsWarming] = useState(false);
   const [loadError, setLoadError] = useState(null);
 
   const [sessions, setSessions] = useState([]);
@@ -40,7 +41,6 @@ export default function App() {
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Refs protecting the message-loading effect from clobbering in-flight sends.
   const justSentRef = useRef(false);
   const skipNextFetchRef = useRef(false);
   const sendingInProgressRef = useRef(false);
@@ -100,16 +100,11 @@ export default function App() {
       return;
     }
 
-    // Guard 1: an in-flight send manages its own message state.
     if (sendingInProgressRef.current) return;
-
-    // Guard 2: skip the fetch triggered by handleSend creating a new session.
     if (skipNextFetchRef.current) {
       skipNextFetchRef.current = false;
       return;
     }
-
-    // Guard 3: the classic post-send guard.
     if (isSending) return;
     if (justSentRef.current) {
       justSentRef.current = false;
@@ -178,6 +173,7 @@ export default function App() {
     if (!question || isSending || !selectedJurisdiction) return;
 
     sendingInProgressRef.current = true;
+    setIsWarming(false);
 
     let activeSessionId = currentSessionId;
     
@@ -203,8 +199,6 @@ export default function App() {
 
     if (messages.length === 0) {
       generateChatTitle(question).then(newTitle => {
-        // SAFETY: never send null/undefined to Supabase — the column has
-        // a NOT NULL constraint. Fall back to a truncated question.
         const safeTitle = newTitle || (question.slice(0, 30) + (question.length > 30 ? "..." : ""));
         setSessions(prev => prev.map(s => s.id === activeSessionId ? { ...s, title: safeTitle } : s));
         updateSessionTitle(activeSessionId, safeTitle).catch(err => 
@@ -265,7 +259,8 @@ export default function App() {
             updated[updated.length - 1] = { ...updated[updated.length - 1], sources: sourcesData };
             return updated;
           });
-        }
+        },
+        (warming) => setIsWarming(warming)
       );
 
       const finalAiMsg = await addMessage(activeSessionId, "assistant", fullText, receivedSources);
@@ -366,6 +361,7 @@ export default function App() {
               onChange={setInputValue} 
               onSend={handleSend} 
               disabled={isSending || !selectedJurisdiction} 
+              isWarming={isWarming}
             />
           </div>
         </main>

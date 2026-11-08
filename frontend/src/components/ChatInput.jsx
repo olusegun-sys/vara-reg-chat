@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 
-export default function ChatInput({ value, onChange, onSend, disabled }) {
+export default function ChatInput({ value, onChange, onSend, disabled, isWarming }) {
   const textareaRef = useRef(null);
 
   useEffect(() => {
@@ -26,6 +26,19 @@ export default function ChatInput({ value, onChange, onSend, disabled }) {
   return (
     <div className="p-3 sm:p-5 bg-luxury border-t border-slate-800/50">
       <div className="max-w-3xl mx-auto relative">
+        {/* Warming Up Indicator */}
+        {isWarming && (
+          <div className="flex items-center justify-center gap-2 mb-3 animate-fade-in">
+            <svg className="w-3.5 h-3.5 text-brand-500 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span className="text-[11px] font-medium text-brand-400 uppercase tracking-wide">
+              Warming up the AI… (cold start)
+            </span>
+          </div>
+        )}
+
         <form 
           className="flex items-end gap-2 bg-luxury-light rounded-3xl p-2 border border-slate-700/50 focus-within:border-brand-500 focus-within:ring-1 focus-within:ring-brand-500 transition-all shadow-lg"
           onSubmit={(e) => { e.preventDefault(); if (canSend) onSend(); }}
