@@ -15,13 +15,16 @@ SYSTEM_PROMPT = """You are a regulatory compliance research assistant. You are n
 - If the user asks a conceptual question (e.g., "why does this matter?", "can you explain that simpler?", "what's the intent here?"), you MAY use your general pre-trained knowledge to explain the concepts found in the retrieved chunks.
 - **CRITICAL RULE:** You MUST still anchor every specific rule, date, penalty, or obligation to the retrieved chunks. Do not invent new laws. If you are explaining a concept, you can use general knowledge, but if you are stating a legal fact, it MUST be cited.
 
-## JURISDICTION & ROLE
+## ROLE CLASSIFICATION PRECISION (EU AI ACT)
+When discussing the EU AI Act, you must be surgically precise about the difference between these roles:
+- **Provider:** Develops an AI system (or has it developed) and places it on the market or puts it into service under its own name or trademark. Only the Provider is responsible for the initial conformity assessment.
+- **Deployer:** Uses an AI system under its own authority (e.g., a bank using a third-party credit-scoring tool). If a company merely hosts or integrates an existing model without changing its intended purpose, it is a Deployer, NOT a Provider. Do NOT tell a hosting company they need a conformity assessment.
+- **Distributor:** Makes an AI system available on the market without modifying it. 
+- **Testing Liability:** The liability for "testing in real-world conditions" applies ONLY to specific regulatory sandboxes / pre-market testing (Articles 54-60). Do NOT use this to describe standard post-market commercial liability.
+
+## JURISDICTION AWARENESS
 Answer only for the selected jurisdiction: AE-Dubai (VARA) or EU (AI Act).
-For the EU AI Act, you MUST explicitly classify the user's role based on the facts:
-- Provider: Develops the AI and puts it on the market.
-- Deployer: Uses the AI under its own authority (e.g., a bank).
-- Downstream Provider: Fine-tunes a third-party model.
-State the role clearly (e.g., "As a Deployer, your obligations..."). If ambiguous, state the likely role.
+State the user's role clearly (e.g., "As a Deployer, your obligations..."). If ambiguous, state the likely role based on the facts.
 
 ## CITATION RULES & ARTICLE VERIFICATION
 1. Every specific factual claim, rule, or obligation MUST cite its source.
@@ -106,6 +109,7 @@ CRITIC_PROMPT = """You are a strict legal compliance auditor. Your job is to rev
 1. **Hallucinations:** Does the answer contain ANY specific facts, numbers, dates, penalty amounts, or article numbers that do NOT appear in the source context? (FAIL)
 2. **Missing Citations:** Does the answer make specific factual claims without citing a source? (FAIL)
 3. **Source Mismatch:** Does the answer cite a document that isn't actually in the provided sources? (FAIL)
+4. **Role Misclassification:** Does the answer confuse a "Deployer" with a "Provider" under the EU AI Act? (FAIL)
 
 ## HOW TO RESPOND
 Output ONLY one of these two strings:
@@ -356,7 +360,7 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
         yield f"data: {json.dumps({'type': 'text', 'text': draft})}\n\n"
     else:
         print("[critic] Hallucination detected. Retrying with original question...")
-        fallback_chunks = chunks # Fallback to same chunks for retry
+        fallback_chunks = chunks
         
         retry_draft = generate_answer(question, fallback_chunks, history, jurisdiction)
         yield f"data: {json.dumps({'type': 'text', 'text': retry_draft})}\n\n"
