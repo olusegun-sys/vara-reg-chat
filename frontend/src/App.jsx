@@ -16,6 +16,10 @@ const RECENT_WINDOW = 8;
 const SESSION_STORAGE_KEY = "vara_current_session_id";
 const JURISDICTION_STORAGE_KEY = "vara_selected_jurisdiction";
 
+// Draft keys
+const DRAFT_KEY_PREFIX = "vara_draft_";
+const DRAFT_NEW_KEY = "vara_draft_new"; // Use sessionStorage for "New Chat" drafts
+
 export default function App() {
   const [jurisdictions, setJurisdictions] = useState([]);
   const [selectedJurisdiction, setSelectedJurisdiction] = useState(() => {
@@ -42,13 +46,52 @@ export default function App() {
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // State for the new Source Drawer
+  // State for the Source Drawer
   const [sourceDrawerOpen, setSourceDrawerOpen] = useState(false);
   const [activeSources, setActiveSources] = useState([]);
 
   const justSentRef = useRef(false);
   const skipNextFetchRef = useRef(false);
   const sendingInProgressRef = useRef(false);
+
+  // --- Load draft when switching sessions ---
+  useEffect(() => {
+    try {
+      if (currentSessionId) {
+        // Load from localStorage for existing sessions
+        const savedDraft = localStorage.getItem(`${DRAFT_KEY_PREFIX}${currentSessionId}`);
+        setInputValue(savedDraft || "");
+      } else {
+        // Load from sessionStorage for "New Chat" (survives refresh, but not new tab)
+        const savedDraft = sessionStorage.getItem(DRAFT_NEW_KEY);
+        setInputValue(savedDraft || "");
+      }
+    } catch {
+      setInputValue("");
+    }
+  }, [currentSessionId]);
+
+  // --- Save draft as user types ---
+  useEffect(() => {
+    try {
+      if (currentSessionId) {
+        const key = `${DRAFT_KEY_PREFIX}${currentSessionId}`;
+        if (inputValue) {
+          localStorage.setItem(key, inputValue);
+        } else {
+          localStorage.removeItem(key);
+        }
+      } else {
+        if (inputValue) {
+          sessionStorage.setItem(DRAFT_NEW_KEY, inputValue);
+        } else {
+          sessionStorage.removeItem(DRAFT_NEW_KEY);
+        }
+      }
+    } catch (e) {
+      console.warn("[app] Could not persist draft:", e);
+    }
+  }, [inputValue, currentSessionId]);
 
   useEffect(() => {
     getJurisdictions().then(data => {
@@ -135,12 +178,15 @@ export default function App() {
     setMessages([]);
     setInputValue("");
     setSourceDrawerOpen(false);
+    try {
+      sessionStorage.removeItem(DRAFT_NEW_KEY); // Clear new chat draft explicitly
+    } catch {}
   };
 
   const handleSelectSession = (id) => {
     setCurrentSessionId(id);
-    setInputValue("");
     setSourceDrawerOpen(false);
+    // Draft loading is handled by the useEffect on currentSessionId
   };
 
   const handleRename = async (id, newTitle) => {
@@ -154,6 +200,9 @@ export default function App() {
       setCurrentSessionId(null); 
     }
     await deleteSession(id);
+    try {
+      localStorage.removeItem(`${DRAFT_KEY_PREFIX}${id}`); // Clean up draft for deleted session
+    } catch {}
   };
 
   const handleTogglePin = async (id) => {
@@ -186,6 +235,15 @@ export default function App() {
 
     sendingInProgressRef.current = true;
     setIsWarming(false);
+
+    // Clear draft when sending
+    try {
+      if (currentSessionId) {
+        localStorage.removeItem(`${DRAFT_KEY_PREFIX}${currentSessionId}`);
+      } else {
+        sessionStorage.removeItem(DRAFT_NEW_KEY);
+      }
+    } catch {}
 
     let activeSessionId = currentSessionId;
     
@@ -380,7 +438,6 @@ export default function App() {
         </main>
       </div>
 
-      {/* The new Slide-out Drawer */}
       <SourceDrawer 
         isOpen={sourceDrawerOpen}
         onClose={() => setSourceDrawerOpen(false)}
