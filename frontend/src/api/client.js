@@ -53,16 +53,23 @@ export async function streamChat(question, jurisdiction, history, onChunk, onSou
   if (!response.ok) {
     clearTimeout(warmingTimeout);
     if (onWarming) onWarming(false);
-    let detail = "Something went wrong.";
+    let detail = "The AI service is temporarily unavailable. Please try again in a moment.";
     try {
       const err = await response.json();
-      detail = err.detail || detail;
+      // If it's a 500 with "embedding" or "Cohere" in the message, use the friendly text
+      if (response.status === 500 && (err.detail || "").toLowerCase().includes("embedding")) {
+        detail = "The AI service is temporarily unavailable (Cohere connection). Please try again in 60 seconds.";
+      } else if (err.detail) {
+        detail = err.detail;
+      }
     } catch {}
     throw new Error(detail);
   }
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder("utf-8");
+
+  // SSE BUFFERING FIX
   let buffer = "";
 
   while (true) {
@@ -100,6 +107,7 @@ export async function streamChat(question, jurisdiction, history, onChunk, onSou
     }
   }
 
+  // Flush any trailing event if the stream ended without "\n\n".
   if (buffer.trim()) {
     for (const line of buffer.split("\n")) {
       if (!line.startsWith("data: ")) continue;
@@ -107,7 +115,9 @@ export async function streamChat(question, jurisdiction, history, onChunk, onSou
         const data = JSON.parse(line.slice(6).trim());
         if (data.type === "sources") onSources(data.sources);
         else if (data.type === "text") onChunk(data.text);
-      } catch {}
+      } catch {
+        // ignore — likely a partial heartbeat
+      }
     }
   }
 

@@ -22,11 +22,13 @@ LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "1500"))
 # --- LLM Provider Settings (Backup 1: OpenRouter) ---
 BACKUP_LLM_API_KEY = os.getenv("BACKUP_LLM_API_KEY", "").strip()
 BACKUP_LLM_BASE_URL = os.getenv("BACKUP_LLM_BASE_URL", "https://openrouter.ai/api/v1").strip()
-BACKUP_LLM_MODEL = os.getenv("BACKUP_LLM_MODEL", "meta-llama/llama-3-70b-instruct:free").strip()
+# FIXED: Llama 3 70b was retired. Switched to Llama 3.3.
+BACKUP_LLM_MODEL = os.getenv("BACKUP_LLM_MODEL", "meta-llama/llama-3.3-70b-instruct:free").strip()
 
 # --- LLM Provider Settings (Backup 2: Google Gemini) ---
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash").strip()
+# FIXED: Gemini 1.5-flash was deprecated in the v1beta API. Switched to 2.0-flash.
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash").strip()
 
 # --- Embeddings (Cohere) ---
 COHERE_API_KEY = os.getenv("COHERE_API_KEY", "").strip()
@@ -56,8 +58,6 @@ TRUSTED_DOMAINS = [
     "finma.ch", "cbn.gov.ng", "vara.ae", "reuters.com", "ft.com", "bloomberg.com"
 ]
 
-# Phrases the LLM emits when it can't find an answer. If the generated answer
-# contains any of these, routes.py silently retries with web search.
 REFUSAL_PATTERNS = [
     "I couldn't find authoritative sources",
     "I don't have that information",
@@ -66,15 +66,24 @@ REFUSAL_PATTERNS = [
     "not in the provided document",
 ]
 
-# --- Query Hint Map (Fix for Article 50 & Omnibus Deadline) ---
-# If the query contains these trigger words, append the hints to force the
-# retriever to look at the correct amendment chunk.
+# --- Query Hint Map (Fixes retrieval precision) ---
 QUERY_HINT_MAP = {
-    "deadline": ["2026/1744", "Digital Omnibus", "2 December 2027", "high-risk obligations"],
-    "apply": ["2026/1744", "Digital Omnibus", "2 December 2027", "high-risk obligations"],
-    "date": ["2026/1744", "Digital Omnibus", "2 December 2027", "high-risk obligations"],
+    # If asking about the Omnibus amendment or high-risk dates
+    "deadline": ["Regulation (EU) 2026/1744", "Digital Omnibus", "2 December 2027"],
+    "when do high-risk": ["Regulation (EU) 2026/1744", "Digital Omnibus", "2 December 2027"],
+    "1 january 2026": ["Regulation (EU) 2026/1744", "2 December 2027"],
+    
+    # If asking about Article 50 / transparency
     "article 50": ["Article 50", "transparency obligations", "synthetic content"],
     "transparency": ["Article 50", "transparency obligations", "synthetic content"],
+
+    # If asking about Cabinet Decision 111 specifically (to avoid confusion with 112)
+    "cabinet decision no. 111": ["Cabinet Decision No. 111/2022"],
+    "cabinet decision 111": ["Cabinet Decision No. 111/2022"],
+
+    # If asking about high-risk classification (force retrieval of original Act, not Omnibus)
+    "high-risk classification": ["Article 6", "Annex III", "Regulation (EU) 2024/1689"],
+    "classification rules": ["Article 6", "Annex III", "Regulation (EU) 2024/1689"],
 }
 
 # --- Jurisdiction Registry ---

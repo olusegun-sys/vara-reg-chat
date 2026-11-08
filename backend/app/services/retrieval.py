@@ -1,6 +1,7 @@
 import json
 import urllib.parse
 import re
+import time
 from typing import List, Dict, Any
 
 import faiss
@@ -112,11 +113,31 @@ def _search_faiss(query: str, jurisdiction: str, top_k: int) -> List[Dict[str, A
     """Internal helper to embed a query and search FAISS."""
     index, metadata = _load_index_and_metadata()
     
-    response = co.embed(
-        texts=[query],
-        model="embed-english-v3.0",
-        input_type="search_query"
-    )
+    # Retry with backoff — Cohere free tier occasionally times out
+    max_retries = 2
+    response = None
+    for attempt in range(max_retries + 1):
+        try:
+            response = co.embed(
+                texts=[query],
+                model="embed-english-v3.0",
+                input_type="search_query",
+                # Aggressive timeout — fail fast, retry, don't hang
+                request_options={"timeout_in_seconds": 15.0}
+            )
+            break
+        except Exception as e:
+            if attempt < max_retries:
+                wait = 5 * (attempt + 1)  # 5s, 10s
+                print(f"[retrieval] Cohere embed failed (attempt {attempt+1}/{max_retries+1}): {e}. Retrying in {wait}s...")
+                time.sleep(wait)
+            else:
+                print(f"[retrieval] Cohere embed failed after {max_retries+1} attempts. Raising.")
+                raise RuntimeError(
+                    "The embedding service (Cohere) is temporarily unreachable. "
+                    "Please try again in a minute. If this persists, check your internet connection."
+                ) from e
+
     query_vec = np.array(response.embeddings, dtype="float32")
 
     if query_vec.shape[1] != index.d:
