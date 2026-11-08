@@ -20,7 +20,7 @@ function markdownToPlainText(md) {
     .trim();
 }
 
-export default function MessageBubble({ role, content, sources, isLoading, onEdit }) {
+export default function MessageBubble({ role, content, sources, isLoading, onEdit, onViewSources }) {
   const isUser = role === "user";
   const [copied, setCopied] = useState(false);
 
@@ -103,53 +103,18 @@ export default function MessageBubble({ role, content, sources, isLoading, onEdi
               </div>
             )}
 
+            {/* The NEW Single Source Button */}
             {sources && sources.length > 0 && (
               <div className="mt-4 pt-3 border-t border-slate-700/60 w-full">
-                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                  Sources
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {/* Deduplicate by document AND section to show the exact part */}
-                  {[...new Map(sources.map(s => [`${s.document}-${s.section}`, s])).values()].map((sourceEntry, i) => {
-                    const docName = sourceEntry.document;
-                    const url = sourceEntry.source_url;
-                    const sectionName = sourceEntry.section && sourceEntry.section !== "General" && sourceEntry.section !== "Web Search Result"
-                      ? ` (${sourceEntry.section})` 
-                      : "";
-                    const snippet = sourceEntry.snippet || "";
-                    
-                    const baseClasses = "group relative flex items-center gap-1.5 text-[11px] font-medium bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white px-2.5 py-1.5 rounded-md border border-slate-700/50 transition-all cursor-pointer";
-                    
-                    const innerContent = (
-                      <>
-                        <svg className="w-3.5 h-3.5 text-brand-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        <span className="truncate max-w-[200px] sm:max-w-[300px]">
-                          {docName}{sectionName}
-                        </span>
-                        
-                        {/* The Snippet Tooltip (Hover) */}
-                        {snippet && (
-                          <div className="absolute bottom-full left-0 mb-2 w-72 p-3 bg-slate-900 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
-                            <p className="text-[11px] text-slate-300 italic leading-relaxed line-clamp-4">
-                              "{snippet}..."
-                            </p>
-                            <div className="absolute -bottom-1.5 left-6 w-3 h-3 bg-slate-900 border-b border-r border-slate-700 rotate-45"></div>
-                          </div>
-                        )}
-                      </>
-                    );
-
-                    return url ? (
-                      <a key={i} href={url} target="_blank" rel="noopener noreferrer" className={baseClasses}>
-                        {innerContent}
-                      </a>
-                    ) : (
-                      <div key={i} className={baseClasses}>{innerContent}</div>
-                    );
-                  })}
-                </div>
+                <button
+                  onClick={() => onViewSources(sources)}
+                  className="flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-brand-400 bg-slate-800/40 hover:bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700/50 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                  </svg>
+                  {sources.length} {sources.length === 1 ? 'Source' : 'Sources'}
+                </button>
               </div>
             )}
           </>

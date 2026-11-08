@@ -9,7 +9,7 @@ function LoadingSpinner() {
   );
 }
 
-export default function ChatWindow({ messages, onEdit, isLoading }) {
+export default function ChatWindow({ messages, onEdit, isLoading, onViewSources }) {
   const scrollContainerRef = useRef(null);
   const prevCountRef = useRef(0);
   const rafPendingRef = useRef(false);
@@ -30,10 +30,6 @@ export default function ChatWindow({ messages, onEdit, isLoading }) {
     });
   };
 
-  // Primary scroll effect: handles new messages, session loads, and streaming.
-  // useLayoutEffect fires synchronously before paint, so the user never sees
-  // an intermediate scroll position. rAF batches multiple calls per frame
-  // (streaming fires 50-100 setMessages/sec — we don't want 100 scroll calls).
   useLayoutEffect(() => {
     if (isLoading) return;
     if (!scrollContainerRef.current) return;
@@ -45,11 +41,8 @@ export default function ChatWindow({ messages, onEdit, isLoading }) {
     prevCountRef.current = currCount;
 
     if (delta > 0 || prevCount === 0) {
-      // New message(s) or session load → instant scroll
       scrollToBottom(false);
     } else {
-      // Same count, content changed → streaming. Only follow if user is
-      // within 150px of bottom (respects manual scroll-up).
       const el = scrollContainerRef.current;
       const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
       if (distance < 150) {
@@ -58,25 +51,18 @@ export default function ChatWindow({ messages, onEdit, isLoading }) {
     }
   }, [messages, isLoading]);
 
-  // Belt-and-suspenders: when the last message transitions from isLoading:true
-  // to isLoading:false (streaming complete), the DOM re-layouts. Fire one more
-  // scroll after two rAF frames to catch any deferred layout.
-  // Why two frames: React commits, browser lays out, then paints. The second
-  // rAF lands after layout for the final state.
   useEffect(() => {
     if (isLoading) return;
     const lastMsg = messages[messages.length - 1];
     if (!lastMsg) return;
-    if (lastMsg.isLoading) return; // still streaming — primary effect handles it
+    if (lastMsg.isLoading) return;
 
-    // Streaming just finished. Wait for layout, then scroll.
     let cancelled = false;
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         if (cancelled) return;
         const el = scrollContainerRef.current;
         if (!el) return;
-        // Only scroll if user is still near bottom (respects manual scroll-up)
         const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
         if (distance < 200) {
           el.scrollTo({ top: el.scrollHeight, behavior: "auto" });
@@ -107,15 +93,6 @@ export default function ChatWindow({ messages, onEdit, isLoading }) {
       ) : (
         <div className="max-w-3xl mx-auto space-y-6 pb-4">
           {messages.map((msg, i) => (
-            // FIX: key={i}, not key={msg.id || i}.
-            // Why: the assistant placeholder has id="temp-ai" during streaming,
-            // then App.jsx replaces it with the real Supabase id when streaming
-            // finishes. If we use msg.id as key, React sees "temp-ai" → "uuid"
-            // and REMOUNTS the entire bubble component — which collapses the
-            // scroll container's content height briefly, resetting scrollTop
-            // to near zero. That's the "jump to top" the user was seeing.
-            // Index is stable because chat messages are append-only. React
-            // handles in-place content growth within the same key fine.
             <MessageBubble
               key={i}
               role={msg.role}
@@ -123,6 +100,7 @@ export default function ChatWindow({ messages, onEdit, isLoading }) {
               sources={msg.sources}
               isLoading={msg.isLoading}
               onEdit={onEdit}
+              onViewSources={onViewSources}
             />
           ))}
         </div>

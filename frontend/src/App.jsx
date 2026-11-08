@@ -3,6 +3,7 @@ import JurisdictionSelector from "./components/JurisdictionSelector.jsx";
 import ChatWindow from "./components/ChatWindow.jsx";
 import ChatInput from "./components/ChatInput.jsx";
 import Sidebar from "./components/Sidebar.jsx";
+import SourceDrawer from "./components/SourceDrawer.jsx";
 import { getJurisdictions, streamChat, generateChatTitle, extractFacts } from "./api/client.js";
 import { 
   getSessions, createSession, getMessages, addMessage, 
@@ -40,6 +41,10 @@ export default function App() {
   const [messages, setMessages] = useState([]);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // State for the new Source Drawer
+  const [sourceDrawerOpen, setSourceDrawerOpen] = useState(false);
+  const [activeSources, setActiveSources] = useState([]);
 
   const justSentRef = useRef(false);
   const skipNextFetchRef = useRef(false);
@@ -129,11 +134,13 @@ export default function App() {
     setCurrentSessionId(null);
     setMessages([]);
     setInputValue("");
+    setSourceDrawerOpen(false);
   };
 
   const handleSelectSession = (id) => {
     setCurrentSessionId(id);
     setInputValue("");
+    setSourceDrawerOpen(false);
   };
 
   const handleRename = async (id, newTitle) => {
@@ -166,6 +173,11 @@ export default function App() {
 
   const handleEditMessage = (content) => {
     setInputValue(content);
+  };
+
+  const handleViewSources = (sources) => {
+    setActiveSources(sources);
+    setSourceDrawerOpen(true);
   };
 
   const handleSend = useCallback(async () => {
@@ -354,6 +366,7 @@ export default function App() {
             messages={messages} 
             onEdit={handleEditMessage} 
             isLoading={isLoadingMessages} 
+            onViewSources={handleViewSources}
           />
           <div className="w-full shrink-0">
             <ChatInput 
@@ -366,6 +379,13 @@ export default function App() {
           </div>
         </main>
       </div>
+
+      {/* The new Slide-out Drawer */}
+      <SourceDrawer 
+        isOpen={sourceDrawerOpen}
+        onClose={() => setSourceDrawerOpen(false)}
+        sources={activeSources}
+      />
     </div>
   );
 }
