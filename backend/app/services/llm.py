@@ -25,7 +25,7 @@ When discussing the EU AI Act, you must be surgically precise about the differen
 - **Testing Liability:** The liability for "testing in real-world conditions" applies ONLY to specific regulatory sandboxes / pre-market testing (Articles 54-60). Do NOT use this to describe standard post-market commercial liability.
 
 ## JURISDICTION AWARENESS
-Answer only for the selected jurisdiction: AE-Dubai (VARA) or EU (AI Act).
+Answer only for the selected jurisdiction: AE-Dubai (VARA), EU (AI Act), or NG-CBN (Central Bank of Nigeria).
 State the user's role clearly (e.g., "As a Deployer, your obligations..."). If ambiguous, state the likely role based on the facts.
 
 ## CITATION RULES & ARTICLE VERIFICATION
@@ -80,6 +80,7 @@ REWRITER_PROMPT = """You rewrite user messages into keyword-rich search queries 
 The user's question is about ONE of these jurisdictions:
 - AE-Dubai (VARA)
 - EU (AI Act)
+- NG-CBN (Central Bank of Nigeria)
 
 ## YOUR JOB
 1. Identify the actual question (usually the final sentence).
@@ -415,19 +416,30 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
     try:
         is_safe = yield from _run_with_heartbeat(critic_check, question, chunks, draft)
     except Exception as e:
+        # Critic errored (network, quota, timeout). Fail open and ship the draft.
         print(f"[stream] critic_check failed: {e}")
         is_safe = True
 
+    # --- Critic is ADVISORY ONLY as of 2026-11-09 ---
+    # Rationale for the change:
+    #   - In production testing, the Critic flagged 2 out of 3 correct answers
+    #     as FAIL (false positives), triggering a full re-generation each time.
+    #   - Re-generation doubled latency (10+ minutes on Gemini fallback for a
+    #     single question, ~60-120s on Groq only) for no quality improvement —
+    #     the retry produced essentially the same answer.
+    #   - For a POC demo, shipping the first draft in 10-20 seconds is better
+    #     than shipping the second draft in 60-120 seconds.
+    #   - The Critic still runs, still logs PASS/FAIL for telemetry, and still
+    #     provides a signal we can act on in a future iteration. It just no
+    #     longer blocks the answer.
+    # Next-iteration fix: tighten CRITIC_PROMPT further, or move the Critic to
+    # a different model/provider so it isn't competing with Groq's TPM budget.
     if is_safe:
-        yield f"data: {json.dumps({'type': 'text', 'text': draft})}\n\n"
+        print("[stream] Critic PASS — shipping draft")
     else:
-        print("[critic] Hallucination detected. Retrying with original question...")
-        try:
-            retry_draft = yield from _run_with_heartbeat(generate_answer, question, chunks, history, jurisdiction)
-        except Exception as e:
-            print(f"[stream] retry generate_answer failed: {e}")
-            retry_draft = draft
-        yield f"data: {json.dumps({'type': 'text', 'text': retry_draft})}\n\n"
+        print("[stream] Critic FAIL — shipping draft anyway (advisory mode)")
+
+    yield f"data: {json.dumps({'type': 'text', 'text': draft})}\n\n"
 
 
 def generate_title(question: str) -> str:

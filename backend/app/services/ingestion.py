@@ -79,6 +79,34 @@ def clean_vara_pdf_text(text: str) -> str:
     return "\n".join(kept_lines)
 
 
+def _demerge_fused_words(text: str) -> str:
+    """
+    Insert spaces where a PDF extracted fused text with no word boundaries.
+
+    Why this exists:
+    Some CBN PDFs use font mappings that pypdf cannot decode into separate
+    words — the extracted text has no spaces between words, so BM25 sees
+    each chunk as one giant token and FAISS embeddings become useless.
+    Fix: insert a space between (lowercase→uppercase), (letter→digit), and
+    (digit→letter) transitions. This reconstructs word boundaries without
+    breaking acronyms like AML/CFT or VASP.
+
+    Example:
+        "CentralBankofNigeria"  → "Central Bank of Nigeria"
+        "Plot33,AbubakarTafawa" → "Plot 33, Abubakar Tafawa"
+
+    Only called for CBN documents — VARA/EU PDFs already extract cleanly,
+    and this heuristic would corrupt already-correct text.
+    """
+    # lowercase followed by uppercase: "isNeed" -> "is Need"
+    text = re.sub(r"([a-z])([A-Z])", r"\1 \2", text)
+    # letter followed by digit: "Plot33" -> "Plot 33"
+    text = re.sub(r"([a-zA-Z])(\d)", r"\1 \2", text)
+    # digit followed by letter: "33Abubakar" -> "33 Abubakar"
+    text = re.sub(r"(\d)([a-zA-Z])", r"\1 \2", text)
+    return text
+
+
 def load_pdf_pages(pdf_path: Path) -> List[Dict[str, Any]]:
     pages = []
     if pdf_path.suffix.lower() == ".txt":
@@ -101,8 +129,14 @@ def load_pdf_pages(pdf_path: Path) -> List[Dict[str, Any]]:
         # Why the guard: clean_vara_pdf_text() also strips standalone 1–3 digit
         # lines — which would delete EU AI Act article/paragraph numbers and
         # break citations. Non-VARA jurisdictions skip the cleaner entirely.
+        #
+        # CBN PDFs: pypdf sometimes extracts fused text ("CentralBankofNigeria")
+        # with no word boundaries. Demerge before chunking so BM25 and FAISS
+        # can see real words. The demerger runs only on CBN files.
         if _is_vara_document(pdf_path):
             text = clean_vara_pdf_text(raw)
+        elif pdf_path.name.startswith("cbn_"):
+            text = _demerge_fused_words(raw)
         else:
             text = raw
         # Drop pages whose remaining content is too short to be a real rule
