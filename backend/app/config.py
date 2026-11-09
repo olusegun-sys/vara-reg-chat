@@ -22,13 +22,18 @@ LLM_MAX_TOKENS = int(os.getenv("LLM_MAX_TOKENS", "1500"))
 # --- LLM Provider Settings (Backup 1: OpenRouter) ---
 BACKUP_LLM_API_KEY = os.getenv("BACKUP_LLM_API_KEY", "").strip()
 BACKUP_LLM_BASE_URL = os.getenv("BACKUP_LLM_BASE_URL", "https://openrouter.ai/api/v1").strip()
-# FIXED: Llama 3 70b was retired. Switched to Llama 3.3.
 BACKUP_LLM_MODEL = os.getenv("BACKUP_LLM_MODEL", "meta-llama/llama-3.3-70b-instruct:free").strip()
 
 # --- LLM Provider Settings (Backup 2: Google Gemini) ---
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
-# FIXED: Gemini 1.5-flash was deprecated in the v1beta API. Switched to 2.0-flash.
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash").strip()
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip()
+
+# --- LLM Provider Settings (Backup 3: Cloudflare Workers AI) ---
+CLOUDFLARE_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID", "").strip()
+CLOUDFLARE_API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN", "").strip()
+# Cloudflare model naming: @cf/<provider>/<model>. This model has ~8K context window,
+# enough for RAG chunks but tight. Do NOT route the Critic here (reasoning_effort is Groq-only).
+CLOUDFLARE_MODEL = os.getenv("CLOUDFLARE_MODEL", "@cf/meta/llama-3.1-8b-instruct-fp8").strip()
 
 # --- Embeddings (Cohere) ---
 COHERE_API_KEY = os.getenv("COHERE_API_KEY", "").strip()
@@ -68,20 +73,13 @@ REFUSAL_PATTERNS = [
 
 # --- Query Hint Map (Fixes retrieval precision) ---
 QUERY_HINT_MAP = {
-    # If asking about the Omnibus amendment or high-risk dates
     "deadline": ["Regulation (EU) 2026/1744", "Digital Omnibus", "2 December 2027"],
     "when do high-risk": ["Regulation (EU) 2026/1744", "Digital Omnibus", "2 December 2027"],
     "1 january 2026": ["Regulation (EU) 2026/1744", "2 December 2027"],
-    
-    # If asking about Article 50 / transparency
     "article 50": ["Article 50", "transparency obligations", "synthetic content"],
     "transparency": ["Article 50", "transparency obligations", "synthetic content"],
-
-    # If asking about Cabinet Decision 111 specifically (to avoid confusion with 112)
     "cabinet decision no. 111": ["Cabinet Decision No. 111/2022"],
     "cabinet decision 111": ["Cabinet Decision No. 111/2022"],
-
-    # If asking about high-risk classification (force retrieval of original Act, not Omnibus)
     "high-risk classification": ["Article 6", "Annex III", "Regulation (EU) 2024/1689"],
     "classification rules": ["Article 6", "Annex III", "Regulation (EU) 2024/1689"],
 }
@@ -92,12 +90,10 @@ JURISDICTIONS = {
         "regulator": "VARA",
         "name": "Dubai Virtual Assets Regulatory Authority",
         "documents": [
-            # Compulsory Rulebooks (4)
             {"file": "vara_compliance_risk_rulebook.txt", "title": "Compliance and Risk Management Rulebook", "effective_date": "2025-05-19", "source_url": "https://rulebooks.vara.ae/index.php/rulebook/compliance-and-risk-management-rulebook", "document_type": "rulebook"},
             {"file": "vara_company_rulebook.txt", "title": "Company Rulebook", "effective_date": "2025-05-19", "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_36_VER20250519.pdf", "document_type": "rulebook"},
             {"file": "vara_technology_rulebook.txt", "title": "Technology and Information Rulebook", "effective_date": "2025-05-19", "source_url": "https://rulebooks.vara.ae/index.php/rulebook/technology-and-information-rulebook", "document_type": "rulebook"},
             {"file": "vara_market_conduct_rulebook.txt", "title": "Market Conduct Rulebook", "effective_date": "2025-05-19", "source_url": "https://rulebooks.vara.ae/index.php/rulebook/market-conduct-rulebook", "document_type": "rulebook"},
-            # VA Activity Rulebooks (9)
             {"file": "VARA_EN_258_VER20260331.pdf", "title": "Exchange Services Rulebook", "effective_date": "2026-03-31", "source_url": "https://rulebooks.vara.ae/index.php/rulebook/exchange-services-rulebook", "document_type": "rulebook"},
             {"file": "VARA_EN_279_VER20250519.pdf", "title": "Lending and Borrowing Services Rulebook", "effective_date": "2025-05-19", "source_url": "https://rulebooks.vara.ae/index.php/rulebook/lending-and-borrowing-services-rulebook", "document_type": "rulebook"},
             {"file": "VARA_EN_215_VER20250519.pdf", "title": "Advisory Services Rulebook", "effective_date": "2025-05-19", "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_215_VER20250519.pdf", "document_type": "rulebook"},
@@ -105,10 +101,8 @@ JURISDICTIONS = {
             {"file": "VARA_EN_243_VER20250519.pdf", "title": "Custody Services Rulebook", "effective_date": "2025-05-19", "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_243_VER20250519.pdf", "document_type": "rulebook"},
             {"file": "VARA_EN_317_VER20250519.pdf", "title": "VA Management and Investment Services Rulebook", "effective_date": "2025-05-19", "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_317_VER20250519.pdf", "document_type": "rulebook"},
             {"file": "VARA_EN_347_VER20250519.pdf", "title": "VA Transfer and Settlement Services Rulebook", "effective_date": "2025-05-19", "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_347_VER20250519.pdf", "document_type": "rulebook"},
-            # Guidance (2)
             {"file": "VARA_EN_388_VER1.pdf", "title": "Guidance on Marketing of Virtual Assets", "effective_date": "2024-08-31", "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_388_VER1.pdf", "document_type": "guidance"},
             {"file": "VARA_EN_516_VER1.pdf", "title": "Guidance on Virtual Asset Issuance", "effective_date": "2026-04-09", "source_url": "https://rulebooks.vara.ae/index.php/rulebook/virtual-asset-issuance-rulebook", "document_type": "guidance"},
-            # Framework Documents (4)
             {"file": "VARA_EN_18_VER992_2.pdf", "title": "Virtual Assets and Related Activities Regulations 2023", "effective_date": "2023-02-07", "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_18_VER992_2.pdf", "document_type": "regulation"},
             {"file": "VARA_EN_338_VER1.pdf", "title": "Law No. (4) of 2022 Regulating Virtual Assets in the Emirate of Dubai", "effective_date": "2022-03-11", "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_338_VER1.pdf", "document_type": "law"},
             {"file": "VARA_EN_339_VER1.pdf", "title": "Cabinet Decision No. 111/2022 on the Regulation of Virtual Assets and Their Service Providers", "effective_date": "2022-12-12", "source_url": "https://rulebooks.vara.ae/sites/default/files/en_net_file_store/VARA_EN_339_VER1.pdf", "document_type": "cabinet_decision"},

@@ -184,9 +184,16 @@ def chat_stream(req: ChatRequest):
         chunks, _ = _apply_web_fallback(req.question)
 
     # Note: llm.stream_answer now handles the Critic agent internally.
+    # StreamingResponse below carries SSE headers so the connection survives
+    # the multi-second silent window while generate_answer + critic_check run.
     return StreamingResponse(
         llm.stream_answer(req.question, chunks, req.history, req.jurisdiction),
         media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
     )
 
 

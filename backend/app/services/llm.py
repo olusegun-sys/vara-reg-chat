@@ -1,9 +1,11 @@
 import json
 import re
 import time
+import concurrent.futures
 from typing import List, Dict, Any
 from openai import OpenAI
-import google.generativeai as genai
+from google import genai  # google.genai — the current SDK (replaces deprecated google.generativeai)
+from google.genai import types as genai_types  # config types for the new SDK
 
 from app import config
 
@@ -103,20 +105,32 @@ Output: high-risk AI system classification Article 6 Annex I Annex III safety co
 """
 
 
-CRITIC_PROMPT = """You are a strict legal compliance auditor. Your job is to review a draft answer written by an AI assistant and verify its accuracy against the provided source context.
+CRITIC_PROMPT = """You are a legal compliance auditor reviewing a draft answer against the provided source context. Your job is to catch REAL accuracy problems, not to second-guess legitimate paraphrasing.
 
-## YOUR CHECKLIST
-1. **Hallucinations:** Does the answer contain ANY specific facts, numbers, dates, penalty amounts, or article numbers that do NOT appear in the source context? (FAIL)
-2. **Missing Citations:** Does the answer make specific factual claims without citing a source? (FAIL)
-3. **Source Mismatch:** Does the answer cite a document that isn't actually in the provided sources? (FAIL)
-4. **Role Misclassification:** Does the answer confuse a "Deployer" with a "Provider" under the EU AI Act? (FAIL)
+## CHECK ONLY THESE FOUR FAILURE MODES
+
+1. **Hallucinated specific facts:** Does the answer state a SPECIFIC fact — a number, date, penalty amount, or article number — that does NOT appear in the provided context? Only flag if the specific fact contradicts or is absent from the context. Paraphrasing general concepts is fine.
+
+2. **Missing citations on specific claims:** Does the answer make a claim about a specific rule, date, penalty, or article WITHOUT any citation? If the answer cites a page (e.g., "p. 115"), an article, or a document name, that counts as cited. Only flag if a specific claim has NO source reference at all.
+
+3. **Source mismatch:** Does the answer cite a document that is not in the provided sources?
+
+4. **Role misclassification:** Does the answer confuse "Provider" with "Deployer" under the EU AI Act?
+
+## WHAT NOT TO FLAG
+- Paraphrasing, summarization, analogies, or explaining concepts in the answer's own words.
+- Citing by page number instead of article number (this is correct per system instructions).
+- Saying "the retrieved excerpts state..." or "based on the provided sources..." — this is proper anchoring.
+- Minor wording differences from the source text.
+- Answering a conceptual question using general knowledge, as long as specific legal facts are cited.
+- Slightly different phrasing of a legal concept if the meaning is preserved.
 
 ## HOW TO RESPOND
 Output ONLY one of these two strings:
-- "PASS" (if the answer is factually grounded and properly cited)
-- "FAIL" (if the answer has hallucinations, missing citations, or source mismatches)
+- "PASS" — the answer is grounded in the provided context and properly cited, with at most minor paraphrase differences.
+- "FAIL" — ONLY if one of the four failure modes above is clearly present.
 
-Do NOT output any other text. Just "PASS" or "FAIL"."""
+Do NOT output any other text. Do NOT explain your reasoning. Just "PASS" or "FAIL"."""
 
 
 _CROSS_CUTTING_TOPICS = [
@@ -196,31 +210,19 @@ def _get_client() -> OpenAI:
     return OpenAI(
         api_key=config.LLM_API_KEY,
         base_url=config.LLM_BASE_URL,
-        timeout=60.0,
+        timeout=15.0,  # lowered from 60s: healthy calls finish in 2-10s, stuck tiers fail fast
     )
 
 def _get_backup_client() -> OpenAI:
     return OpenAI(
         api_key=config.BACKUP_LLM_API_KEY,
         base_url=config.BACKUP_LLM_BASE_URL,
-        timeout=60.0,
+        timeout=15.0,  # lowered from 60s: same reasoning as Tier 1
     )
 
 def _get_gemini_client():
-    genai.configure(api_key=config.GEMINI_API_KEY)
-    return genai.GenerativeModel(
-        model_name=config.GEMINI_MODEL,
-        system_instruction=SYSTEM_PROMPT
-    )
-
-def _format_gemini_history(messages: List[Dict[str, str]]) -> list:
-    history = []
-    for msg in messages:
-        if msg["role"] == "system":
-            continue
-        role = "model" if msg["role"] == "assistant" else "user"
-        history.append({"role": role, "parts": [msg["content"]]})
-    return history
+    # google.genai uses a Client object, not module-level configure()
+    return genai.Client(api_key=config.GEMINI_API_KEY)
 
 
 def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
@@ -266,16 +268,25 @@ Review the draft answer against the context. Output ONLY 'PASS' or 'FAIL'."""
     try:
         client = _get_client()
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model=config.LLM_MODEL,
             temperature=0.0,
-            max_tokens=10,
+            max_tokens=200,  # raised: reasoning model needs headroom beyond reasoning tokens
+            # gpt-oss is a reasoning model — without low effort it burns the token
+            # budget on hidden "thinking" and returns empty content (finish_reason=length).
+            # Groq supports this parameter; OpenAI spec does not. Do NOT carry this line
+            # if we ever route the Critic to Gemini/OpenRouter/Cloudflare.
+            reasoning_effort="low",
             messages=[
                 {"role": "system", "content": CRITIC_PROMPT},
                 {"role": "user", "content": check_message}
             ],
         )
         result = (response.choices[0].message.content or "").strip().upper()
-        print(f"[critic] Result: {result}")
+        print(f"[critic] Result: '{result}'")  # quoted so empty strings are visible in the log
+        if not result:
+            # Empty response — treat as PASS (fail-open), same philosophy as the except block.
+            print("[critic] Empty response — failing open (treating as PASS)")
+            return True
         return "PASS" in result
     except Exception as e:
         print(f"[critic] Failed: {e}")
@@ -301,36 +312,63 @@ def generate_answer(question: str, chunks: List[Dict[str, Any]], history: List[D
     except Exception as e:
         print(f"[llm] Tier 1 (Groq) failed: {e}")
 
-    # Tier 2: OpenRouter
+    # Tier 2: Gemini (google.genai SDK)
+    if config.GEMINI_API_KEY:
+        try:
+            print("[llm] Trying Tier 2 (Gemini)...")
+            client = _get_gemini_client()
+
+            contents = []
+            for msg in messages:
+                if msg["role"] == "system":
+                    continue  # system prompt handled via config below
+                role = "model" if msg["role"] == "assistant" else "user"
+                contents.append({"role": role, "parts": [{"text": msg["content"]}]})
+
+            response = client.models.generate_content(
+                model=config.GEMINI_MODEL,
+                contents=contents,
+                config=genai_types.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT,
+                    temperature=config.LLM_TEMPERATURE,
+                    max_output_tokens=config.LLM_MAX_TOKENS,
+                ),
+            )
+            return response.text.strip()
+        except Exception as e:
+            print(f"[llm] Tier 2 (Gemini) failed: {e}")
+
+    # Tier 3: OpenRouter
     if config.BACKUP_LLM_API_KEY:
         try:
-            print("[llm] Trying Tier 2 (OpenRouter)...")
+            print("[llm] Trying Tier 3 (OpenRouter)...")
             client = _get_backup_client()
             response = client.chat.completions.create(
                 model=config.BACKUP_LLM_MODEL, temperature=config.LLM_TEMPERATURE, max_tokens=config.LLM_MAX_TOKENS, messages=messages
             )
             return (response.choices[0].message.content or "").strip()
         except Exception as e:
-            print(f"[llm] Tier 2 (OpenRouter) failed: {e}")
+            print(f"[llm] Tier 3 (OpenRouter) failed: {e}")
 
-    # Tier 3: Gemini
-    if config.GEMINI_API_KEY:
+    # Tier 4: Cloudflare Workers AI
+    # OpenAI-compatible endpoint; base URL embeds the Account ID, so the client is built per-call.
+    if config.CLOUDFLARE_ACCOUNT_ID and config.CLOUDFLARE_API_TOKEN:
         try:
-            print("[llm] Trying Tier 3 (Gemini)...")
-            gemini = _get_gemini_client()
-            gemini_messages = _format_gemini_history(messages)
-            prompt = gemini_messages.pop()["parts"][0]
-            
-            response = gemini.generate_content(
-                contents=gemini_messages + [{"role": "user", "parts": [prompt]}],
-                generation_config=genai.types.GenerationConfig(
-                    temperature=config.LLM_TEMPERATURE,
-                    max_output_tokens=config.LLM_MAX_TOKENS,
-                )
+            print("[llm] Trying Tier 4 (Cloudflare)...")
+            cf_client = OpenAI(
+                api_key=config.CLOUDFLARE_API_TOKEN,
+                base_url=f"https://api.cloudflare.com/client/v4/accounts/{config.CLOUDFLARE_ACCOUNT_ID}/ai/v1",
+                timeout=15.0,  # lowered from 60s: same reasoning as Tier 1
             )
-            return response.text.strip()
+            response = cf_client.chat.completions.create(
+                model=config.CLOUDFLARE_MODEL,
+                temperature=config.LLM_TEMPERATURE,
+                max_tokens=config.LLM_MAX_TOKENS,
+                messages=messages,
+            )
+            return (response.choices[0].message.content or "").strip()
         except Exception as e:
-            print(f"[llm] Tier 3 (Gemini) failed: {e}")
+            print(f"[llm] Tier 4 (Cloudflare) failed: {e}")
 
     raise RuntimeError("All AI providers are currently unavailable. Please wait 60 seconds and try again.")
 
@@ -347,22 +385,48 @@ def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dic
     if sources_data:
         yield f"data: {json.dumps({'type': 'sources', 'sources': sources_data})}\n\n"
 
-    # Option A: Generate full answer, check with Critic, THEN stream
-    draft = generate_answer(question, chunks, history, jurisdiction)
-    
+    # Heartbeat-protected generation: yield keep-alive comments every 2s while blocking
+    # generate_answer / critic_check calls run in a background thread.
+    HEARTBEAT_INTERVAL = 2.0
+
+    def _run_with_heartbeat(fn, *args):
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(fn, *args)
+            while not future.done():
+                try:
+                    future.result(timeout=HEARTBEAT_INTERVAL)
+                    break
+                except concurrent.futures.TimeoutError:
+                    yield ": keep-alive\n\n"
+            return future.result()
+
+    try:
+        draft = yield from _run_with_heartbeat(generate_answer, question, chunks, history, jurisdiction)
+    except Exception as e:
+        print(f"[stream] generate_answer failed: {e}")
+        error_payload = {"type": "text", "text": "Something went wrong while generating the answer. Please try again."}
+        yield f"data: {json.dumps(error_payload)}\n\n"
+        return
+
     if "couldn't find authoritative" in draft or "don't have that information" in draft:
         yield f"data: {json.dumps({'type': 'text', 'text': draft})}\n\n"
         return
-        
-    is_safe = critic_check(question, chunks, draft)
-    
+
+    try:
+        is_safe = yield from _run_with_heartbeat(critic_check, question, chunks, draft)
+    except Exception as e:
+        print(f"[stream] critic_check failed: {e}")
+        is_safe = True
+
     if is_safe:
         yield f"data: {json.dumps({'type': 'text', 'text': draft})}\n\n"
     else:
         print("[critic] Hallucination detected. Retrying with original question...")
-        fallback_chunks = chunks
-        
-        retry_draft = generate_answer(question, fallback_chunks, history, jurisdiction)
+        try:
+            retry_draft = yield from _run_with_heartbeat(generate_answer, question, chunks, history, jurisdiction)
+        except Exception as e:
+            print(f"[stream] retry generate_answer failed: {e}")
+            retry_draft = draft
         yield f"data: {json.dumps({'type': 'text', 'text': retry_draft})}\n\n"
 
 
