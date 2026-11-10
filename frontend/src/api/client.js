@@ -21,17 +21,13 @@ export async function generateChatTitle(question) {
   }
 }
 
-export async function streamChat(question, jurisdiction, history, onChunk, onSources, onWarming) {
-  // If the server doesn't send the first byte within 4 seconds, the user
-  // will see a "Warming up" message. This happens on Render's free tier
-  // when the backend has been idle for 15+ min and the container is cold.
-  let firstByteReceived = false;
-  const warmingTimeout = setTimeout(() => {
-    if (!firstByteReceived && onWarming) {
-      console.log("[client] Backend cold start detected — showing warmup message");
-      onWarming(true);
-    }
-  }, 4000);
+export async function streamChat(question, jurisdiction, history, onChunk, onSources) {
+  // Note: the previous "Warming up the AI… (cold start)" indicator was
+  // removed on 2026-11-10. The backend sends heartbeat SSE comments
+  // (`: keep-alive\n\n`) every 2 seconds during long LLM calls, so the
+  // HTTP connection stays alive. The 4s timeout that used to fire this
+  // message was misleading — it fired on any >4s wait, including normal
+  // LLM generation time, not just Render cold starts.
 
   let response;
   try {
@@ -45,14 +41,10 @@ export async function streamChat(question, jurisdiction, history, onChunk, onSou
       }),
     });
   } catch (err) {
-    clearTimeout(warmingTimeout);
-    if (onWarming) onWarming(false);
     throw err;
   }
 
   if (!response.ok) {
-    clearTimeout(warmingTimeout);
-    if (onWarming) onWarming(false);
     let detail = "The AI service is temporarily unavailable. Please try again in a moment.";
     try {
       const err = await response.json();
@@ -69,19 +61,12 @@ export async function streamChat(question, jurisdiction, history, onChunk, onSou
   const reader = response.body.getReader();
   const decoder = new TextDecoder("utf-8");
 
-  // SSE BUFFERING FIX
+  // SSE BUFFERING
   let buffer = "";
 
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
-
-    // First byte arrived — clear the warming message
-    if (!firstByteReceived) {
-      firstByteReceived = true;
-      clearTimeout(warmingTimeout);
-      if (onWarming) onWarming(false);
-    }
 
     buffer += decoder.decode(value, { stream: true });
     const events = buffer.split("\n\n");
@@ -120,9 +105,6 @@ export async function streamChat(question, jurisdiction, history, onChunk, onSou
       }
     }
   }
-
-  clearTimeout(warmingTimeout);
-  if (onWarming) onWarming(false);
 }
 
 export async function extractFacts(sessionId, userMessage) {

@@ -31,7 +31,6 @@ export default function App() {
   });
   const [inputValue, setInputValue] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const [isWarming, setIsWarming] = useState(false);
   const [loadError, setLoadError] = useState(null);
 
   const [sessions, setSessions] = useState([]);
@@ -234,7 +233,6 @@ export default function App() {
     if (!question || isSending || !selectedJurisdiction) return;
 
     sendingInProgressRef.current = true;
-    setIsWarming(false);
 
     // Clear draft when sending
     try {
@@ -329,8 +327,7 @@ export default function App() {
             updated[updated.length - 1] = { ...updated[updated.length - 1], sources: sourcesData };
             return updated;
           });
-        },
-        (warming) => setIsWarming(warming)
+        }
       );
 
       const finalAiMsg = await addMessage(activeSessionId, "assistant", fullText, receivedSources);
@@ -431,8 +428,7 @@ export default function App() {
               value={inputValue} 
               onChange={setInputValue} 
               onSend={handleSend} 
-              disabled={isSending || !selectedJurisdiction} 
-              isWarming={isWarming}
+              disabled={isSending || !selectedJurisdiction}
             />
           </div>
         </main>
