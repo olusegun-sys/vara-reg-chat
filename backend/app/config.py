@@ -79,16 +79,46 @@ REFUSAL_PATTERNS = [
 ]
 
 # --- Query Hint Map (Fixes retrieval precision) ---
+# Each entry: a trigger phrase that, when present in the user's question,
+# appends specific keywords to the search query. Use these when a question
+# has failed to retrieve the right chunks because the phrasing didn't match.
+#
+# Add new entries as users reveal phrasings we haven't anticipated. The
+# 2026-11-09 additions were driven by hard-test failures on Article 13,
+# the Omnibus deadline date, and role classification.
 QUERY_HINT_MAP = {
+    # --- EU: High-risk AI system dates (Omnibus 2026/1744) ---
     "deadline": ["Regulation (EU) 2026/1744", "Digital Omnibus", "2 December 2027"],
     "when do high-risk": ["Regulation (EU) 2026/1744", "Digital Omnibus", "2 December 2027"],
+    "when do the high-risk": ["Regulation (EU) 2026/1744", "Digital Omnibus", "2 December 2027", "2 August 2028"],
+    "obligations take effect": ["Regulation (EU) 2026/1744", "Digital Omnibus", "2 December 2027", "2 August 2028"],
+    "high-risk system obligations": ["Regulation (EU) 2026/1744", "Digital Omnibus", "2 December 2027", "2 August 2028"],
     "1 january 2026": ["Regulation (EU) 2026/1744", "2 December 2027"],
+
+    # --- EU: Transparency / Article 50 ---
     "article 50": ["Article 50", "transparency obligations", "synthetic content"],
     "transparency": ["Article 50", "transparency obligations", "synthetic content"],
-    "cabinet decision no. 111": ["Cabinet Decision No. 111/2022"],
-    "cabinet decision 111": ["Cabinet Decision No. 111/2022"],
+
+    # --- EU: Article 13 (instructions for use) — added 2026-11-09 ---
+    "article 13": ["Article 13", "instructions for use", "high-risk AI systems", "Regulation (EU) 2024/1689"],
+    "instructions for use": ["Article 13", "instructions for use", "high-risk AI systems", "Regulation (EU) 2024/1689"],
+
+    # --- EU: Provider vs Deployer role classification — added 2026-11-09 ---
+    # When the question is about what role a company has, force retrieval of the
+    # chunks that define Provider, Deployer, and Distributor, plus the rules on
+    # when a Deployer becomes a Provider (Article 25).
+    "provider or a deployer": ["Provider", "Deployer", "Distributor", "Article 25", "Article 26", "Regulation (EU) 2024/1689"],
+    "provider or deployer": ["Provider", "Deployer", "Distributor", "Article 25", "Article 26", "Regulation (EU) 2024/1689"],
+    "am i a provider": ["Provider", "Deployer", "Article 25", "Article 26", "Regulation (EU) 2024/1689"],
+    "are we a provider": ["Provider", "Deployer", "Article 25", "Article 26", "Regulation (EU) 2024/1689"],
+
+    # --- EU: High-risk classification ---
     "high-risk classification": ["Article 6", "Annex III", "Regulation (EU) 2024/1689"],
     "classification rules": ["Article 6", "Annex III", "Regulation (EU) 2024/1689"],
+
+    # --- VARA: Cabinet Decision disambiguation ---
+    "cabinet decision no. 111": ["Cabinet Decision No. 111/2022"],
+    "cabinet decision 111": ["Cabinet Decision No. 111/2022"],
 }
 
 # --- Jurisdiction Registry ---
