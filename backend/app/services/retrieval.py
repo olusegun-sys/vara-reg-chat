@@ -112,9 +112,19 @@ def _extract_keywords(text: str) -> str:
 def _search_faiss(query: str, jurisdiction: str, top_k: int) -> List[Dict[str, Any]]:
     """Internal helper to embed a query and search FAISS."""
     index, metadata = _load_index_and_metadata()
-    
-    # Retry with backoff — Cohere free tier occasionally times out
-    max_retries = 2
+
+    # Retry with exponential backoff — Cohere free tier occasionally times out
+    # on the first attempt. Four attempts with increasing waits (5s, 15s, 30s)
+    # catch transient hiccups without hanging the request too long.
+    # Total worst-case wait if all fail: 5 + 15 + 30 = 50 seconds of backoff,
+    # plus up to 4 × 15s timeout per attempt. This is bounded and predictable.
+    #
+    # Why 3 retries (4 total attempts): a 20-second Cohere blip (which we have
+    # seen) exhausts the old 2-retry schedule (5s + 10s + 15s timeout ≈ 30s)
+    # before Cohere recovers. The new schedule gives a 20-second blip a real
+    # chance to succeed on the 3rd attempt (after 5s + 15s = 20s wait).
+    max_retries = 3
+    backoff_schedule = [5, 15, 30]  # seconds between retries
     response = None
     for attempt in range(max_retries + 1):
         try:
@@ -122,20 +132,20 @@ def _search_faiss(query: str, jurisdiction: str, top_k: int) -> List[Dict[str, A
                 texts=[query],
                 model="embed-english-v3.0",
                 input_type="search_query",
-                # Aggressive timeout — fail fast, retry, don't hang
+                # Timeout per attempt — keeps a single hung call from blocking forever
                 request_options={"timeout_in_seconds": 15.0}
             )
             break
         except Exception as e:
             if attempt < max_retries:
-                wait = 5 * (attempt + 1)  # 5s, 10s
+                wait = backoff_schedule[attempt]
                 print(f"[retrieval] Cohere embed failed (attempt {attempt+1}/{max_retries+1}): {e}. Retrying in {wait}s...")
                 time.sleep(wait)
             else:
                 print(f"[retrieval] Cohere embed failed after {max_retries+1} attempts. Raising.")
                 raise RuntimeError(
                     "The embedding service (Cohere) is temporarily unreachable. "
-                    "Please try again in a minute. If this persists, check your internet connection."
+                    "Please try again in 60 seconds. If this persists, check your internet connection."
                 ) from e
 
     query_vec = np.array(response.embeddings, dtype="float32")
