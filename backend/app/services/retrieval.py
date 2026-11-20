@@ -58,6 +58,59 @@ def is_low_confidence(chunks: List[Dict[str, Any]]) -> bool:
     return _best_distance(chunks) > LOW_CONFIDENCE_DISTANCE
 
 
+# NEW: grounding classifier — pure function, no I/O, no dependencies beyond re.
+# NEW: why it exists: gives every downstream caller one consistent signal about
+# NEW: whether the retrieved set is likely to contain the answer, so B2's
+# NEW: "answer from memory" and B3's "claim corpus-grounded" stop diverging.
+def _classify_grounding(chunks: List[Dict[str, Any]], question: str) -> str:
+    # NEW: empty retrieval is the clearest signal — the model has nothing to go on.
+    # NEW: why "weak" not "strong": with zero chunks, any answer is model memory.
+    if not chunks:
+        return "weak"
+
+    # NEW: best distance drives the strong/weak split; same threshold the rest
+    # NEW: of the file already uses for the low-confidence broadening retry.
+    # NEW: why reuse it: keeping one threshold means one place to tune it later.
+    best = _best_distance(chunks)
+
+    # NEW: a second cheap signal — does any chunk's text share a non-trivial
+    # NEW: word with the question? If not, the chunks may be topically adjacent
+    # NEW: but answer-irrelevant, which is the B2 failure mode.
+    # NEW: why re.findall not a tokenizer: no new dependency; re is already imported.
+    question_words = {w for w in re.findall(r'\w+', question.lower()) if len(w) > 3}
+    overlap_found = False
+    if question_words:
+        for c in chunks:
+            chunk_words = set(re.findall(r'\w+', (c.get("text") or "").lower()))
+            if question_words & chunk_words:
+                overlap_found = True
+                break
+
+    # NEW: three bands. "strong" = good distance + some lexical overlap.
+    # NEW: "weak" = bad distance (the broadening retry already ran and failed
+    # NEW: to improve it, since retrieve_chunks only returns after that step).
+    # NEW: "partial" = the in-between case.
+    if best <= LOW_CONFIDENCE_DISTANCE and overlap_found:
+        return "strong"
+    if best > LOW_CONFIDENCE_DISTANCE:
+        return "weak"
+    return "partial"
+
+
+# NEW: stamp the classification onto every chunk so the return type stays a
+# NEW: plain List[Dict]. One classification per call — the grounding flag
+# NEW: describes the retrieval set, not any individual chunk.
+# NEW: why not wrap in a dict: a wrapper would change the return shape and
+# NEW: break every caller. Stamping keeps the shape identical.
+def _attach_grounding(chunks: List[Dict[str, Any]], question: str) -> List[Dict[str, Any]]:
+    if not chunks:
+        return chunks
+    label = _classify_grounding(chunks, question)
+    for c in chunks:
+        c["grounding"] = label
+    return chunks
+
+
 # --- VARA "Part" Mapping ---------------------------------------------------
 _VARA_PART_MAPPING = {
     "Exchange Services Rulebook": [
@@ -173,7 +226,7 @@ def _search_faiss(query: str, jurisdiction: str, top_k: int) -> List[Dict[str, A
         })
         if len(chunks) >= top_k:
             break
-            
+
     return chunks
 
 
@@ -181,13 +234,13 @@ def _search_bm25(query: str, jurisdiction: str, top_k: int) -> List[Dict[str, An
     """Search the BM25 index for exact keyword matches."""
     _, metadata = _load_index_and_metadata()
     tokenized_query = re.findall(r'\w+', query.lower())
-    
+
     # Get scores for all docs
     scores = _BM25.get_scores(tokenized_query)
-    
+
     # Sort indices by score descending
     top_indices = np.argsort(scores)[::-1]
-    
+
     chunks = []
     for idx in top_indices:
         if scores[idx] == 0: # Stop if scores drop to 0 (no keyword match)
@@ -205,7 +258,7 @@ def _search_bm25(query: str, jurisdiction: str, top_k: int) -> List[Dict[str, An
         })
         if len(chunks) >= top_k:
             break
-            
+
     return chunks
 
 
@@ -216,20 +269,20 @@ def _reciprocal_rank_fusion(list1: List[Dict[str, Any]], list2: List[Dict[str, A
     """
     rrf_scores = {}
     chunk_map = {}
-    
+
     for rank, chunk in enumerate(list1):
         idx = chunk["id"]
         chunk_map[idx] = chunk
         rrf_scores[idx] = rrf_scores.get(idx, 0) + 1.0 / (k + rank + 1)
-        
+
     for rank, chunk in enumerate(list2):
         idx = chunk["id"]
         chunk_map[idx] = chunk
         rrf_scores[idx] = rrf_scores.get(idx, 0) + 1.0 / (k + rank + 1)
-        
+
     # Sort by RRF score descending
     sorted_indices = sorted(rrf_scores.keys(), key=lambda x: rrf_scores[x], reverse=True)
-    
+
     # Return the merged chunks
     return [chunk_map[idx] for idx in sorted_indices]
 
@@ -255,11 +308,11 @@ def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List
     if is_low_confidence(faiss_chunks):
         print(f"[retrieval] Low FAISS confidence (dist: {_best_distance(faiss_chunks):.2f}). Attempting broader keyword search...")
         broader_query = _extract_keywords(question)
-        
+
         if broader_query:
             broader_faiss = _search_faiss(broader_query, jurisdiction, top_k)
             broader_bm25 = _search_bm25(broader_query, jurisdiction, top_k)
-            
+
             # If the broader search improved the FAISS distance, use the new merged set
             if broader_faiss and _best_distance(broader_faiss) < _best_distance(faiss_chunks):
                 print(f"[retrieval] Broader search improved confidence (new dist: {_best_distance(broader_faiss):.2f}). Using broader results.")
@@ -267,8 +320,14 @@ def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List
 
     # 4. Trim to top_k
     chunks = chunks[:top_k]
-    
-    return _attach_source_urls(chunks, jurisdiction)
+
+    # NEW: attach source URLs first, then stamp the grounding flag.
+    # NEW: why this order: _attach_source_urls stays single-purpose (URL + section),
+    # NEW: and _attach_grounding only reads distance and text — no coupling.
+    # NEW: if a caller passes a custom top_k, the grounding flag reflects the
+    # NEW: actual final set, not the pre-trim candidates.
+    chunks = _attach_source_urls(chunks, jurisdiction)
+    return _attach_grounding(chunks, question)
 
 
 def get_chunk_count() -> int:
