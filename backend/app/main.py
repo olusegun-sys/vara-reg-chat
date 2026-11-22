@@ -15,8 +15,9 @@ Deployment notes:
 
 import os
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.api.routes import router
 from app import config
@@ -89,6 +90,23 @@ app = FastAPI(
 )
 
 app.add_middleware(CORSMiddleware, **_cors_config())
+
+
+# NEW: CORS-safe exception handler. Must be registered AFTER
+# CORSMiddleware so its response passes back OUT through CORS and gets
+# the Access-Control-Allow-Origin header. Without this, an unhandled
+# exception produces a 500 response without CORS headers, and the browser
+# reports a misleading CORS error instead of the real 500. Verified
+# 2026-11-22: the Cohere 429 outage showed as a CORS error on the frontend
+# until the backend logs were read; this handler makes future 500s visible
+# in the browser without needing log access.
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error", "error": str(exc)},
+    )
+
 
 # All API routes live under /api so a reverse proxy or static frontend
 # can coexist on the same domain without path conflicts.
