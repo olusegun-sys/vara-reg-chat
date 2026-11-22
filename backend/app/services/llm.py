@@ -243,6 +243,15 @@ def _get_gemini_client():
 
 
 def rewrite_query(question: str, jurisdiction: str = "AE-Dubai") -> str:
+    # Skip the rewriter for article-specific questions. The raw question is
+    # already specific enough, and the rewriter's REWRITER_PROMPT says "For
+    # dates, include BOTH 2024/1689 AND 2026/1744" — which pulls the Omnibus
+    # into article queries and outranks the AI Act. Verified 2026-11-22:
+    # raw question retrieves AI Act p.69 (Article 13); rewritten question
+    # retrieves Omnibus p.4/12/13/40. Skip = raw = correct.
+    if re.search(r"\bArticle\s+\d+", question, re.IGNORECASE):
+        return _apply_query_hints(question, question)
+
     word_count = len(question.split())
     if word_count < 8 or word_count > 40:
         return _apply_query_hints(question, question)

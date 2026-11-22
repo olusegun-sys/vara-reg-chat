@@ -16,11 +16,6 @@ co = cohere.Client(api_key=config.COHERE_API_KEY)
 
 
 # --- VARA PDF text cleaning ------------------------------------------------
-# Why this exists: every VARA PDF page repeats the same Arabic+English footer
-# ("varaconnect@vara.ae - PO Box 9292...") and a standalone page number. Without
-# stripping it, those lines get chunked and embedded hundreds of times, polluting
-# the index with near-duplicate noise that steals top_k slots from real rule text.
-# Also drops pages whose only content was a table rendered as "1 1 1 1 1 ...".
 VARA_FOOTER_MARKERS = (
     "varaconnect@vara.ae",
     "araconnect@vara.ae",
@@ -43,36 +38,21 @@ def _is_arabic_only(line: str) -> bool:
 
 
 def _is_vara_document(pdf_path: Path) -> bool:
-    """Return True if this PDF is a VARA document (identified by filename prefix).
-
-    Why filename-based: VARA PDFs are all named VARA_EN_*.pdf; every other
-    jurisdiction's files use different naming. This avoids threading a
-    jurisdiction string through every ingestion call, and it's correct because
-    the filename is the one thing that's guaranteed to be VARA-specific here.
-    """
+    """Return True if this PDF is a VARA document (identified by filename prefix)."""
     return pdf_path.name.startswith("VARA_EN_")
 
 
 def clean_vara_pdf_text(text: str) -> str:
-    """
-    Strip VARA page footers and Arabic-only lines from extracted PDF text.
-    Called only on VARA PDFs — non-VARA jurisdictions bypass this cleaner
-    (see the guard in load_pdf_pages) so their article/paragraph numbering
-    survives intact. The .txt branch of load_pdf_pages() is untouched.
-    """
+    """Strip VARA page footers and Arabic-only lines from extracted PDF text."""
     kept_lines = []
     for raw_line in text.splitlines():
         line = raw_line.strip()
-        # Drop empty lines that survive after other filters
         if not line:
             continue
-        # Drop any line containing a known footer marker (substring match)
         if any(marker in line for marker in VARA_FOOTER_MARKERS):
             continue
-        # Drop lines that are Arabic-only (no Latin letters at all)
         if _is_arabic_only(line):
             continue
-        # Drop standalone page numbers (e.g. "5" or "36" left over after footer strip)
         if re.fullmatch(r"\d{1,3}", line):
             continue
         kept_lines.append(line)
@@ -82,28 +62,106 @@ def clean_vara_pdf_text(text: str) -> str:
 def _demerge_fused_words(text: str) -> str:
     """
     Insert spaces where a PDF extracted fused text with no word boundaries.
-
-    Why this exists:
-    Some CBN PDFs use font mappings that pypdf cannot decode into separate
-    words — the extracted text has no spaces between words, so BM25 sees
-    each chunk as one giant token and FAISS embeddings become useless.
-    Fix: insert a space between (lowercase→uppercase), (letter→digit), and
-    (digit→letter) transitions. This reconstructs word boundaries without
-    breaking acronyms like AML/CFT or VASP.
-
-    Example:
-        "CentralBankofNigeria"  → "Central Bank of Nigeria"
-        "Plot33,AbubakarTafawa" → "Plot 33, Abubakar Tafawa"
-
-    Only called for CBN documents — VARA/EU PDFs already extract cleanly,
-    and this heuristic would corrupt already-correct text.
+    Only called for CBN documents. See prior explanation.
     """
-    # lowercase followed by uppercase: "isNeed" -> "is Need"
     text = re.sub(r"([a-z])([A-Z])", r"\1 \2", text)
-    # letter followed by digit: "Plot33" -> "Plot 33"
     text = re.sub(r"([a-zA-Z])(\d)", r"\1 \2", text)
-    # digit followed by letter: "33Abubakar" -> "33 Abubakar"
     text = re.sub(r"(\d)([a-zA-Z])", r"\1 \2", text)
+    return text
+
+
+# --- EU PDF text cleaning ---------------------------------------------------
+# Dictionary-based shatter repair. See STATE.md §5 for the full diagnostic.
+def _load_english_words() -> frozenset:
+    """Load the English wordlist from backend/data/english_words.txt."""
+    wordlist_path = config.DATA_DIR / "english_words.txt"
+    if not wordlist_path.exists():
+        print(f"[ingest] WARNING: {wordlist_path} not found; shatter repair will be skipped.")
+        return frozenset()
+    with open(wordlist_path, "r", encoding="utf-8") as f:
+        words = frozenset(line.strip().lower() for line in f if line.strip())
+    print(f"[ingest] Loaded {len(words)} English words for shatter repair.")
+    return words
+
+
+_ENGLISH_WORDS = None
+
+
+def _get_english_words() -> frozenset:
+    global _ENGLISH_WORDS
+    if _ENGLISH_WORDS is None:
+        _ENGLISH_WORDS = _load_english_words()
+    return _ENGLISH_WORDS
+
+
+def _deshatter_eu_text(text: str) -> str:
+    """
+    Rejoin words that the EU PDF's font metrics shattered with stray spaces.
+
+    Algorithm (strict — only joins when the joined result is a real word):
+    1. Pre-pass: join hyphenated shatters ("high-r isk" -> "high-risk").
+    2. Main pass: iterate over every SPACE between two letters. For each space,
+       extract the full word to the left and the full word to the right, and
+       join them ONLY if the joined form is a real English word.
+    3. Multi-pass: repeat up to 5 times. Each pass removes spaces, so the text
+       strictly shrinks and converges.
+
+    Only called for EU documents. VARA and CBN have their own cleaners.
+    If the dictionary is missing, returns text unchanged (fail-safe).
+    """
+    words = _get_english_words()
+    if not words:
+        return text
+
+    # Pre-pass: hyphenated shatters. "-r isk" -> "-risk". Bound is {1}.
+    text = re.sub(r"(-[A-Za-z]{1})\s+([a-z]{1,20})", r"\1\2", text)
+
+    def _left_word(s: str, i: int) -> str:
+        start = i
+        while start > 0 and s[start - 1].isalpha():
+            start -= 1
+        return s[start:i]
+
+    def _right_word(s: str, i: int) -> str:
+        end = i + 1
+        while end < len(s) and s[end].isalpha():
+            end += 1
+        return s[i + 1:end]
+
+    def _process_once(s: str) -> str:
+        matches = list(re.finditer(r"(?<=[A-Za-z]) (?=[a-z])", s))
+        if not matches:
+            return s
+
+        out = []
+        last = 0
+        for m in matches:
+            i = m.start()
+            if i < last:
+                continue
+            left = _left_word(s, i)
+            right = _right_word(s, i)
+            if left and right and (left + right).lower() in words:
+                # Emit text up to (but NOT including) the left word. Why
+                # `i - len(left)`: `left` is the word ending at position i,
+                # so `s[last:i]` would include `left` again when we append
+                # `left + right` below. Trimming the slice by len(left)
+                # aligns the boundary with the start of the left word.
+                out.append(s[last:i - len(left)])
+                out.append(left + right)  # the joined word (only copy)
+                last = i + 1 + len(right)  # skip past the right word
+            else:
+                out.append(s[last:i + 1])  # text up to and including space
+                last = i + 1
+        out.append(s[last:])
+        return "".join(out)
+
+    for _ in range(5):
+        new_text = _process_once(text)
+        if new_text == text:
+            break
+        text = new_text
+
     return text
 
 
@@ -111,10 +169,8 @@ def load_pdf_pages(pdf_path: Path) -> List[Dict[str, Any]]:
     pages = []
     if pdf_path.suffix.lower() == ".txt":
         try:
-            # errors="replace" prevents crashing on weird binary characters
             with open(pdf_path, "r", encoding="utf-8", errors="replace") as f:
                 text = f.read()
-            # Strip out null bytes and non-printable garbage
             text = "".join(char for char in text if char.isprintable() or char in "\n\r\t")
             if text.strip():
                 pages.append({"page": 1, "text": text})
@@ -125,22 +181,12 @@ def load_pdf_pages(pdf_path: Path) -> List[Dict[str, Any]]:
     reader = PdfReader(str(pdf_path))
     for idx, page in enumerate(reader.pages, start=1):
         raw = page.extract_text() or ""
-        # Only VARA PDFs carry the bilingual footer garbage this cleaner removes.
-        # Why the guard: clean_vara_pdf_text() also strips standalone 1–3 digit
-        # lines — which would delete EU AI Act article/paragraph numbers and
-        # break citations. Non-VARA jurisdictions skip the cleaner entirely.
-        #
-        # CBN PDFs: pypdf sometimes extracts fused text ("CentralBankofNigeria")
-        # with no word boundaries. Demerge before chunking so BM25 and FAISS
-        # can see real words. The demerger runs only on CBN files.
         if _is_vara_document(pdf_path):
             text = clean_vara_pdf_text(raw)
         elif pdf_path.name.startswith("cbn_"):
             text = _demerge_fused_words(raw)
         else:
-            text = raw
-        # Drop pages whose remaining content is too short to be a real rule
-        # (typically pypdf's mis-rendered table pages: "1 1 1 1 1 ...").
+            text = _deshatter_eu_text(raw)
         if len(text) < 40:
             continue
         pages.append({"page": idx, "text": text})
@@ -264,3 +310,34 @@ def ingest_document(jurisdiction: str, doc_config: Dict[str, str]) -> int:
     count = store_in_faiss(chunks, embeddings, jurisdiction, regulator, doc_config["title"], doc_config["effective_date"])
     print(f"[ingest] Stored {count} chunks in FAISS.")
     return count
+
+
+# Test harness. Run with `python -m app.services.ingestion` from backend/.
+if __name__ == "__main__":
+    from app.config import DATA_DIR
+
+    sample = DATA_DIR / "EU_AI_Act_Regulation_2024_1689.pdf"
+    print(f"[test] Loading page 69 from {sample.name}...")
+    reader = PdfReader(str(sample))
+    raw = reader.pages[68].extract_text() or ""
+    cleaned = _deshatter_eu_text(raw)
+
+    print("\n[test] BEFORE (first 600 chars):")
+    print(raw[:600])
+    print("\n[test] AFTER (first 600 chars):")
+    print(cleaned[:600])
+
+    print("\n[test] Spot checks — these should all be TRUE:")
+    for phrase in [
+        "such", "high-risk", "system", "biometric", "identification",
+        "Article", "Directive", "enforcement", "purpose", "genuine",
+        "In no case", "a genuine", "It shall", "This paragraph",
+    ]:
+        print(f"  {phrase!r}: {phrase in cleaned}")
+
+    print("\n[test] Spot checks — these should all be FALSE (no over-joins):")
+    for bad in [
+        "suchhigh", "AIsyste", "enforcementpur", "criminaloffe",
+        "Itsshall", "decisionthat", "Thisparagraph", "inno case",
+    ]:
+        print(f"  {bad!r}: {bad in cleaned}")
