@@ -36,7 +36,6 @@ def _load_index_and_metadata() -> tuple:
     except Exception as exc:
         raise RuntimeError(f"Could not load metadata: {exc}") from exc
 
-    # Build the BM25 index for exact keyword matching
     print(f"[retrieval] Building BM25 index over {len(_METADATA)} chunks...")
     _TOKENIZED_CORPUS = [re.findall(r'\w+', m["text"].lower()) for m in _METADATA]
     _BM25 = BM25Okapi(_TOKENIZED_CORPUS)
@@ -58,25 +57,113 @@ def is_low_confidence(chunks: List[Dict[str, Any]]) -> bool:
     return _best_distance(chunks) > LOW_CONFIDENCE_DISTANCE
 
 
+# NEW: content-containment check — the Karpathy honesty fix. Pure function.
+# NEW: why this exists: FAISS similarity can be high while the answer text is
+# NEW: absent, letting the model confabulate from memory. This helper
+# NEW: distinguishes "the corpus contains the answer" from "the corpus is
+# NEW: topically similar" by requiring a distinctive match from the question.
+# NEW:
+# NEW: two-tier article check (2026-11-22):
+# NEW:   Tier 1: chunk `section` field == "Article N" (uses the labels from
+# NEW:           _fix_sections.py, IF they survived the commit).
+# NEW:   Tier 2: chunk text (first 100 chars) starts with "article N" (fallback
+# NEW:           for chunks without section labels).
+# NEW: Both tiers are required because we can't guarantee the section labels
+# NEW: made it into the deployed metadata; the fallback handles both cases.
+# NEW:
+# NEW: short numbers (1-3 digits) without an "Article" context are IGNORED,
+# NEW: because they appear coincidentally (page numbers, cross-references).
+# NEW: 4+ digit numbers (years, amounts) are still checked directly.
+def _contains_query_subject(chunks: List[Dict[str, Any]], question: str) -> bool:
+    if not chunks or not question:
+        return False
+
+    stopwords = {
+        # common English
+        "what", "are", "the", "for", "is", "a", "an", "and", "or", "in", "on",
+        "of", "to", "with", "by", "from", "how", "does", "do", "can", "could",
+        "should", "would", "will", "this", "that", "these", "those", "was",
+        "were", "been", "being", "have", "has", "had", "having", "about",
+        "under", "over", "into", "via", "per", "which", "who", "whom", "whose",
+        "where", "when", "why", "than", "then", "there", "their", "they",
+        # generic legal terms — appear in every chunk, no discriminating power
+        "article", "articles", "regulation", "regulations", "regulatory",
+        "require", "requires", "required", "requirement", "requirements",
+        "law", "laws", "legal", "legally", "act", "acts", "section", "sections",
+        "paragraph", "paragraphs", "clause", "clauses", "provision", "provisions",
+        "obligation", "obligations", "eu", "ai", "eua", "ais",
+    }
+
+    # --- Check 1: article-specific queries ----------------------------------
+    # If the question names "Article N", the ONLY reliable signal is whether a
+    # chunk is actually ABOUT Article N (not just a cross-reference to "Article
+    # N of Regulation 2016/679" embedded in some other article's text).
+    article_match = re.search(r'\bArticle\s+(\d+[a-zA-Z]?)\b', question, re.IGNORECASE)
+    if article_match:
+        target_num = article_match.group(1)
+        target_section = "Article " + target_num
+        target_phrase_prefix = ("article " + target_num).lower()
+
+        # Tier 1: check the section field (from _fix_sections.py labels).
+        for c in chunks:
+            if (c.get("section") or "").strip() == target_section:
+                return True
+
+        # Tier 2: check if the chunk's text STARTS with the article heading.
+        # This catches chunks where the heading is at the top but the section
+        # field wasn't relabeled.
+        for c in chunks:
+            head = (c.get("text") or "")[:100].lower().lstrip()
+            if head.startswith(target_phrase_prefix):
+                return True
+
+        # No chunk is actually about this article.
+        return False
+
+    # --- Check 2: 4+ digit numbers (years, amounts) -------------------------
+    # 4-digit numbers are distinctive enough to match directly. 1-3 digit
+    # numbers are too coincidental to trust without context.
+    numbers = re.findall(r'\b\d+\b', question)
+    for num in numbers:
+        if len(num) >= 4:
+            for c in chunks:
+                if num in (c.get("text") or "").lower():
+                    return True
+
+    # --- Check 3: keyword containment ---------------------------------------
+    words = re.findall(r'\w+', question.lower())
+    keywords = [w for w in words if len(w) > 3 and w not in stopwords]
+
+    if not keywords:
+        return False
+
+    # 3a: single-keyword containment.
+    for c in chunks:
+        text = (c.get("text") or "").lower()
+        for kw in keywords:
+            if kw in text:
+                return True
+
+    # 3b: two-keyword phrase containment.
+    for i in range(len(keywords) - 1):
+        phrase = keywords[i] + " " + keywords[i + 1]
+        for c in chunks:
+            if phrase in (c.get("text") or "").lower():
+                return True
+
+    return False
+
+
 # NEW: grounding classifier — pure function, no I/O, no dependencies beyond re.
-# NEW: why it exists: gives every downstream caller one consistent signal about
-# NEW: whether the retrieved set is likely to contain the answer, so B2's
-# NEW: "answer from memory" and B3's "claim corpus-grounded" stop diverging.
 def _classify_grounding(chunks: List[Dict[str, Any]], question: str) -> str:
-    # NEW: empty retrieval is the clearest signal — the model has nothing to go on.
-    # NEW: why "weak" not "strong": with zero chunks, any answer is model memory.
     if not chunks:
         return "weak"
 
-    # NEW: best distance drives the strong/weak split; same threshold the rest
-    # NEW: of the file already uses for the low-confidence broadening retry.
-    # NEW: why reuse it: keeping one threshold means one place to tune it later.
+    if not _contains_query_subject(chunks, question):
+        return "ungrounded"
+
     best = _best_distance(chunks)
 
-    # NEW: a second cheap signal — does any chunk's text share a non-trivial
-    # NEW: word with the question? If not, the chunks may be topically adjacent
-    # NEW: but answer-irrelevant, which is the B2 failure mode.
-    # NEW: why re.findall not a tokenizer: no new dependency; re is already imported.
     question_words = {w for w in re.findall(r'\w+', question.lower()) if len(w) > 3}
     overlap_found = False
     if question_words:
@@ -86,10 +173,6 @@ def _classify_grounding(chunks: List[Dict[str, Any]], question: str) -> str:
                 overlap_found = True
                 break
 
-    # NEW: three bands. "strong" = good distance + some lexical overlap.
-    # NEW: "weak" = bad distance (the broadening retry already ran and failed
-    # NEW: to improve it, since retrieve_chunks only returns after that step).
-    # NEW: "partial" = the in-between case.
     if best <= LOW_CONFIDENCE_DISTANCE and overlap_found:
         return "strong"
     if best > LOW_CONFIDENCE_DISTANCE:
@@ -97,11 +180,7 @@ def _classify_grounding(chunks: List[Dict[str, Any]], question: str) -> str:
     return "partial"
 
 
-# NEW: stamp the classification onto every chunk so the return type stays a
-# NEW: plain List[Dict]. One classification per call — the grounding flag
-# NEW: describes the retrieval set, not any individual chunk.
-# NEW: why not wrap in a dict: a wrapper would change the return shape and
-# NEW: break every caller. Stamping keeps the shape identical.
+# NEW: stamp the classification onto every chunk.
 def _attach_grounding(chunks: List[Dict[str, Any]], question: str) -> List[Dict[str, Any]]:
     if not chunks:
         return chunks
@@ -138,14 +217,12 @@ def _attach_source_urls(chunks: List[Dict[str, Any]], jurisdiction: str) -> List
         page = c.get("page", 1)
         url = url_by_title.get(title, "")
 
-        # 1. Inject the VARA "Part" name if we have a mapping for this doc
         if title in _VARA_PART_MAPPING:
             for mapping in _VARA_PART_MAPPING[title]:
                 if mapping["start"] <= page <= mapping["end"]:
                     c["section"] = mapping["section"]
                     break
 
-        # 2. Deep Linking & Text Highlighting for PDFs
         if url and url.lower().endswith('.pdf') and page > 1:
             search_phrase = c.get("text", "")[:50].replace("\n", " ").strip()
             encoded_phrase = urllib.parse.quote(search_phrase)
@@ -163,21 +240,10 @@ def _extract_keywords(text: str) -> str:
 
 
 def _search_faiss(query: str, jurisdiction: str, top_k: int) -> List[Dict[str, Any]]:
-    """Internal helper to embed a query and search FAISS."""
     index, metadata = _load_index_and_metadata()
 
-    # Retry with exponential backoff — Cohere free tier occasionally times out
-    # on the first attempt. Four attempts with increasing waits (5s, 15s, 30s)
-    # catch transient hiccups without hanging the request too long.
-    # Total worst-case wait if all fail: 5 + 15 + 30 = 50 seconds of backoff,
-    # plus up to 4 × 15s timeout per attempt. This is bounded and predictable.
-    #
-    # Why 3 retries (4 total attempts): a 20-second Cohere blip (which we have
-    # seen) exhausts the old 2-retry schedule (5s + 10s + 15s timeout ≈ 30s)
-    # before Cohere recovers. The new schedule gives a 20-second blip a real
-    # chance to succeed on the 3rd attempt (after 5s + 15s = 20s wait).
     max_retries = 3
-    backoff_schedule = [5, 15, 30]  # seconds between retries
+    backoff_schedule = [5, 15, 30]
     response = None
     for attempt in range(max_retries + 1):
         try:
@@ -185,7 +251,6 @@ def _search_faiss(query: str, jurisdiction: str, top_k: int) -> List[Dict[str, A
                 texts=[query],
                 model="embed-english-v3.0",
                 input_type="search_query",
-                # Timeout per attempt — keeps a single hung call from blocking forever
                 request_options={"timeout_in_seconds": 15.0}
             )
             break
@@ -231,19 +296,15 @@ def _search_faiss(query: str, jurisdiction: str, top_k: int) -> List[Dict[str, A
 
 
 def _search_bm25(query: str, jurisdiction: str, top_k: int) -> List[Dict[str, Any]]:
-    """Search the BM25 index for exact keyword matches."""
     _, metadata = _load_index_and_metadata()
     tokenized_query = re.findall(r'\w+', query.lower())
 
-    # Get scores for all docs
     scores = _BM25.get_scores(tokenized_query)
-
-    # Sort indices by score descending
     top_indices = np.argsort(scores)[::-1]
 
     chunks = []
     for idx in top_indices:
-        if scores[idx] == 0: # Stop if scores drop to 0 (no keyword match)
+        if scores[idx] == 0:
             break
         meta = metadata[idx]
         if meta.get("jurisdiction") != jurisdiction:
@@ -254,7 +315,7 @@ def _search_bm25(query: str, jurisdiction: str, top_k: int) -> List[Dict[str, An
             "page": meta.get("page", 0),
             "section": meta.get("section", "General"),
             "document": meta.get("document", "Unknown"),
-            "distance": 1.0 / (scores[idx] + 1.0), # Convert BM25 score to a distance-like metric
+            "distance": 1.0 / (scores[idx] + 1.0),
         })
         if len(chunks) >= top_k:
             break
@@ -263,10 +324,6 @@ def _search_bm25(query: str, jurisdiction: str, top_k: int) -> List[Dict[str, An
 
 
 def _reciprocal_rank_fusion(list1: List[Dict[str, Any]], list2: List[Dict[str, Any]], k: int = 60) -> List[Dict[str, Any]]:
-    """
-    Merge two ranked lists using RRF.
-    This combines semantic meaning (FAISS) with exact keyword matching (BM25).
-    """
     rrf_scores = {}
     chunk_map = {}
 
@@ -280,10 +337,8 @@ def _reciprocal_rank_fusion(list1: List[Dict[str, Any]], list2: List[Dict[str, A
         chunk_map[idx] = chunk
         rrf_scores[idx] = rrf_scores.get(idx, 0) + 1.0 / (k + rank + 1)
 
-    # Sort by RRF score descending
     sorted_indices = sorted(rrf_scores.keys(), key=lambda x: rrf_scores[x], reverse=True)
 
-    # Return the merged chunks
     return [chunk_map[idx] for idx in sorted_indices]
 
 
@@ -293,18 +348,14 @@ def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List
     if index.ntotal == 0:
         return []
 
-    # 1. Dual Search (FAISS + BM25)
     faiss_chunks = _search_faiss(question, jurisdiction, top_k)
     bm25_chunks = _search_bm25(question, jurisdiction, top_k)
 
-    # 2. Reciprocal Rank Fusion
     if faiss_chunks or bm25_chunks:
         chunks = _reciprocal_rank_fusion(faiss_chunks, bm25_chunks)
     else:
         chunks = []
 
-    # 3. Check Confidence (using FAISS distance)
-    # We check if the best FAISS result was poor. If so, we broaden and try again.
     if is_low_confidence(faiss_chunks):
         print(f"[retrieval] Low FAISS confidence (dist: {_best_distance(faiss_chunks):.2f}). Attempting broader keyword search...")
         broader_query = _extract_keywords(question)
@@ -313,19 +364,12 @@ def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List
             broader_faiss = _search_faiss(broader_query, jurisdiction, top_k)
             broader_bm25 = _search_bm25(broader_query, jurisdiction, top_k)
 
-            # If the broader search improved the FAISS distance, use the new merged set
             if broader_faiss and _best_distance(broader_faiss) < _best_distance(faiss_chunks):
                 print(f"[retrieval] Broader search improved confidence (new dist: {_best_distance(broader_faiss):.2f}). Using broader results.")
                 chunks = _reciprocal_rank_fusion(broader_faiss, broader_bm25)
 
-    # 4. Trim to top_k
     chunks = chunks[:top_k]
 
-    # NEW: attach source URLs first, then stamp the grounding flag.
-    # NEW: why this order: _attach_source_urls stays single-purpose (URL + section),
-    # NEW: and _attach_grounding only reads distance and text — no coupling.
-    # NEW: if a caller passes a custom top_k, the grounding flag reflects the
-    # NEW: actual final set, not the pre-trim candidates.
     chunks = _attach_source_urls(chunks, jurisdiction)
     return _attach_grounding(chunks, question)
 
@@ -336,3 +380,41 @@ def get_chunk_count() -> int:
         return index.ntotal
     except Exception:
         return 0
+
+
+# Test harness. No LLM calls, no Groq tokens. Cohere calls: 5 per run.
+if __name__ == "__main__":
+    test_cases = [
+        ("A — VARA staking", "What are the staking requirements for virtual asset service providers under VARA?", "AE-Dubai", "strong"),
+        ("B1 — Provider/Deployer", "We are a US company hosting a third-party hiring tool for EU customers. Are we a provider or a deployer under the EU AI Act?", "EU", "strong"),
+        ("B3 — High-risk dates", "When do the high-risk AI system obligations take effect?", "EU", "strong"),
+        ("B2 — Article 13", "What does Article 13 of the EU AI Act require regarding instructions for use?", "EU", "strong"),
+        ("Unanswerable — Article 99", "What does Article 99 of the EU AI Act require?", "EU", "ungrounded"),
+    ]
+
+    print("=== Grounding test harness ===")
+    print("(No LLM calls. 5 Cohere calls. Free to re-run.)")
+    print()
+
+    passed = 0
+    failed = 0
+    for label, question, jurisdiction, expected in test_cases:
+        try:
+            chunks = retrieve_chunks(question, jurisdiction)
+            actual = chunks[0].get("grounding") if chunks else "NO CHUNKS"
+            status = "PASS" if actual == expected else "FAIL"
+            if status == "PASS":
+                passed += 1
+            else:
+                failed += 1
+            print(f"{status}: {label}")
+            print(f"  expected: {expected}, actual: {actual}, chunks: {len(chunks)}")
+            if chunks:
+                print(f"  top: {chunks[0].get('document', '?')} p.{chunks[0].get('page', '?')} section={chunks[0].get('section', '?')!r}")
+            print()
+        except Exception as e:
+            failed += 1
+            print(f"ERROR: {label}: {e}")
+            print()
+
+    print(f"=== {passed} passed, {failed} failed ===")
