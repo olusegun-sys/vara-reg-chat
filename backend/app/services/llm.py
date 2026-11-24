@@ -86,6 +86,20 @@ Do NOT refuse a question just because the exact phrasing isn't in the chunks. If
 Refuse ONLY if the retrieved chunks are completely unrelated to the user's question (e.g., they ask about VARA, but the chunks are about the EU AI Act).
 Refusal message: "I couldn't find authoritative sources in the selected jurisdiction to answer this. Could you rephrase or specify which rulebook you'd like me to look at?"
 
+## GROUNDING CHECK
+The user message begins with "GROUNDING: <label>", where <label> is one of "strong", "partial", "weak", "ungrounded", or "unknown".
+
+- **GROUNDING: strong or partial** — the retrieved chunks are expected to contain the answer. Answer normally, citing the chunks.
+- **GROUNDING: weak** — the retrieval confidence is low. Answer, but note in your response that the sources may not fully cover the question.
+- **GROUNDING: ungrounded** — the retrieved chunks do NOT contain the answer. The chunks are topically adjacent but do not contain the specific information requested. You MUST:
+  1. Refuse to answer from memory. Do NOT state the answer from pre-trained knowledge.
+  2. Say exactly this: "I couldn't find authoritative sources in the selected jurisdiction to answer this. Could you rephrase or specify which rulebook you'd like me to look at?"
+  3. Do NOT cite a page or article from the retrieved chunks. Those chunks are topically adjacent but do not contain the answer.
+  4. Do NOT add a general-knowledge explanation "for context". The user needs to know the corpus doesn't contain the answer, not be given a plausible-sounding workaround.
+- **GROUNDING: unknown** — treat as "partial" (legacy behavior for calls without a grounding label).
+
+The "ungrounded" refusal is a FEATURE, not a bug. A compliance tool that says "I don't know" is more valuable than one that confabulates. Trust is built by refusing when the corpus can't support the answer.
+
 Be precise, be direct, be helpful, and be honest about limits."""
 
 
@@ -214,10 +228,22 @@ def _build_context(chunks: List[Dict[str, Any]]) -> str:
     return "\n\n---\n\n".join(parts)
 
 
+# CHANGED (change 3, 2026-11-24): pass the grounding label into the prompt so
+# the model knows whether its answer is grounded in the corpus. The label
+# comes from retrieval.py's _classify_grounding, which sets it on chunks[0].
+# The SYSTEM_PROMPT's GROUNDING CHECK section tells the model what to do when
+# the label is "ungrounded" (refuse instead of answering from memory).
 def _build_user_message(question: str, chunks: List[Dict[str, Any]], jurisdiction: str = "") -> str:
     context = _build_context(chunks)
     header = f"JURISDICTION: {jurisdiction}\n\n" if jurisdiction else ""
-    return f"""{header}CONTEXT:
+    # Read the grounding label from the first chunk. All chunks in a retrieval
+    # call share the same label (stamped by _attach_grounding), so chunks[0]
+    # is representative. Fall back to "unknown" if the field is missing
+    # (e.g., a caller that bypasses retrieval).
+    grounding = chunks[0].get("grounding", "unknown") if chunks else "unknown"
+    return f"""{header}GROUNDING: {grounding}
+
+CONTEXT:
 {context}
 
 QUESTION: {question}"""
@@ -401,7 +427,7 @@ def generate_answer(question: str, chunks: List[Dict[str, Any]], history: List[D
 
 def stream_answer(question: str, chunks: List[Dict[str, Any]], history: List[Dict[str, str]] = None, jurisdiction: str = ""):
     if not chunks:
-        chunks = [{"page": 1, "section": "No Context", "document": "No Context", "text": "No context."}]
+        chunks = [{"page": 1, "section": "No Context", "document": "No Context", "text": "No context.", "grounding": "weak"}]
 
     sources_data = [
         {"page": c["page"], "section": c["section"], "document": c["document"], "source_url": c.get("source_url", ""), "authority_tier": c.get("authority_tier", ""), "snippet": c.get("text", "")[:250].strip()}
