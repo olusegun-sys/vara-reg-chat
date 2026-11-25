@@ -113,7 +113,13 @@ def chat(req: ChatRequest):
     if not search_query.strip():
         search_query = req.question
 
-    chunks = retrieval.retrieve_chunks(search_query, req.jurisdiction)
+    # CHANGED 2026-11-25: pass the raw question so the grounding check
+    # uses the user's actual ask, not the rewritten query. The rewritten
+    # query is what we retrieve with; the raw question is what we check
+    # containment against.
+    chunks = retrieval.retrieve_chunks(
+        search_query, req.jurisdiction, raw_question=req.question
+    )
 
     should_fallback, reason = _needs_web_fallback(req.question, chunks)
     if should_fallback:
@@ -176,16 +182,16 @@ def chat_stream(req: ChatRequest):
     if not search_query.strip():
         search_query = req.question
 
-    chunks = retrieval.retrieve_chunks(search_query, req.jurisdiction)
+    # CHANGED 2026-11-25: pass the raw question for the grounding check.
+    chunks = retrieval.retrieve_chunks(
+        search_query, req.jurisdiction, raw_question=req.question
+    )
 
     should_fallback, reason = _needs_web_fallback(req.question, chunks)
     if should_fallback:
         print(f"[fallback:pre] {reason}. Triggering web search.")
         chunks, _ = _apply_web_fallback(req.question)
 
-    # Note: llm.stream_answer now handles the Critic agent internally.
-    # StreamingResponse below carries SSE headers so the connection survives
-    # the multi-second silent window while generate_answer + critic_check run.
     return StreamingResponse(
         llm.stream_answer(req.question, chunks, req.history, req.jurisdiction),
         media_type="text/event-stream",
@@ -210,7 +216,10 @@ def debug_search(q: str, jurisdiction: str = "AE-Dubai"):
         if not search_query.strip():
             search_query = q
 
-        chunks = retrieval.retrieve_chunks(search_query, jurisdiction)
+        # CHANGED 2026-11-25: pass the raw question for the grounding check.
+        chunks = retrieval.retrieve_chunks(
+            search_query, jurisdiction, raw_question=q
+        )
 
         should_fallback, reason = _needs_web_fallback(q, chunks)
         internal_chunks = chunks
@@ -238,6 +247,7 @@ def debug_search(q: str, jurisdiction: str = "AE-Dubai"):
                     "source_url": c.get("source_url", ""),
                     "authority_tier": c.get("authority_tier", ""),
                     "distance": c.get("distance", 0),
+                    "grounding": c.get("grounding", ""),
                     "text_snippet": c["text"][:150] + "..."
                 }
                 for c in chunks

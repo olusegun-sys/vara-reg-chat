@@ -57,36 +57,31 @@ def is_low_confidence(chunks: List[Dict[str, Any]]) -> bool:
     return _best_distance(chunks) > LOW_CONFIDENCE_DISTANCE
 
 
-# NEW: content-containment check — the Karpathy honesty fix. Pure function.
-# NEW: why this exists: FAISS similarity can be high while the answer text is
-# NEW: absent, letting the model confabulate from memory. This helper
-# NEW: distinguishes "the corpus contains the answer" from "the corpus is
-# NEW: topically similar" by requiring a distinctive match from the question.
-# NEW:
-# NEW: two-tier article check (2026-11-22):
-# NEW:   Tier 1: chunk `section` field == "Article N" (uses the labels from
-# NEW:           _fix_sections.py, IF they survived the commit).
-# NEW:   Tier 2: chunk text (first 100 chars) starts with "article N" (fallback
-# NEW:           for chunks without section labels).
-# NEW: Both tiers are required because we can't guarantee the section labels
-# NEW: made it into the deployed metadata; the fallback handles both cases.
-# NEW:
-# NEW: short numbers (1-3 digits) without an "Article" context are IGNORED,
-# NEW: because they appear coincidentally (page numbers, cross-references).
-# NEW: 4+ digit numbers (years, amounts) are still checked directly.
-def _contains_query_subject(chunks: List[Dict[str, Any]], question: str) -> bool:
-    if not chunks or not question:
+# CHANGED 2026-11-25: content-containment check now accepts both the raw
+# question (what the user actually asked) and the rewritten query (what was
+# used to retrieve). The article branch runs on the RAW question, because
+# "Article 13" in the user's question is the signal we care about. The
+# rewriter appends article numbers from the hint map (Article 25, Article 26,
+# Article 6), which are NOT in the user's question and should not trigger
+# the article branch. The keyword branch runs on BOTH queries, because the
+# chunks were retrieved with the rewritten query and may contain its keywords
+# (which are legitimate signals of grounding) even if the raw question's
+# keywords don't match.
+def _contains_query_subject(
+    chunks: List[Dict[str, Any]],
+    raw_question: str,
+    rewritten_query: str = None,
+) -> bool:
+    if not chunks or not raw_question:
         return False
 
     stopwords = {
-        # common English
         "what", "are", "the", "for", "is", "a", "an", "and", "or", "in", "on",
         "of", "to", "with", "by", "from", "how", "does", "do", "can", "could",
         "should", "would", "will", "this", "that", "these", "those", "was",
         "were", "been", "being", "have", "has", "had", "having", "about",
         "under", "over", "into", "via", "per", "which", "who", "whom", "whose",
         "where", "when", "why", "than", "then", "there", "their", "they",
-        # generic legal terms — appear in every chunk, no discriminating power
         "article", "articles", "regulation", "regulations", "regulatory",
         "require", "requires", "required", "requirement", "requirements",
         "law", "laws", "legal", "legally", "act", "acts", "section", "sections",
@@ -94,77 +89,92 @@ def _contains_query_subject(chunks: List[Dict[str, Any]], question: str) -> bool
         "obligation", "obligations", "eu", "ai", "eua", "ais",
     }
 
-    # --- Check 1: article-specific queries ----------------------------------
-    # If the question names "Article N", the ONLY reliable signal is whether a
-    # chunk is actually ABOUT Article N (not just a cross-reference to "Article
-    # N of Regulation 2016/679" embedded in some other article's text).
-    article_match = re.search(r'\bArticle\s+(\d+[a-zA-Z]?)\b', question, re.IGNORECASE)
+    # --- Article branch: run on the RAW question only ---------------------
+    # If the user asked about "Article 13", check the section field and
+    # heading for Article 13. If the user asked about "Article 99" and no
+    # chunk is about Article 99, we don't return False yet — the keyword
+    # branch may still match on other terms. (But for a pure "Article N"
+    # question with no other keywords, it'll fall through and return False,
+    # which is the correct "ungrounded" result for Article 99.)
+    article_match = re.search(r'\bArticle\s+(\d+[a-zA-Z]?)\b', raw_question, re.IGNORECASE)
     if article_match:
         target_num = article_match.group(1)
         target_section = "Article " + target_num
         target_phrase_prefix = ("article " + target_num).lower()
 
-        # Tier 1: check the section field (from _fix_sections.py labels).
         for c in chunks:
             if (c.get("section") or "").strip() == target_section:
                 return True
 
-        # Tier 2: check if the chunk's text STARTS with the article heading.
-        # This catches chunks where the heading is at the top but the section
-        # field wasn't relabeled.
         for c in chunks:
             head = (c.get("text") or "")[:100].lower().lstrip()
             if head.startswith(target_phrase_prefix):
                 return True
+        # Article wasn't found by section/heading. Fall through to keyword
+        # check. For "Article 99", the keyword branch will also fail (no
+        # chunk contains "99" as a distinctive 4+ digit number, and the
+        # other keywords are stopwords). For "Article 13", the chunk may
+        # contain "instructions" or "transparency" — those keywords will
+        # match, and the chunk is a valid grounding source even if the
+        # article heading was split mid-chunk.
 
-        # No chunk is actually about this article.
-        return False
+    # --- Numeric branch: 4+ digit numbers, run on both queries ------------
+    for q in (raw_question, rewritten_query):
+        if not q:
+            continue
+        for num in re.findall(r'\b\d+\b', q):
+            if len(num) >= 4:
+                for c in chunks:
+                    if num in (c.get("text") or "").lower():
+                        return True
 
-    # --- Check 2: 4+ digit numbers (years, amounts) -------------------------
-    # 4-digit numbers are distinctive enough to match directly. 1-3 digit
-    # numbers are too coincidental to trust without context.
-    numbers = re.findall(r'\b\d+\b', question)
-    for num in numbers:
-        if len(num) >= 4:
-            for c in chunks:
-                if num in (c.get("text") or "").lower():
+    # --- Keyword branch: run on BOTH queries ------------------------------
+    for q in (raw_question, rewritten_query):
+        if not q:
+            continue
+        words = re.findall(r'\w+', q.lower())
+        keywords = [w for w in words if len(w) > 3 and w not in stopwords]
+
+        if not keywords:
+            continue
+
+        for c in chunks:
+            text = (c.get("text") or "").lower()
+            for kw in keywords:
+                if kw in text:
                     return True
 
-    # --- Check 3: keyword containment ---------------------------------------
-    words = re.findall(r'\w+', question.lower())
-    keywords = [w for w in words if len(w) > 3 and w not in stopwords]
-
-    if not keywords:
-        return False
-
-    # 3a: single-keyword containment.
-    for c in chunks:
-        text = (c.get("text") or "").lower()
-        for kw in keywords:
-            if kw in text:
-                return True
-
-    # 3b: two-keyword phrase containment.
-    for i in range(len(keywords) - 1):
-        phrase = keywords[i] + " " + keywords[i + 1]
-        for c in chunks:
-            if phrase in (c.get("text") or "").lower():
-                return True
+        for i in range(len(keywords) - 1):
+            phrase = keywords[i] + " " + keywords[i + 1]
+            for c in chunks:
+                if phrase in (c.get("text") or "").lower():
+                    return True
 
     return False
 
 
-# NEW: grounding classifier — pure function, no I/O, no dependencies beyond re.
-def _classify_grounding(chunks: List[Dict[str, Any]], question: str) -> str:
+# CHANGED 2026-11-25: accepts rewritten_query so it can pass it through to
+# _contains_query_subject. The raw question is the user's actual ask; the
+# rewritten query is what was used for retrieval. Both are relevant to
+# grounding: the raw question tells us what the user asked, the rewritten
+# query tells us what the retrieval was optimized for.
+def _classify_grounding(
+    chunks: List[Dict[str, Any]],
+    raw_question: str,
+    rewritten_query: str = None,
+) -> str:
     if not chunks:
         return "weak"
 
-    if not _contains_query_subject(chunks, question):
+    if not _contains_query_subject(chunks, raw_question, rewritten_query):
         return "ungrounded"
 
     best = _best_distance(chunks)
 
-    question_words = {w for w in re.findall(r'\w+', question.lower()) if len(w) > 3}
+    # Lexical overlap check uses the raw question's words (what the user
+    # asked), not the rewritten query's, so "strong" reflects the user's
+    # actual vocabulary.
+    question_words = {w for w in re.findall(r'\w+', raw_question.lower()) if len(w) > 3}
     overlap_found = False
     if question_words:
         for c in chunks:
@@ -180,11 +190,15 @@ def _classify_grounding(chunks: List[Dict[str, Any]], question: str) -> str:
     return "partial"
 
 
-# NEW: stamp the classification onto every chunk.
-def _attach_grounding(chunks: List[Dict[str, Any]], question: str) -> List[Dict[str, Any]]:
+# CHANGED 2026-11-25: accepts rewritten_query, passes it through.
+def _attach_grounding(
+    chunks: List[Dict[str, Any]],
+    raw_question: str,
+    rewritten_query: str = None,
+) -> List[Dict[str, Any]]:
     if not chunks:
         return chunks
-    label = _classify_grounding(chunks, question)
+    label = _classify_grounding(chunks, raw_question, rewritten_query)
     for c in chunks:
         c["grounding"] = label
     return chunks
@@ -342,11 +356,26 @@ def _reciprocal_rank_fusion(list1: List[Dict[str, Any]], list2: List[Dict[str, A
     return [chunk_map[idx] for idx in sorted_indices]
 
 
-def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List[Dict[str, Any]]:
+# CHANGED 2026-11-25: added `raw_question` parameter. The live pipeline
+# calls this with the REWRITTEN query as `question` and the RAW user
+# question as `raw_question`. Backward compatible: if raw_question is None,
+# it defaults to `question` (the old behavior, where the retrieval query
+# and the grounding question were the same string).
+def retrieve_chunks(
+    question: str,
+    jurisdiction: str,
+    top_k: int = None,
+    raw_question: str = None,
+) -> List[Dict[str, Any]]:
     top_k = top_k or config.TOP_K_RESULTS
     index, _ = _load_index_and_metadata()
     if index.ntotal == 0:
         return []
+
+    # If raw_question isn't provided, use `question` for both. This keeps
+    # the old behavior for callers that haven't been updated yet.
+    if raw_question is None:
+        raw_question = question
 
     faiss_chunks = _search_faiss(question, jurisdiction, top_k)
     bm25_chunks = _search_bm25(question, jurisdiction, top_k)
@@ -371,7 +400,9 @@ def retrieve_chunks(question: str, jurisdiction: str, top_k: int = None) -> List
     chunks = chunks[:top_k]
 
     chunks = _attach_source_urls(chunks, jurisdiction)
-    return _attach_grounding(chunks, question)
+    # Pass both: raw_question for the content check, question (rewritten)
+    # for the keyword fallback. Both are used inside _contains_query_subject.
+    return _attach_grounding(chunks, raw_question, rewritten_query=question)
 
 
 def get_chunk_count() -> int:
@@ -382,8 +413,16 @@ def get_chunk_count() -> int:
         return 0
 
 
-# Test harness. No LLM calls, no Groq tokens. Cohere calls: 5 per run.
+# Test harness. Runs with `python -m app.services.retrieval` from backend/.
+# Mirrors the LIVE pipeline: raw question -> rewrite_query() -> retrieve_chunks()
+# -> grounding label. The live pipeline passes BOTH the rewritten query (for
+# retrieval) and the raw question (for the content check), exactly as this
+# harness does.
+#
+# Cost: 5 Cohere calls + 5 Groq calls (the rewriter fires for all 5 questions).
 if __name__ == "__main__":
+    from app.services.llm import rewrite_query
+
     test_cases = [
         ("A — VARA staking", "What are the staking requirements for virtual asset service providers under VARA?", "AE-Dubai", "strong"),
         ("B1 — Provider/Deployer", "We are a US company hosting a third-party hiring tool for EU customers. Are we a provider or a deployer under the EU AI Act?", "EU", "strong"),
@@ -392,25 +431,34 @@ if __name__ == "__main__":
         ("Unanswerable — Article 99", "What does Article 99 of the EU AI Act require?", "EU", "ungrounded"),
     ]
 
-    print("=== Grounding test harness ===")
-    print("(No LLM calls. 5 Cohere calls. Free to re-run.)")
+    print("=== Grounding test harness (full pipeline, mirrors live) ===")
+    print("(Cost: 5 Cohere calls + 5 Groq calls for the rewriter. ~1.5k Groq tokens.)")
     print()
 
     passed = 0
     failed = 0
     for label, question, jurisdiction, expected in test_cases:
         try:
-            chunks = retrieve_chunks(question, jurisdiction)
+            rewritten = rewrite_query(question, jurisdiction)
+            print(f"[harness] {label}")
+            print(f"  raw question: {question!r}")
+            print(f"  rewritten:    {rewritten!r}")
+
+            # Mirror the live pipeline: pass the rewritten query for retrieval,
+            # and the raw question for the content check.
+            chunks = retrieve_chunks(rewritten, jurisdiction, raw_question=question)
+
             actual = chunks[0].get("grounding") if chunks else "NO CHUNKS"
             status = "PASS" if actual == expected else "FAIL"
             if status == "PASS":
                 passed += 1
             else:
                 failed += 1
-            print(f"{status}: {label}")
+
             print(f"  expected: {expected}, actual: {actual}, chunks: {len(chunks)}")
             if chunks:
                 print(f"  top: {chunks[0].get('document', '?')} p.{chunks[0].get('page', '?')} section={chunks[0].get('section', '?')!r}")
+                print(f"  top chunk text (first 200 chars): {chunks[0].get('text', '')[:200]!r}")
             print()
         except Exception as e:
             failed += 1
